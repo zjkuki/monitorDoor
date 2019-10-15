@@ -45,7 +45,7 @@
     <application
         android:name="com.example.funsdkdemo.MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/logo"
+        android:icon="@drawable/xmjp_camera"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity

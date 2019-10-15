@@ -129,16 +129,18 @@
         android:textSize="18dp" />
 
 	<TextView
-		android:id="@+id/textTip"
-		android:layout_below="@id/devAddBtn"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:textSize="16dp"
-		android:layout_marginTop="10dp"
-		android:layout_marginBottom="10dp"
-		android:textColor="@color/demo_title"
-		android:text="@string/device_opt_add_tip"
-		android:padding="5dp"
+			android:id="@+id/textTip"
+			android:layout_below="@id/devAddBtn"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="#1F6577"
+			android:textSize="16dp"
+			android:layout_marginTop="10dp"
+			android:layout_marginBottom="0dp"
+			android:textColor="@color/white"
+			android:text="@string/device_opt_add_tip"
+			android:padding="5dp"
+			android:drawableLeft="@drawable/ic_youtube_searched_for_black_24dp"
 		/>
 
 	<com.janady.view.PullToRefreshFrameLayout

@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +27,15 @@ import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.JTabSegmentFragment;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.database.model.Bluetooth;
+import com.janady.database.model.Camera;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
+import com.janady.device.DoorEditFragment;
+import com.janady.device.DoorListFragment;
+import com.janady.device.RemoteEditFragment;
+import com.janady.device.RemoteListFragment;
 import com.janady.manager.DataManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ExpandAdapter;
@@ -47,6 +53,8 @@ import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
 
 public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener {
     QMUITopBarLayout mTopBar;
@@ -107,14 +115,32 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mRecyclerView.setAdapter(mItemAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
+        mRecyclerView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                menu.setHeaderTitle("操作");
+                menu.add(0, 0, 0, "删除");
+            }
+        });
+        mRecyclerView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mRecyclerView.showContextMenu();
+                return true;
+            }
+        });
     }
 
-    public List<MainItemDescription> createData() {
+    /*public List<MainItemDescription> createData() {
+        ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
         List<MainItemDescription> res = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            MainItemDescription items = new MainItemDescription(CameraListFragment.class, "camera-"+i, R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
-            res.add(items);
+        if(camlists.size()>0) {
+            for (int i = 0; i < camlists.size(); i++) {
+                MainItemDescription items = new MainItemDescription(CameraListFragment.class, "camera-" + i, R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
+                res.add(items);
+            }
         }
+
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> items = new ArrayList<>();
         if(blists.size()>0) {
@@ -126,24 +152,55 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             bleDescription.setList(items);
             res.add(bleDescription);
         }
+
         for (int i = 0; i < 2; i++) {
-            MainItemDescription remoteDescription = new MainItemDescription(BluetoothListFragment.class, "remote-"+i, R.drawable.ic_remote, MainItemDescription.DeviceType.REMOTE);
+            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, "remote-"+i, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
             List<Object> remote_items = new ArrayList<>();
             for (int j =0; j < 3; j++) {
-                ItemDescription itemDescription = new ItemDescription(BluetoothEditFragment.class, "remote-"+i, R.drawable.ic_remote);
+                ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, "remote-"+i, R.drawable.ic_remote_3);
+                remote_items.add(itemDescription);
+            }
+            remoteDescription.setList(remote_items);
+            res.add(remoteDescription);
+        }
+
+        for (int i = 0; i < 2; i++) {
+            MainItemDescription remoteDescription = new MainItemDescription(DoorListFragment.class, "door-"+i, R.drawable.ic_room2, MainItemDescription.DeviceType.REMOTE);
+            List<Object> remote_items = new ArrayList<>();
+            for (int j =0; j < 3; j++) {
+                ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, "door-"+i, R.drawable.ic_room2);
                 remote_items.add(itemDescription);
             }
             remoteDescription.setList(remote_items);
             res.add(remoteDescription);
         }
         return res;
-    }
+    }*/
 
     @Override
     public void onItemClick(ItemDescription itemDescription) {
         Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
         try {
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
+
+            if (fragment instanceof DeviceCameraFragment && itemDescription.getItem() instanceof Camera) {
+                Camera citem = (Camera)itemDescription.getItem();
+                FunDevice mFunDevice = null;
+
+                showWaitDialog();
+                // 虚拟一个设备, 只需要序列号和设备类型即可添加
+                mFunDevice = new FunDevice();
+                mFunDevice.devSn = citem.sn;
+                mFunDevice.devName = citem.name;
+                mFunDevice.devType = citem.type;
+                mFunDevice.loginName = citem.loginName;
+                mFunDevice.loginPsw = citem.loginPsw;
+                // 添加设备之前都必须先登录一下,以防设备密码错误,也是校验其合法性
+                FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+
+                ((DeviceCameraFragment)fragment).setFunDevice(mFunDevice);
+            }
+
             startFragment(fragment);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -162,9 +219,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         } catch (java.lang.InstantiationException e) {
             e.printStackTrace();
         }
-        if (fragment instanceof DeviceCameraFragment && mainItemDescription.getDevice() instanceof FunDevice) {
+
+        /*if (fragment instanceof DeviceCameraFragment && mainItemDescription.getDevice() instanceof FunDevice) {
             ((DeviceCameraFragment)fragment).setFunDevice((FunDevice) mainItemDescription.getDevice());
-        }
+        }*/
 
         if (fragment != null) startFragment(fragment);
     }

@@ -1,6 +1,7 @@
 package com.janady.device;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
@@ -9,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.example.funsdkdemo.R;
 import com.janady.setup.JBaseFragment;
@@ -26,15 +30,49 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
     private Button okBtn;
     private EditText mEditWifiSSID = null;
     private EditText mEditWifiPasswd = null;
+    private RadioGroup rbgWifiDeviceGroup = null;
+    private RadioButton rbWifiCam = null;
+    private RadioButton rbWifiRemoter = null;
+    private TextView tvWifiReadMe = null;
+    private TextView tvTips = null;
+
+    private int mWifiDevice = 0;  //0-摄像头 1-控制板
+
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.jconf_wifi, null);
         mTopBar = root.findViewById(R.id.topbar);
         mEditWifiSSID = root.findViewById(R.id.editWifiSSID);
         mEditWifiPasswd = root.findViewById(R.id.editWifiPasswd);
+        rbgWifiDeviceGroup = root.findViewById(R.id.rbg_wifiDeviceGroup);
+
+        rbWifiCam = root.findViewById(R.id.rbWifiCam);
+        rbWifiCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWifiDevice = 0;
+            }
+        });
+
+        rbWifiRemoter = root.findViewById(R.id.rbWifiRemoter);
+        rbWifiRemoter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mWifiDevice = 1;
+            }
+        });
+
+        tvWifiReadMe = root.findViewById(R.id.tvWifiReadMe);
+
+        tvTips = root.findViewById(R.id.tvTips);
+        tvTips.setVisibility(View.GONE);
+
         String currSSID = getConnectWifiSSID();
         mEditWifiSSID.setText(currSSID);
         mEditWifiPasswd.setText(FunWifiPassword.getInstance().getPassword(currSSID));
+
+        tvWifiReadMe.setText("*请选择较强信号的WIFI，正确填写WIFI密码，可快速让设备联网；");
+
         okBtn = root.findViewById(R.id.ok_button);
         okBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,6 +187,11 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             showToast(String.format(
                     getResources().getString(R.string.device_opt_set_wifi_success),
                     funDevice.getDevSn()));
+            Intent intent = new Intent();
+            intent.putExtra("DeviceTypsSpinnerNo",0);
+            intent.setClass(getContext(), DeviceAddByUser.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
     }
 }

@@ -18,7 +18,7 @@
             android:layout_width="200dp"
             android:layout_height="140dp"
             android:paddingBottom="80dp"
-            android:src="@drawable/logo"
+            android:src="@drawable/xmjp_camera"
             android:scaleType="fitCenter"
             android:layout_centerInParent="true"
             />

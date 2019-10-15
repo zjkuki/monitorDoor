@@ -1,6 +1,7 @@
 package com.janady.base;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -9,12 +10,19 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.R;
+import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.DeviceAddByUser;
+import com.janady.device.DeviceCameraFragment;
+import com.janady.device.DeviceLanFragment;
+import com.janady.device.RemoteEditFragment;
+import com.janady.device.WifiConfigFragment;
 import com.janady.manager.DataManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.setup.JBaseFragment;
@@ -88,8 +96,8 @@ public class JTabSegmentFragment extends JBaseFragment {
     private void initTabAndPager() {
         mContentViewPager.setAdapter(mPagerAdapter);
         mContentViewPager.setCurrentItem(mDestPage.getPosition(), false);
-        mTabSegment.addTab(new QMUITabSegment.Tab("选择设备类型"));
-        //mTabSegment.addTab(new QMUITabSegment.Tab("附近设备"));
+        mTabSegment.addTab(new QMUITabSegment.Tab("设备类型"));
+        mTabSegment.addTab(new QMUITabSegment.Tab("WIFI配置"));
         mTabSegment.setupWithViewPager(mContentViewPager, false);
         mTabSegment.setMode(QMUITabSegment.MODE_FIXED);
         mTabSegment.setHasIndicator(true);
@@ -142,13 +150,25 @@ public class JTabSegmentFragment extends JBaseFragment {
                     section.addItemView(normalItem, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if(item.getDemoClass() == BluetoothEditFragment.class){
-                                    Intent intent = new Intent();
-                                    intent.putExtra("DeviceTypsSpinnerNo",1);
-                                    intent.setClass(getContext(), DeviceAddByUser.class);
+                            int dts = 1;
+                            Intent intent = new Intent();
+
+                            if(item.getDemoClass() == DeviceCameraFragment.class) {
+                                intent.putExtra("DeviceTypsSpinnerNo", 0);
+                            }
+
+                            if(item.getDemoClass() == BluetoothEditFragment.class) {
+                                intent.putExtra("DeviceTypsSpinnerNo", 1);
+                            }
+
+                            if(item.getDemoClass() == RemoteEditFragment.class) {
+                                intent.putExtra("DeviceTypsSpinnerNo", 2);
+                            }
+
+                            intent.setClass(getContext(), DeviceAddByUser.class);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
-                            }else {
+                            /*}else {
                                 JBaseFragment fragment = null;
                                 try {
                                     fragment = item.getDemoClass().newInstance();
@@ -158,15 +178,29 @@ public class JTabSegmentFragment extends JBaseFragment {
                                 } catch (java.lang.InstantiationException e) {
                                     e.printStackTrace();
                                 }
-                            }
+                            }*/
                         }
                     });
                 }
 
                 section.addTo(mGroupListView);
             } else if (page == ContentPage.Item2) {
-                ImageView tv = view.findViewById(R.id.showHint);
-                tv.setVisibility(View.VISIBLE);
+                view = LayoutInflater.from(getActivity()).inflate(R.layout.jadd_device_inpage, null);
+                
+                Button fastBtn = view.findViewById(R.id.fast_config_button);
+                fastBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startFragment(new WifiConfigFragment());
+                    }
+                });
+                Button lanBtn = view.findViewById(R.id.lan_device);
+                lanBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startFragment(new DeviceLanFragment());
+                    }
+                });
             }
             mPageMap.put(page, view);
         }

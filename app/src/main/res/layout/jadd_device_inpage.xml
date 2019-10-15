@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_gray"
-    android:id="@+id/jadd_device">
+    android:id="@+id/jadd_device_inpage">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/qmui_topbar_height"
+        android:layout_marginTop="0dp"
         android:background="@color/qmui_config_color_background"
         android:fitsSystemWindows="true">
         <LinearLayout
@@ -65,16 +65,4 @@
         </LinearLayout>
     </LinearLayout>
     </ScrollView>
-    <com.qmuiteam.qmui.widget.QMUITopBarLayout
-        android:id="@+id/topbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"/>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
-</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>
+</RelativeLayout>

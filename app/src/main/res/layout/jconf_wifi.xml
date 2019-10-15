@@ -13,17 +13,17 @@
         android:fitsSystemWindows="true">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="106dp"
+            android:layout_width="403dp"
+            android:layout_height="488dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:background="@drawable/layout_border"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" >
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/userLoginUserNameIcon"
@@ -34,6 +34,7 @@
                 android:padding="2dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_wifi" />
+
             <EditText
                 android:id="@+id/editWifiSSID"
                 android:layout_width="match_parent"
@@ -52,19 +53,19 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_alignLeft="@id/userLoginUserNameIcon"
                 android:layout_below="@id/userLoginUserNameIcon"
+                android:layout_alignLeft="@id/userLoginUserNameIcon"
                 android:layout_marginLeft="36dp"
-                android:layout_marginRight="32dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginRight="32dp"
                 android:background="@color/app_color_blue" />
 
             <ImageView
                 android:id="@+id/userLoginPasswdIcon"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:layout_alignLeft="@id/userLoginUserNameIcon"
                 android:layout_below="@id/userLoginUserNameIcon"
+                android:layout_alignLeft="@id/userLoginUserNameIcon"
                 android:layout_marginTop="16dp"
                 android:padding="2dp"
                 android:scaleType="fitXY"
@@ -85,6 +86,87 @@
                 android:textColor="#ff101010"
                 android:textColorHint="#ffe0e0e0"
                 android:textSize="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/userLoginPasswdIcon"
+                android:layout_alignLeft="@id/userLoginPasswdIcon"
+                android:layout_marginLeft="36dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="32dp"
+                android:background="@color/app_color_blue" />
+
+            <ImageView
+                android:id="@+id/wifiDevicesIcon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_below="@id/userLoginPasswdIcon"
+                android:layout_alignLeft="@id/userLoginPasswdIcon"
+                android:layout_marginTop="16dp"
+                android:padding="2dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_remote_2" />
+
+            <RadioGroup
+                android:id="@+id/rbg_wifiDeviceGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editWifiPasswd"
+                android:layout_marginTop="16dp"
+                android:layout_toRightOf="@+id/wifiDevicesIcon"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editWifiPasswd">
+
+                <RadioButton
+                    android:id="@+id/rbWifiCam"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_toRightOf="@id/wifiDevicesIcon"
+                    android:background="#00000000"
+                    android:checked="true"
+                    android:text="摄像头"
+                    android:textColor="#ff101010"
+                    android:textColorHint="#ffe0e0e0"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/rbWifiRemoter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_toRightOf="@id/wifiDevicesIcon"
+                    android:background="#00000000"
+                    android:checked="false"
+                    android:text="控制板"
+                    android:textColor="#ff101010"
+                    android:textColorHint="#ffe0e0e0"
+                    android:textSize="18sp" />
+            </RadioGroup>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/rbg_wifiDeviceGroup"
+                android:layout_alignLeft="@id/tvWifiReadMe"
+                android:layout_marginTop="18dp"
+                android:background="@color/app_color_blue" />
+            <TextView
+                android:id="@+id/tvWifiReadMe"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/rbg_wifiDeviceGroup"
+                android:layout_margin="15dp"
+                android:padding="20px"
+                android:text=""
+                android:textSize="16sp"
+                android:layout_gravity="center"/>
+
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,11 +176,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="connect tips!"
-                android:layout_gravity="center"/>
+                android:id="@+id/tvTips"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10px"
+                android:layout_marginBottom="10px"
+                android:text=""
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                />
+
             <com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton
                 android:id="@+id/ok_button"
                 style="@style/QMUI.RoundButton"

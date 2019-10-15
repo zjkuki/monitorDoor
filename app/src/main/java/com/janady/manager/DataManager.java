@@ -75,15 +75,26 @@ public class DataManager {
     }
     public List<MainItemDescription> getDescriptions() {
         List<MainItemDescription> list = new ArrayList<>();
-        List<FunDevice> funDevices = FunSupport.getInstance().getDeviceList();
+        /*List<FunDevice> funDevices = FunSupport.getInstance().getDeviceList();
         for (FunDevice device : funDevices) {
             MainItemDescription mainDescription = new MainItemDescription(DeviceCameraFragment.class, device.devName, R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
             mainDescription.setDevice(device);
             list.add(mainDescription);
+        }*/
+        MainItemDescription camDescription = new MainItemDescription(BluetoothOperatorFragment.class, "摄像设备", R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
+        ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
+        List<Object> camitems = new ArrayList<>();
+        for (Camera camera : camlists) {
+            ItemDescription itemDescription = new ItemDescription(DeviceCameraFragment.class, camera.sceneName, R.drawable.icon_check);
+            itemDescription.setItem(camera);
+            camitems.add(itemDescription);
         }
+        camDescription.setList(camitems);
+        list.add(camDescription);
+
 
         //MainItemDescription bleDescription = new MainItemDescription(BluetoothLockFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, MainItemDescription.DeviceType.BLE);
-        MainItemDescription bleDescription = new MainItemDescription(BluetoothOperatorFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth_black_24dp, MainItemDescription.DeviceType.BLE);
+        MainItemDescription bleDescription = new MainItemDescription(BluetoothOperatorFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, MainItemDescription.DeviceType.BLE);
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {

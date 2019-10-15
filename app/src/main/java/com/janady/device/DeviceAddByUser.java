@@ -3,6 +3,7 @@ package com.janady.device;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,7 +34,10 @@ import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.janady.AppConstants;
+import com.janady.HomeActivity;
+import com.janady.MainActivity;
 import com.janady.database.model.Bluetooth;
+import com.janady.database.model.Camera;
 import com.janady.lkd.ClientManager;
 import com.janady.view.PullRefreshListView;
 import com.janady.view.PullToRefreshFrameLayout;
@@ -84,7 +88,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
     private boolean isBleScanning = false;
 
     private Bluetooth mBluetooth;
-    private ArrayList<Bluetooth> blists  =MyApplication.liteOrm.query(Bluetooth.class);
+    private Camera mCamera;
 
 	//private final int MESSAGE_DELAY_FINISH = 0x100;
 	private final int MESSAGE_REFRESH_DEVICE_STATUS = 0x100;
@@ -129,6 +133,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		setContentView(R.layout.jdevice_add_by_user);
 
 		mBleDevices = new ArrayList<SearchResult>();
+		mBluetooth = new Bluetooth();
+		mCamera = new Camera();
 
 
 		mTextTitle = (TextView)findViewById(R.id.textViewInTopLayout);
@@ -165,12 +171,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		//mSpinnerDevType.setSelection(0);
 		//mCurrDevType = mSupportDevTypes[0];
         mSpinnerDevType.setSelection(spinnerArrNo);
+
         mCurrDevType = mSupportDevTypes[spinnerArrNo];
 		mSpinnerDevType.setOnItemSelectedListener(this);
 		
 		mEditDevSN = (EditText)findViewById(R.id.editDeviceSN);
 		mEditSceneName = (EditText)findViewById(R.id.editSceneName);
-		mEditPassword = (EditText)findViewById(R.id.editDeviceSN);
+		mEditPassword = (EditText)findViewById(R.id.editDeviceLoginPassword);
 		mBtnDevAdd = (Button)findViewById(R.id.devAddBtn);
 		mBtnDevAdd.setOnClickListener(this);
 		
@@ -181,8 +188,6 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		mListViewDev = mRefreshLayout.getPullToRefreshListView();
 		mAdapterDev = new ListAdapterSimpleFunDevice(this, mCurrDevType);
-
-		mBluetooth = new Bluetooth();
 
 		mAdapterDev.setOnClickListener(new ListAdapterSimpleFunDevice.OnClickListener() {
 			@Override
@@ -195,11 +200,18 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 			@Override
 			public void OnClickedFun(FunDevice funDevice) {
+				mFunDevice = funDevice;
 				mEditDevSN.setText(funDevice.devSn);
 				//mEditSceneName.setText();
 				Log.d("DeviceAddByUser", "OnClickedFun: \ndevLoginName:"+funDevice.loginName
 						+"\ndevLoginPsw:"+funDevice.loginPsw
-						+"\nID:"+funDevice.getId());
+						+"\nID:"+funDevice.getId()
+						+"\nSerialNo:"+funDevice.getSerialNo()
+						+"\nSN:"+funDevice.getDevSn()
+						+"\nName:"+funDevice.getDevName()
+						+"\nIP:"+funDevice.getDevIP()
+						+"\nMac:"+funDevice.getDevMac()
+						+"\nDevType:"+funDevice.getDevType());
 			}
 		});
 
@@ -222,6 +234,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		mTextTitle.setText(R.string.guide_module_title_device_add);
 
 
+		if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
+			mEditPassword.setVisibility(View.VISIBLE);
+		}else{
+			mEditPassword.setVisibility(View.GONE);
+		}
+
+
 		// 设置登录方式为互联网方式
 		//FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
 		FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
@@ -242,7 +261,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
+		//super.onDestroy();
 		// 注销设备事件监听
 		FunSupport.getInstance().removeOnFunDeviceListener(this);
 		
@@ -279,7 +298,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			break;
 		case R.id.devAddBtn:
 			{
-				if(mEditDevSN.getText().equals("") || mEditSceneName.getText().equals("")){
+				if(mEditDevSN.getText().toString().equals("") || mEditSceneName.getText().toString().equals("")){
 					alertDialog("序列号或场景名不能为空！", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -291,28 +310,60 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							return;
 						}
 					});
-				}
+				}else {
 
-				//requestDeviceLogin();
-				if(mCurrDevType==FunDevType.EE_DEV_BLUETOOTH){
-					Bluetooth bluetooth = null;
-					mBluetooth.mac = mEditDevSN.getText().toString();
-					mBluetooth.name = mEditSceneName.getText().toString();
-					mBluetooth.password = mEditPassword.getText().toString();
-					List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, mBluetooth.mac));
-					if (bles != null && bles.size() > 0) {
-						bluetooth = bles.get(0);
-						bluetooth.name = mBluetooth.name;
-						bluetooth.password = mBluetooth.password;
+					//requestDeviceLogin();
+
+					if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
+						Bluetooth bluetooth = null;
+						mBluetooth.mac = mEditDevSN.getText().toString();
+						mBluetooth.name = mEditSceneName.getText().toString();
+						mBluetooth.password = mEditPassword.getText().toString();
+						List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, mBluetooth.mac));
+						if (bles != null && bles.size() > 0) {
+							bluetooth = bles.get(0);
+							bluetooth.name = mBluetooth.name;
+							bluetooth.password = mBluetooth.password;
+						} else {
+							bluetooth = mBluetooth;
+						}
+						MyApplication.liteOrm.save(bluetooth);
+
+
 					} else {
-						bluetooth = mBluetooth;
+						List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
+						if (cams != null && cams.size() > 0) {
+							mCamera = cams.get(0);
+							mCamera.devId = mFunDevice.getId();
+							mCamera.devIp = mFunDevice.getDevIP();
+							mCamera.mac = mFunDevice.getDevMac();
+							mCamera.name = mFunDevice.getDevName();
+							mCamera.serialNo = mFunDevice.getSerialNo();
+							mCamera.type = mFunDevice.getDevType();
+							mCamera.sceneName = mEditSceneName.getText().toString();
+							mCamera.loginName = "admin";
+							mCamera.loginPsw = "";
+						} else {
+							mCamera.devId = mFunDevice.getId();
+							mCamera.devIp = mFunDevice.getDevIP();
+							mCamera.mac = mFunDevice.getDevMac();
+							mCamera.name = mFunDevice.getDevName();
+							mCamera.sn = mFunDevice.getDevSn();
+							mCamera.serialNo = mFunDevice.getSerialNo();
+							mCamera.type = mFunDevice.getDevType();
+							mCamera.sceneName = mEditSceneName.getText().toString();
+							mCamera.loginName = "admin";
+							mCamera.loginPsw = "";
+						}
+						MyApplication.liteOrm.save(mCamera);
 					}
-					MyApplication.liteOrm.save(bluetooth);
 
-				}else{
+					Intent intent = new Intent();
+					intent.setClass(this, HomeActivity.class);
+					startActivity(intent);
 
+					finish();
 				}
-
 			}
 			break;
 		case R.id.btnScanCode:
@@ -391,7 +442,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			mFunDevice = new FunDevice();
 			mFunDevice.devSn = devSN;
 			mFunDevice.devName = devSN;
-			mFunDevice.devType = mCurrDevType;
+			mFunDevice.devType = EE_DEV_BOUTIQUEROTOT;
 			mFunDevice.loginName = "admin";
 			mFunDevice.loginPsw = "";
 		}
@@ -686,8 +737,6 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	private void refreshLanDeviceList() {
 		hideWaitDialog();
-
-		hideWaitDialog();
 		mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
 		mRefreshLayout.showState(AppConstants.LIST);
 
@@ -727,7 +776,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
             mTextTip.setText("停止扫描设备....");
             isBleScanning = true;
             mRefreshLayout.showState(AppConstants.LIST);
-            BluetoothLog.w("正在搜索蓝牙设备");
+            BluetoothLog.w("正在搜索设备");
             //toolbar.setTitle(R.string.string_refreshing);
         }
 

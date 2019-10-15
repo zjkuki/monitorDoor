@@ -9,6 +9,12 @@ import com.example.funsdkdemo.R;
 import com.janady.RoundRect;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
+import com.janady.database.model.Bluetooth;
+import com.janady.device.BluetoothEditFragment;
+import com.janady.device.BluetoothListFragment;
+import com.janady.device.BluetoothOperatorFragment;
+import com.janady.device.CameraListFragment;
+import com.janady.device.DeviceCameraFragment;
 
 import java.util.List;
 
@@ -30,7 +36,15 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         holder.getTextView(R.id.name).setText(item.getName());
 
         RoundRect roundRect = new RoundRect(100,100,10);
-        Bitmap photo = roundRect.toRoundRect(context,R.drawable.btlocker2);
+        Bitmap photo = null;
+        if(item.getDemoClass()== BluetoothOperatorFragment.class) {
+            photo = roundRect.toRoundRect(context, R.drawable.btlocker2);
+        }
+
+        if(item.getDemoClass()== DeviceCameraFragment.class){
+            photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera);
+        }
+
         holder.getImageView(R.id.img).setImageBitmap(photo);
     }
 }
