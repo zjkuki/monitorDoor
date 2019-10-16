@@ -1,67 +1,104 @@
 package com.janady.device;
 
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.janady.adapter.BluetoothDeviceAdapter;
+import com.janady.base.BaseRecyclerAdapter;
+import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.JBaseGroupedListFragment;
+import com.janady.base.JTabSegmentFragment;
 import com.janady.database.model.Bluetooth;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
+import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
+import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class BluetoothListFragment extends JBaseGroupedListFragment {
+public class BluetoothListFragment extends JBaseFragment {
+    QMUITopBarLayout mTopBar;
+    RecyclerView mRecyclerView;
+    QMUIPullRefreshLayout mPullRefreshLayout;
+    //    private BaseRecyclerAdapter<FunDevice> mItemAdapter;
+//    private List<FunDevice> mFunDevices;
+    private BaseRecyclerAdapter<Bluetooth> mItemAdapter;
+    private List<Bluetooth> mBluetooths;
     @Override
-    protected String title() {
-        return "蓝牙门禁";
-    }
+    protected View onCreateView() {
+        View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
 
-    @Override
-    protected void initGroupListView() {
-        int size = QMUIDisplayHelper.dp2px(getContext(), 20);
-        QMUIGroupListView.Section section = QMUIGroupListView.newSection(getContext())
-                .setTitle("已经添加的蓝牙设备")
-                .setLeftIconSize(size, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
-        for (final Bluetooth bluetooth : blists) {
-            QMUICommonListItemView itemView = mGroupListView.createItemView(
-                    ContextCompat.getDrawable(getContext(), R.drawable.ic_bluetooth_black_24dp),
-                    bluetooth.name,
-                    bluetooth.door == null ? "" : bluetooth.door.name,
-                    QMUICommonListItemView.HORIZONTAL,
-                    QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-            section.addItemView(itemView, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    BluetoothEditFragment fragment = new BluetoothEditFragment();
-                    fragment.setBluetooth(bluetooth);
-                    startFragment(fragment);
-                }
-            });
-        }
-        if (blists.size() > 0) section.addTo(mGroupListView);
-
-        QMUIGroupListView.Section action = QMUIGroupListView.newSection(getContext());
-        QMUICommonListItemView itemView = mGroupListView.createItemView(
-                ContextCompat.getDrawable(getContext(), R.drawable.socket_task_add_normal),
-                "新增蓝牙设备",
-                null,
-                QMUICommonListItemView.HORIZONTAL,
-                QMUICommonListItemView.ACCESSORY_TYPE_CHEVRON);
-        action.addItemView(itemView, new View.OnClickListener() {
+        mTopBar = rootView.findViewById(R.id.topbar);
+        mRecyclerView = rootView.findViewById(R.id.listview);
+        mPullRefreshLayout = rootView.findViewById(R.id.pull_to_refresh);
+        mPullRefreshLayout.setRefreshOffsetCalculator(new QMUICenterGravityRefreshOffsetCalculator());
+        mPullRefreshLayout.setOnPullListener(new QMUIPullRefreshLayout.OnPullListener() {
             @Override
-            public void onClick(View v) {
+            public void onMoveTarget(int offset) {
 
-                JBaseFragment fragment = new BluetoothEditFragment();
-                startFragment(fragment);
+            }
+
+            @Override
+            public void onMoveRefreshView(int offset) {
+
+            }
+
+            @Override
+            public void onRefresh() {
+                mPullRefreshLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //onDataLoaded();
+                        mPullRefreshLayout.finishRefresh();
+                    }
+                }, 2000);
             }
         });
-        action.addTo(mGroupListView);
+        initTopBar();
+        initRecyclerView();
+        return rootView;
+    }
+    private void initTopBar() {
+        mTopBar.setTitle("我的蓝牙设备");
+        mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //startFragment(new JTabSegmentFragment());
+                Intent intent = new Intent();
+                intent.putExtra("DeviceTypsSpinnerNo", 1);
+                intent.setClass(getContext(), DeviceAddByUser.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
+        //FunSupport.getInstance().registerOnFunDeviceOptListener(this);
+    }
+
+    private void initRecyclerView() {
+        mBluetooths = MyApplication.liteOrm.query(Bluetooth.class);
+        mItemAdapter = new BluetoothDeviceAdapter(getContext(), mBluetooths);
+        mItemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View itemView, int pos) {
+                BluetoothOperatorFragment bluetoothOperatorFragment = new BluetoothOperatorFragment();
+                bluetoothOperatorFragment.setBluetoothDevice(mBluetooths.get(pos));
+                startFragment(bluetoothOperatorFragment);
+            }
+        });
+        mRecyclerView.setAdapter(mItemAdapter);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+        mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
     }
 }

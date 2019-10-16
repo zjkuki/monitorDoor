@@ -18,7 +18,7 @@
         <shape>
             <solid android:color="@color/transparent" />
             <stroke android:width="0.5dp" 
-                    android:color="@color/bg_gray"  />
+                    android:color="@color/black"  />
             <corners 
                 android:radius="0dp"
                 />   

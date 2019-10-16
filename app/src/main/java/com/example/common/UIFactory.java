@@ -49,7 +49,7 @@ public class UIFactory {
 	/**
 	 * 创建二维码
 	 * @param text
-	 * @param format
+	 *
 	 * @param qrSize
 	 * @param color
 	 * @return

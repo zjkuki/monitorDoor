@@ -110,10 +110,12 @@ public class ActivityGuideDeviceRecordList extends ActivityDemo
 
         setContentView(R.layout.activity_device_record_list);
 
-        int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
+        //int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
+        String devSn = getIntent().getStringExtra("FUN_DEVICE_ID");
         boolean byFile = getIntent().getBooleanExtra("BY_FILE", true);
-        FunDevice funDevice = FunSupport.getInstance().findDeviceById(devId);
-        if (devId==0) {
+        //FunDevice funDevice = FunSupport.getInstance().findDeviceById(devId);
+        FunDevice funDevice = FunSupport.getInstance().findDeviceBySn(devSn);
+        if (devSn!="") {
             funDevice = FunSupport.getInstance().mCurrDevice;
         }
         if (null == funDevice) {

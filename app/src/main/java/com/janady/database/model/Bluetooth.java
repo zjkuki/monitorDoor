@@ -15,7 +15,8 @@ public class Bluetooth {
     @PrimaryKey(AssignType.AUTO_INCREMENT)
     @Column("_id") // 指定列名
     private int id;
-    public static final String COL_MAC = "address";
+
+    public static final String COL_MAC = "mac";
 
     @Column(COL_MAC) // 指定列名
     @Unique

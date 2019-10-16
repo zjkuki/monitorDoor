@@ -244,7 +244,6 @@
                 android:layout_alignBottom="@id/userPasswdIcon"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/userPasswdIcon"
-                android:layout_toLeftOf="@id/textGarde"
                 android:background="#00000000"
                 android:gravity="center_vertical"
                 android:hint="@string/user_forget_pwd_new_passw"

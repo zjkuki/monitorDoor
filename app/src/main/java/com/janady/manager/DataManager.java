@@ -48,7 +48,7 @@ public class DataManager {
         CategoryItemDescription camera = new CategoryItemDescription(CameraListFragment.class, "摄像机", R.drawable.ic_camera, funDevices.size());
         //CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, blists.size());
         //CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment.class, "远程控制", R.drawable.ic_remote, rlists.size());
-        CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth_black_24dp, blists.size());
+        CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, blists.size());
         CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment.class, "远程控制", R.drawable.ic_remote_3, rlists.size());
         CategoryItemDescription room = new CategoryItemDescription(DoorListFragment.class, "场景", R.drawable.ic_room2, dlists.size());
         list.add(camera);
@@ -64,7 +64,7 @@ public class DataManager {
         /*CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothEditFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, 0);
         CategoryItemDescription remote = new CategoryItemDescription(RemoteEditFragment.class, "远程控制", R.drawable.ic_remote, 0);
         CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "房间", R.drawable.ic_room, 0);*/
-        CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothEditFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth_black_24dp, 0);
+        CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothEditFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, 0);
         CategoryItemDescription remote = new CategoryItemDescription(RemoteEditFragment.class, "远程控制", R.drawable.ic_remote_3, 0);
         CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "场景", R.drawable.ic_room2, 0);
         list.add(camera);
@@ -81,7 +81,7 @@ public class DataManager {
             mainDescription.setDevice(device);
             list.add(mainDescription);
         }*/
-        MainItemDescription camDescription = new MainItemDescription(CameraListFragment.class, "摄像设备", R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
+        MainItemDescription camDescription = new MainItemDescription(CameraListFragment.class, "摄像机", R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
         ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
         List<Object> camitems = new ArrayList<>();
         for (Camera camera : camlists) {
@@ -98,7 +98,7 @@ public class DataManager {
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {
-            ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.name, R.drawable.icon_check);
+            ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
             itemDescription.setItem(bluetooth);
             bitems.add(itemDescription);
         }

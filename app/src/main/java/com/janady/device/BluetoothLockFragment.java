@@ -9,8 +9,11 @@ import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.janady.BleLockerCallBack;
 import com.janady.base.JTabSegmentFragment;
+import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
+import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.ClientManager;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -32,7 +35,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         mTopBar = root.findViewById(R.id.topbar);
         initTopBar();
         bleLocker = new BleLocker(MAC, false, BleService,
-                BleNotifitesCharacter, BleWriteCharacter, "123456",800, iBleLockerCallBack);
+                BleNotifitesCharacter, BleWriteCharacter, "123123",800, iBleLockerCallBack);
         root.findViewById(R.id.open).setOnClickListener(this);
         root.findViewById(R.id.close).setOnClickListener(this);
         root.findViewById(R.id.lock).setOnClickListener(this);
@@ -74,72 +77,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     }
 
 
-    BleLocker.IBleLockerListener iBleLockerCallBack = new BleLocker.IBleLockerListener() {
-        @Override
-        public void onPasswordChanged(int code, String rtvMsg) {
-            AppendText(getTime()+" 密码修改, onPasswordChanged：code="+code +" message=" + rtvMsg+"\n");
-        }
-
-        @Override
-        public void onOpened(int code, String rtvMsg) {
-            AppendText(getTime()+" 功能-开 onOpened：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-
-        @Override
-        public void onClosed(int code, String rtvMsg) {
-            AppendText(getTime()+" 功能-关, onClosed：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onStoped(int code, String rtvMsg) {
-            AppendText(getTime()+" 功能-停 onStoped：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-
-        @Override
-        public void onLock(int code, String rtvMsg) {
-            AppendText(getTime()+" 功能-锁 onLock：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onBleReadResponse(int code, String rtvMsg) {
-            AppendText(getTime()+" 读取返回信息 onReadResponse：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onBleWriteResponse(int code, String rtvMsg) {
-            //AppendText(getTime()+" 发送数据 onWriteResponse：code="+code +" message=" + rtvMsg +"\n");
-            //BluetoothLog.v(String.format("%s onWriteResponse", this.getClass().getSimpleName()));
-        }
-
-        @Override
-        public void onBleNotifyResponse(int code, String NotifyValue, String rtvMsg) {
-            AppendText(getTime()+" 设备消息 onBleNotifyResponse：code="+code +" NotifyValue="+ NotifyValue +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onConnected(int code, String rtvMsg) {
-            AppendText(getTime()+" 连接设备，onConnected：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onDisconnected(int code, String rtvMsg) {
-            AppendText(getTime()+" 断开连接，onDisconnected：code="+code +" message=" + rtvMsg +"\n");
-        }
-
-        @Override
-        public void onHeartBeatting(int code, String rtvMsg) {
-            AppendText(getTime()+" 发送心跳，onHeartBeatting：code="+code +" message=" + rtvMsg +"\n");
-        }
-    };
-    private void AppendText(String text) {
-        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
-    }
-    private String getTime() {
-        SimpleDateFormat sdf= new SimpleDateFormat("HH:mm:ss");
-        return sdf.format(new Date());
-    }
+    BleLocker.IBleLockerListener iBleLockerCallBack = new BleLockerCallBack(requireContext(),true);
 
     private boolean isScanning = false;
     @Override
@@ -194,12 +132,10 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             searchBtn.setText("停止扫描");
             isScanning = true;
 
-            AppendText("MainActivity.onSearchStarted");
-        }
+       }
 
         @Override
         public void onDeviceFounded(SearchResult device) {
-            AppendText("MainActivity.onDeviceFounded " + device.device.getAddress());
 //            if (!mDevices.contains(device)) {
 //                mDevices.add(device);
 //                mAdapter.setDataList(mDevices);
@@ -224,7 +160,6 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
         @Override
         public void onSearchStopped() {
-            AppendText("MainActivity.onSearchStopped");
 
             isScanning = true;
             searchBtn.setText("扫描设备");
@@ -233,7 +168,6 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
         @Override
         public void onSearchCanceled() {
-            AppendText("MainActivity.onSearchCanceled");
 
             searchBtn.setText("扫描设备");
             //toolbar.setTitle(R.string.devices);

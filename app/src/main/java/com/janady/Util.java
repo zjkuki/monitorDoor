@@ -180,4 +180,13 @@ public class Util {
             mode = 1;
         return mode;
     }
+
+    public static void sleep(int interval){
+        try {
+            Thread.sleep(300);
+
+        }catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

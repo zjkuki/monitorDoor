@@ -1,5 +1,6 @@
 package com.janady.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -81,6 +82,7 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
                 //确定按钮
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
+                    @SuppressLint("WrongConstant")
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         MyApplication.liteOrm.delete(mCurrCamDev);

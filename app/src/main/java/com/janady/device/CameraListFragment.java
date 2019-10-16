@@ -1,5 +1,6 @@
 package com.janady.device;
 
+import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -72,7 +73,13 @@ public class CameraListFragment extends JBaseFragment {
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startFragment(new JTabSegmentFragment());
+                //startFragment(new JTabSegmentFragment());
+                //startFragment(new JTabSegmentFragment());
+                Intent intent = new Intent();
+                intent.putExtra("DeviceTypsSpinnerNo", 0);
+                intent.setClass(getContext(), DeviceAddByUser.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
 

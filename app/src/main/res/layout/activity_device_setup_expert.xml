@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white" >
@@ -28,10 +29,11 @@
             
             <!-- 曝光时间 -->
             <RelativeLayout
-                android:id="@+id/layoutSetupExposureTime"
+                android:id="@+id/layoutSetupExposureTime1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                style="@style/setup_sub_layout" >
+                style="@style/setup_sub_layout"
+                tools:ignore="DuplicateIds">
 
                 <TextView
                     android:id="@+id/titleSetupExposureTime"
@@ -108,7 +110,7 @@
                     android:background="@drawable/spinner_ab_activated_holo_dark" />
                 
                 <TextView
-                    android:id="@+id/setupRecordModeTip"
+                    android:id="@+id/setupRecordModeTip1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/titleSetupElectronicSlowShutter"

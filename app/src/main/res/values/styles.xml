@@ -176,4 +176,5 @@
         <item name="android:divider">@drawable/list_divider_line</item>
         <item name="android:dividerHeight">1.5dp</item>
     </style>
+
 </resources>
