@@ -43,6 +43,7 @@ import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevice;
 import com.qmuiteam.qmui.layout.QMUILinearLayout;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
@@ -55,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_UNKNOWN;
 
 public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener {
     QMUITopBarLayout mTopBar;
@@ -86,7 +88,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mPullRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        //onDataLoaded();
+                        refreshDataSet();
                         mPullRefreshLayout.finishRefresh();
                     }
                 }, 2000);
@@ -187,16 +189,20 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 Camera citem = (Camera)itemDescription.getItem();
                 FunDevice mFunDevice = null;
 
-                showWaitDialog();
                 // 虚拟一个设备, 只需要序列号和设备类型即可添加
                 mFunDevice = new FunDevice();
                 mFunDevice.devSn = citem.sn;
                 mFunDevice.devName = citem.name;
+                mFunDevice.devIp = citem.devIp;
+                mFunDevice.devMac = citem.mac;
+                mFunDevice.tcpPort = 34567;
                 mFunDevice.devType = citem.type;
+                mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
+                mFunDevice.isRemote = true;
                 mFunDevice.loginName = citem.loginName;
                 mFunDevice.loginPsw = citem.loginPsw;
                 // 添加设备之前都必须先登录一下,以防设备密码错误,也是校验其合法性
-                FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+                //FunSupport.getInstance().requestDeviceLogin(citem.camDevice);
 
                 ((DeviceCameraFragment)fragment).setFunDevice(mFunDevice);
             }
@@ -234,7 +240,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onStart() {
         super.onStart();
+        refreshDataSet();
+    }
+
+    private void  refreshDataSet() {
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter.setData(mainItems);
+        mItemAdapter.notifyDataSetChanged();
     }
 }

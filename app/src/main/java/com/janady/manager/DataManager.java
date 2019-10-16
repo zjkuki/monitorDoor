@@ -81,7 +81,7 @@ public class DataManager {
             mainDescription.setDevice(device);
             list.add(mainDescription);
         }*/
-        MainItemDescription camDescription = new MainItemDescription(BluetoothOperatorFragment.class, "摄像设备", R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
+        MainItemDescription camDescription = new MainItemDescription(CameraListFragment.class, "摄像设备", R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
         ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
         List<Object> camitems = new ArrayList<>();
         for (Camera camera : camlists) {
@@ -94,7 +94,7 @@ public class DataManager {
 
 
         //MainItemDescription bleDescription = new MainItemDescription(BluetoothLockFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, MainItemDescription.DeviceType.BLE);
-        MainItemDescription bleDescription = new MainItemDescription(BluetoothOperatorFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, MainItemDescription.DeviceType.BLE);
+        MainItemDescription bleDescription = new MainItemDescription(BluetoothListFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, MainItemDescription.DeviceType.BLE);
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {
@@ -107,12 +107,12 @@ public class DataManager {
 
         ArrayList<Remote> rlists = MyApplication.liteOrm.query(Remote.class);
         for (Remote remote : rlists) {
-            MainItemDescription remoteDescription = new MainItemDescription(BluetoothListFragment.class, remote.name, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
+            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, remote.name, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
             remoteDescription.setDevice(remote);
             if (remote.doorList != null) {
                 List<Object> ritems = new ArrayList<>();
                 for (Door door : remote.doorList) {
-                    ItemDescription itemDescription = new ItemDescription(BluetoothEditFragment.class, door.name, R.drawable.icon_check);
+                    ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, door.name, R.drawable.icon_check);
                     itemDescription.setItem(door);
                     ritems.add(itemDescription);
                 }

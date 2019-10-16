@@ -1,6 +1,7 @@
 package com.janady.database.model;
 
 import com.lib.funsdk.support.models.FunDevType;
+import com.lib.funsdk.support.models.FunDevice;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -30,6 +31,7 @@ public class Camera {
     public String devIp;
     public String loginName;
     public String loginPsw;
+    public FunDevice camDevice;
     public boolean isFirst = true;
     public FunDevType type;
     public String sceneName;

@@ -6,13 +6,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.janady.adapter.CameraDeviceAdapter;
 import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.JTabSegmentFragment;
+import com.janady.database.model.Camera;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevice;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
@@ -24,8 +28,10 @@ public class CameraListFragment extends JBaseFragment {
     QMUITopBarLayout mTopBar;
     RecyclerView mRecyclerView;
     QMUIPullRefreshLayout mPullRefreshLayout;
-    private BaseRecyclerAdapter<FunDevice> mItemAdapter;
-    private List<FunDevice> mFunDevices;
+//    private BaseRecyclerAdapter<FunDevice> mItemAdapter;
+//    private List<FunDevice> mFunDevices;
+    private BaseRecyclerAdapter<Camera> mItemAdapter;
+    private List<Camera> mFunDevices;
     @Override
     protected View onCreateView() {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
@@ -73,14 +79,29 @@ public class CameraListFragment extends JBaseFragment {
         //FunSupport.getInstance().registerOnFunDeviceOptListener(this);
     }
     private void initRecyclerView() {
-        mFunDevices = FunSupport.getInstance().getDeviceList();
-        mItemAdapter = new FunDeviceAdapter(getContext(), mFunDevices);
+        //mFunDevices = FunSupport.getInstance().getDeviceList();
+        //mItemAdapter = new FunDeviceAdapter(getContext(), mFunDevices);
+        mFunDevices = MyApplication.liteOrm.query(Camera.class);
+        mItemAdapter = new CameraDeviceAdapter(getContext(), mFunDevices);
         mItemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int pos) {
-                FunDevice funDevice = mFunDevices.get(pos);
+                //FunDevice funDevice = mFunDevices.get(pos);
+                // 虚拟一个设备, 只需要序列号和设备类型即可添加
+                FunDevice mFunDevice =new FunDevice();
+                mFunDevice.devSn = mFunDevices.get(pos).sn;
+                mFunDevice.devName = mFunDevices.get(pos).name;
+                mFunDevice.devIp = mFunDevices.get(pos).devIp;
+                mFunDevice.devMac = mFunDevices.get(pos).mac;
+                mFunDevice.tcpPort = 34567;
+                mFunDevice.devType = mFunDevices.get(pos).type;
+                mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
+                mFunDevice.isRemote = true;
+                mFunDevice.loginName = mFunDevices.get(pos).loginName;
+                mFunDevice.loginPsw = mFunDevices.get(pos).loginPsw;
                 DeviceCameraFragment deviceCameraFragment = new DeviceCameraFragment();
-                deviceCameraFragment.setFunDevice(funDevice);
+                //deviceCameraFragment.setFunDevice(funDevice);
+                deviceCameraFragment.setFunDevice(mFunDevice);
                 startFragment(deviceCameraFragment);
             }
         });

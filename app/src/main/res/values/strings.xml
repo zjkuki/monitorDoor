@@ -25,7 +25,7 @@
     <string name="guide_module_title_device_connect2">"2.7 Device List (User's)"</string>
     <string name="guide_module_title_device_browse">2.8 Browse Files</string>
     <string name="guide_module_title_device_alarm">2.9 Device Alarm</string>
-    <string name="guide_module_title_device_setwifi">2.10 WiFi configuration</string>
+    <string name="guide_module_title_device_setwifi">WiFi configuration</string>
     <string name="guide_module_title_media">3. Media</string>
     <string name="guide_module_title_media_play_live">3.1 Play live video</string>
     <string name="guide_module_title_media_play_record">3.2 Play remote record</string>

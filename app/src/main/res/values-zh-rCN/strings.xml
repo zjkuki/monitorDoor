@@ -25,7 +25,7 @@
     <string name="guide_module_title_device_connect2">2.7 设备列表(用户远程)</string>
     <string name="guide_module_title_device_browse">2.8 浏览设备文件</string>
     <string name="guide_module_title_device_alarm">2.9 设备报警</string>
-    <string name="guide_module_title_device_setwifi">2.10 快速配置WiFi</string>
+    <string name="guide_module_title_device_setwifi">快速配置WiFi</string>
     <string name="guide_module_title_media">3. 媒体功能</string>
     <string name="guide_module_title_media_play_live">3.1 播放实时视频</string>
     <string name="guide_module_title_media_play_record">3.2 播放远程录像</string>

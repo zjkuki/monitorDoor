@@ -203,6 +203,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				mFunDevice = funDevice;
 				mEditDevSN.setText(funDevice.devSn);
 				//mEditSceneName.setText();
+				List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
+				if (cams != null && cams.size() > 0) {
+				  mEditSceneName.setText(cams.get(0).sceneName);
+				}else{
+					mEditSceneName.setText("");
+				}
 				Log.d("DeviceAddByUser", "OnClickedFun: \ndevLoginName:"+funDevice.loginName
 						+"\ndevLoginPsw:"+funDevice.loginPsw
 						+"\nID:"+funDevice.getId()
@@ -482,7 +488,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		if (!FunSupport.getInstance().requestLanDeviceList()) {
 			showToast(R.string.guide_message_error_call);
 		} else {
-			showWaitDialog();
+			//showWaitDialog();
+			mRefreshLayout.showState(AppConstants.LOADING);
 		}
 	}
 
