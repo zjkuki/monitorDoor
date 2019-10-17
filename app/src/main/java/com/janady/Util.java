@@ -12,8 +12,11 @@ import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by song on 2017/2/13.
@@ -188,5 +191,25 @@ public class Util {
         }catch(InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void AppendText(final TextView tv_result, final String str){
+        tv_result.post(new Runnable() {
+            @Override
+            public void run() {
+                tv_result.append(str);
+                int scrollAmount = tv_result.getLayout().getLineTop(tv_result.getLineCount())
+                        - tv_result.getHeight();
+                if (scrollAmount > 0)
+                    tv_result.scrollTo(0, scrollAmount);
+                else
+                    tv_result.scrollTo(0, 0);
+            }
+        });
+    }
+
+    public static String getPrintTime(){
+        SimpleDateFormat sdf= new SimpleDateFormat("HH:mm:ss");
+        return sdf.format(new Date());
     }
 }
