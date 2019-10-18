@@ -7,6 +7,8 @@ public class ItemDescription {
     private String mKitName;
     private int mIconRes;
     private Object mItem;
+    private boolean mEnable = true;
+
     public ItemDescription(Class<? extends JBaseFragment> kitDemoClass, String kitName){
         this(kitDemoClass, kitName, 0);
     }
@@ -16,6 +18,7 @@ public class ItemDescription {
         mKitDemoClass = kitDemoClass;
         mKitName = kitName;
         mIconRes = iconRes;
+        mEnable = true;
     }
     public Class<? extends JBaseFragment> getDemoClass() {
         return mKitDemoClass;
@@ -35,5 +38,13 @@ public class ItemDescription {
 
     public void setItem(Object item) {
         this.mItem = item;
+    }
+
+    public boolean getEnable() {
+        return mEnable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.mEnable = enable;
     }
 }

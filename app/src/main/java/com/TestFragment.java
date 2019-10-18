@@ -1,9 +1,12 @@
 package com;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.Image;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +23,10 @@ import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.janady.Dialogs;
 import com.janady.RoundRect;
 import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
@@ -36,6 +43,7 @@ import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
+import com.janady.lkd.ClientManager;
 import com.janady.manager.DataManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ExpandAdapter;
@@ -44,6 +52,7 @@ import com.janady.model.MainItemDescription;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevStatus;
+import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 import com.qmuiteam.qmui.layout.QMUILinearLayout;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
@@ -64,6 +73,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     QMUIPullRefreshLayout mPullRefreshLayout;
     private ExpandAdapter mItemAdapter;
     private List<MainItemDescription> mainItems;
+
+    private List<SearchResult> mBleDevices = new ArrayList<SearchResult>();
+
+    private Handler mHandler = new Handler();
+
     @Override
     protected View onCreateView() {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
@@ -94,6 +108,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }, 2000);
             }
         });
+
+        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
 
         initTopBar();
         initRecyclerView();
@@ -179,8 +195,30 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         return res;
     }*/
 
+    private void startBluetooth(){
+        if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
+            Dialogs.alertDialog2Btn(this.getContext(), "提示", "您的蓝牙未开启，需要现在打开蓝牙吗？", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(!ClientManager.getClient().openBluetooth()){
+                        return;
+                    }else{
+                        return;
+                    }
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+        }
+    }
+
     @Override
     public void onItemClick(ItemDescription itemDescription) {
+
         Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
         try {
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
@@ -244,8 +282,72 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
     private void  refreshDataSet() {
+        startBluetooth();
+        DataManager.getInstance().mBleDevices = mBleDevices;
+        DataManager.getInstance().mFunDevices = FunSupport.getInstance().getLanDeviceList();
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter.setData(mainItems);
         mItemAdapter.notifyDataSetChanged();
     }
+
+
+    private void searchBleDevice() {
+            if(mBleDevices.size()>0){mBleDevices.clear();}
+            SearchRequest request = new SearchRequest.Builder()
+                    .searchBluetoothLeDevice(5000, 2).build();
+
+            ClientManager.getClient().search(request, mSearchResponse);
+        Log.i("DataManager","停止扫描设备....");
+    }
+
+    private final SearchResponse mSearchResponse = new SearchResponse() {
+        @Override
+        public void onSearchStarted() {
+            Log.i("DataManager","开始扫描设备");
+        }
+
+
+        @Override
+        public void onDeviceFounded(SearchResult device) {
+            if (device.getName().contains("VB")) {
+                if (!mBleDevices.contains(device)) {
+                    mBleDevices.add(device);
+                }
+
+                if (mBleDevices.size() > 0) {
+                    Log.i("DataManager","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
+                    refreshDataSet();
+                }
+            } else {
+                Log.i("DataManager","非本产品蓝牙设备");
+            }
+        }
+
+        @Override
+        public void onSearchStopped() {
+            Log.i("DataManager","扫描停止");
+            if (mBleDevices.size() > 0) {
+                refreshDataSet();
+            }
+        }
+
+        @Override
+        public void onSearchCanceled() {
+            Log.i("DataManager","扫描取消");
+            if (mBleDevices.size() > 0) {
+                refreshDataSet();
+            }
+        }
+    };
+
+    Runnable searchDevices=new Runnable() {
+        @Override
+        public void run() {
+            searchBleDevice();
+            if(FunSupport.getInstance().requestLanDeviceList()){
+                refreshDataSet();
+            }
+            mHandler.postDelayed(searchDevices, 30000);//每n秒执行一次runnable.
+        }
+    };
 }

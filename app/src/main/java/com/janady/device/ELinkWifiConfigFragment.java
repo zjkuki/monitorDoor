@@ -35,7 +35,8 @@ public class ELinkWifiConfigFragment extends JBaseFragment {
         String currSSID = getConnectWifiSSID();
         mEditWifiSSID.setText(currSSID);
         mEditWifiPasswd.setText(FunWifiPassword.getInstance().getPassword(currSSID));
-        tipsTv = root.findViewById(R.id.tips);
+        tipsTv = root.findViewById(R.id.tvTips
+        );
         okBtn = root.findViewById(R.id.ok_button);
         okBtn.setText("发送配网");
         okBtn.setOnClickListener(new View.OnClickListener() {

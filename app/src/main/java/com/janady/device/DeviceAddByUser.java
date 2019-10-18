@@ -319,7 +319,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			mHandler.removeCallbacksAndMessages(null);
 		}
 
-		bleLocker.disconnect();
+		if(bleLocker!=null){bleLocker.disconnect();}
 
 		super.onDestroy();
 	}

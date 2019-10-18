@@ -1,7 +1,14 @@
 package com.janady.manager;
 
+import android.util.Log;
+
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.janady.AppConstants;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
@@ -18,16 +25,23 @@ import com.janady.device.DoorListFragment;
 import com.janady.device.ELinkWifiConfigFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
+import com.janady.lkd.ClientManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
+
 public class DataManager {
+    public List<SearchResult> mBleDevices;
+    public List<FunDevice> mFunDevices;
+
     private static DataManager _sInstance;
     public static DataManager getInstance() {
         if (_sInstance == null) {
@@ -89,7 +103,10 @@ public class DataManager {
         List<Object> camitems = new ArrayList<>();
         for (Camera camera : camlists) {
             ItemDescription itemDescription = new ItemDescription(DeviceCameraFragment.class, camera.sceneName, R.drawable.icon_check);
+
+            itemDescription.setEnable(matchFunDevOnline(camera.sn));
             itemDescription.setItem(camera);
+
             camitems.add(itemDescription);
         }
         camDescription.setList(camitems);
@@ -102,7 +119,10 @@ public class DataManager {
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {
             ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
+
+            itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
             itemDescription.setItem(bluetooth);
+
             bitems.add(itemDescription);
         }
         bleDescription.setList(bitems);
@@ -124,5 +144,49 @@ public class DataManager {
             list.add(remoteDescription);
         }
         return list;
+    }
+
+
+    /**
+     * 查找蓝牙设备列表是否有这个设备
+     *
+     * @param bleMac 搜索字符
+     */
+    public boolean matchBleDevOnline(String bleMac) {
+        if(mBleDevices==null){return false;}
+        //如果为null，直接使用全部数据
+        if (!bleMac.equals("") ||  mBleDevices.size()>0) {
+            //否则，匹配相应的数据
+            for (int i = 0; i < mBleDevices.size(); i++) {
+                if (mBleDevices.get(i).getAddress().contains(bleMac)) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
+                   return true;
+                }
+            }
+            return  false;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 查找摄像设备列表是否有这个设备
+     *
+     * @param FunDevSn 搜索字符
+     */
+    public boolean matchFunDevOnline(String FunDevSn) {
+        if(mFunDevices==null){return false;}
+
+        //如果为null，直接使用全部数据
+        if (!FunDevSn.equals("") || mFunDevices.size()>0) {
+            //否则，匹配相应的数据
+            for (int i = 0; i < mFunDevices.size(); i++) {
+                if (mFunDevices.get(i).getDevSn() == FunDevSn) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
+                    return true;
+                }
+            }
+            return  false;
+        }else{
+            return false;
+        }
     }
 }

@@ -130,7 +130,7 @@
                     android:layout_toRightOf="@id/wifiDevicesIcon"
                     android:background="#00000000"
                     android:checked="true"
-                    android:text="ÉãÏñÍ·"
+                    android:text="æ‘„åƒæœº"
                     android:textColor="#ff101010"
                     android:textColorHint="#ffe0e0e0"
                     android:textSize="18sp" />
@@ -144,7 +144,7 @@
                     android:layout_toRightOf="@id/wifiDevicesIcon"
                     android:background="#00000000"
                     android:checked="false"
-                    android:text="¿ØÖÆ°å"
+                    android:text="WIFIæŽ§åˆ¶æ¿"
                     android:textColor="#ff101010"
                     android:textColorHint="#ffe0e0e0"
                     android:textSize="18sp" />

@@ -1,5 +1,8 @@
 package com.janady.setup;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import java.util.List;
 
 public abstract class JBaseFragment extends QMUIFragment {
     private Toast mToast;
+
     protected void showToast(int id) {
         showToast(getContext().getResources().getString(id));
     }
@@ -46,6 +50,10 @@ public abstract class JBaseFragment extends QMUIFragment {
             mWaitDialog.dismiss();
         }
     }
+
+
+
+
     /**
      *  判断某个字符串是否存在于数组中
      *  用来判断该配置是否通道相关

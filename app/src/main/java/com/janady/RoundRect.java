@@ -9,8 +9,12 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RoundRect {
@@ -111,4 +115,68 @@ public class RoundRect {
         return output;
     }
 
+    public Bitmap appendTextToPicture(final String picPath, final String msg){
+        Bitmap bmp = BitmapFactory.decodeFile(picPath);
+        return appendTextToPicture(bmp, msg);
+    }
+
+    public Bitmap appendTextToPicture(final Bitmap bmp, final String msg) {
+//返回具有指定宽度和高度可变的位图,它的初始密度可以调用getDensity()
+        final int TXT_SIZE = 10;
+        //Bitmap bmp = BitmapFactory.decodeFile(picPath);
+        final int y_offset = 0;
+        int heigth = bmp.getHeight() + y_offset + TXT_SIZE;
+        final int max_width = bmp.getWidth();
+        List<String> buf = new ArrayList<String>();
+        String lineStr = "";
+
+        Paint p = new Paint();
+        Typeface font = Typeface.create("宋体", Typeface.BOLD);
+        p.setColor(Color.BLACK);
+        p.setTypeface(font);
+        p.setTextSize(TXT_SIZE);
+
+        for (int i = 0; i < msg.length(); ) {
+
+            if (Character.getType(msg.charAt(i)) == Character.OTHER_LETTER) {
+                // 如果这个字符是一个汉字
+                if ((i + 1) < msg.length()) {
+                    lineStr += msg.substring(i, i + 2);
+                }
+
+                i = i + 2;
+            } else {
+                lineStr += msg.substring(i, i + 1);
+                i++;
+            }
+
+            float[] ws = new float[lineStr.length()];
+            int wid = p.getTextWidths(lineStr, ws);
+
+            if (wid > max_width) {
+                buf.add(lineStr);
+                lineStr = "";
+                heigth += (TXT_SIZE + y_offset);
+            }
+
+            if (i >= msg.length()) {
+                heigth += (TXT_SIZE + y_offset);
+                break;
+            }
+        }
+
+
+        Bitmap canvasBmp = Bitmap.createBitmap(max_width, heigth + TXT_SIZE, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(canvasBmp);
+        canvas.drawColor(Color.BLACK);
+
+        float y = y_offset + TXT_SIZE;
+        for (String str : buf) {
+            canvas.drawText(str, 0, y, p);
+            y += (TXT_SIZE + y_offset);
+        }
+
+        canvas.drawBitmap(bmp, 0, y, p);
+        return canvasBmp;
+    }
 }
