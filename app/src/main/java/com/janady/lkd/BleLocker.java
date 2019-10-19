@@ -349,12 +349,12 @@ public class BleLocker {
                 rtv=ByteUtils.byteToString(data);
 
                 //CommonUtils.toast("success");
-                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, BleLockerStatus.READ_RESPONSE_SUCCESS); }
+                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, data, BleLockerStatus.READ_RESPONSE_SUCCESS); }
             } else {
                 //CommonUtils.toast("failed");
                 rtv="bluetooth read failed";
                 BluetoothLog.v(String.format("read: "));
-                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, BleLockerStatus.READ_RESPONSE_FAIL); }
+                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, data, BleLockerStatus.READ_RESPONSE_FAIL); }
             }
         }
     };
@@ -367,12 +367,12 @@ public class BleLocker {
                 BluetoothLog.v(String.format("write success"));
                 //CommonUtils.toast("success");
                 rtv="发送成功";
-                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, BleLockerStatus.WRITE_SUCCESS); }
+                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleWriteResponse(mBluetooth, BleLockerStatus.WRITE_SUCCESS); }
             } else {
                 rtv="发送失败";
                 BluetoothLog.v(String.format("write failed"));
                 //CommonUtils.toast("failed");
-                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleReadResponse(mBluetooth, BleLockerStatus.WRITE_FAIL); }
+                if(mIBleLockerListener!=null){ mIBleLockerListener.onBleWriteResponse(mBluetooth, BleLockerStatus.WRITE_FAIL); }
             }
         }
     };
@@ -388,6 +388,21 @@ public class BleLocker {
             }
 
             String rtvMsg="";
+
+            if(mBleNotifyValue.contains("STA")){
+                String stat = mBleNotifyValue.substring(4,4);
+                if(stat == "1") {
+                    if (mIBleLockerListener != null) {
+                        mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.LOCKED);
+                    }
+                }else{
+                    if (mIBleLockerListener != null) {
+                        mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.UNLOCKED);
+                    }
+                }
+
+            }
+
             switch (mBleNotifyValue) {
                 case "ERROR PASS":
                     rtvMsg = "密码错误";
@@ -487,7 +502,7 @@ public class BleLocker {
 
         void onOpened(Bluetooth bluetooth, BleLockerStatus status);
 
-        void onBleReadResponse(Bluetooth bluetooth,BleLockerStatus status);
+        void onBleReadResponse(Bluetooth bluetooth, byte[] data, BleLockerStatus status);
 
         void onBleWriteResponse(Bluetooth bluetooth, BleLockerStatus status);
 

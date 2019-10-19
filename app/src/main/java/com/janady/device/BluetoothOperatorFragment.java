@@ -6,11 +6,13 @@ import android.widget.TextView;
 
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.Util;
 import com.janady.base.JBaseSegmentFragment;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +29,10 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
     private TextView tvresult;
 
     private boolean debugMsg;
+
+    private boolean isLocked = false;
+
+    private List<String> viewTitleList = new ArrayList<>();
 
     public void setBluetoothDevice(Bluetooth bluetooth){
         mBluetooth = bluetooth;
@@ -50,7 +56,9 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
     @Override
     protected List<View> createPageViews() {
         List<View> viewList = new ArrayList<>();
-        ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
+
+        //ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
+        List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, mBleLocker.getmMac()));
         mBleLockers = new ArrayList<BleLocker>();
         for (Bluetooth bluetooth : blists) {
 
@@ -67,15 +75,25 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
             view.findViewById(R.id.close).setOnClickListener(this);
             view.findViewById(R.id.lock).setOnClickListener(this);
             view.findViewById(R.id.unlock).setOnClickListener(this);
+
+
+            viewTitleList.add(bluetooth.sceneName);
             viewList.add(view);
+
 
             showWaitDialog();
 
             tabSelected(0);
+
             //mBleLocker.connect();
         }
 
         return viewList;
+    }
+
+    @Override
+    protected  List<String> getPageTitles(){
+        return viewTitleList;
     }
 
     @Override
@@ -115,53 +133,60 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
     private BleLocker.IBleLockerListener iBleLockerListener = new BleLocker.IBleLockerListener() {
         @Override
         public void onPasswordChanged(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onPasswordChanged：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onPasswordChanged：" + status.getmStatusMsg());
         }
 
         @Override
         public void onClosed(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onClose：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onClose：" + status.getmStatusMsg());
         }
 
         @Override
         public void onStoped(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onStop：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onStop：" + status.getmStatusMsg());
         }
 
         @Override
         public void onLock(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onLock：\n" + status.getmStatusMsg());
+            if(status==BleLockerStatus.LOCKED){
+                isLocked = true;
+            }else{
+                isLocked = false;
+            }
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onLock：" + status.getmStatusMsg());
         }
 
         @Override
         public void onOpened(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onOpen：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "..\n   onOpen：" + status.getmStatusMsg());
         }
 
         @Override
-        public void onBleReadResponse(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onBleReadResponse：\n" + status.getmStatusMsg());
+        public void onBleReadResponse(Bluetooth bluetooth,  byte[] data, BleLockerStatus status) {
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onBleReadResponse：" + String.format("read: %s", ByteUtils.byteToString(data))+"\n"
+                    +"\n   onBleReadResponse Status:"+ status.getmStatusMsg());
         }
 
         @Override
         public void onBleWriteResponse(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onBleWriteResponse：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onBleWriteResponse：" + status.getmStatusMsg()
+            );
         }
 
         @Override
         public void onBleNotifyResponse(Bluetooth bluetooth, String NotifyValue, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onNotifyResponse：\n" + status.getmStatusMsg()
-                        +"Response Content:\n"+ NotifyValue);
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onNotifyResponse：" +  NotifyValue
+                    +"\n    on NotifyResponse Status: " + status.getmStatusMsg());
         }
 
         @Override
         public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onConnected：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onConnected：" + status.getmStatusMsg());
         }
 
         @Override
         public void onDisconnected(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onDisconnected：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onDisconnected：" + status.getmStatusMsg());
         }
 
         @Override
@@ -172,17 +197,17 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
         @Override
         public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
             hideWaitDialog();
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onReday feed back：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onReday feed back：" + status.getmStatusMsg());
 
         }
 
         @Override
         public void onGetRssi(Bluetooth bluetooth, int Rssi, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onGetRssi feed back：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onGetRssi feed back：" + status.getmStatusMsg());
         }
         @Override
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "... onPasswdError：\n" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onPasswdError：" + status.getmStatusMsg());
         }
     };
 

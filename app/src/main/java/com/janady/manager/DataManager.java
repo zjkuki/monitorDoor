@@ -25,6 +25,7 @@ import com.janady.device.DoorListFragment;
 import com.janady.device.ELinkWifiConfigFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
+import com.janady.lkd.BleLocker;
 import com.janady.lkd.ClientManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
@@ -118,10 +119,12 @@ public class DataManager {
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {
-            ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
+            //ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
+            ItemDescription itemDescription = new ItemDescription(BluetoothLockFragment.class, bluetooth.sceneName, R.drawable.icon_check);
 
             itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
             itemDescription.setItem(bluetooth);
+            //itemDescription.setItem(new BleLocker(bluetooth,false,800,null));
 
             bitems.add(itemDescription);
         }
@@ -180,7 +183,7 @@ public class DataManager {
         if (!FunDevSn.equals("") || mFunDevices.size()>0) {
             //否则，匹配相应的数据
             for (int i = 0; i < mFunDevices.size(); i++) {
-                if (mFunDevices.get(i).getDevSn() == FunDevSn) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
+                if (mFunDevices.get(i).getDevSn().contains(FunDevSn)) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
                     return true;
                 }
             }

@@ -22,6 +22,7 @@ import com.janady.base.RecyclerViewHolder;
 import com.janady.database.model.Bluetooth;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
+import com.janady.device.BluetoothLockFragment;
 import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
@@ -46,33 +47,47 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         holder.getTextView(R.id.name).setText(item.getName());
 
         RoundRect roundRect = new RoundRect(100,100,10);
+
+        String stat = "未就绪";
+        int textColor= Color.BLACK;
         Bitmap photo = null;
-        if(item.getDemoClass()== BluetoothOperatorFragment.class) {
+        //if(item.getDemoClass()== BluetoothOperatorFragment.class) {
+        if(item.getDemoClass()== BluetoothLockFragment.class) {
             if(item.getEnable()) {
-                photo = roundRect.toRoundRect(context, R.drawable.btlocker2);
+                stat = "在线";
+                textColor = 0xFF00bfa5;
+                photo = roundRect.toRoundRect(context, R.drawable.btlocker3);
 
             }else{
-                photo = roundRect.toRoundRect(context, R.drawable.btlocker2_disable);
+                stat = "离线";
+                textColor = Color.RED;
+                photo = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
             }
         }
 
         if(item.getDemoClass()== DeviceCameraFragment.class){
             if(item.getEnable()) {
+                textColor = 0xFF00bfa5;
+                stat = "在线";
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera);
             }else{
+                stat = "离线";
+                textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera_disable);
             }
         }
 
-        Paint paint= new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextSize(10);
-        paint.setColor(Color.BLACK);
+        if(photo!=null) {
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setTextSize(16);
+            paint.setColor(textColor);
 
-        Canvas cav = new Canvas(photo);
-        cav.drawText("test",0,0, paint);
+            Canvas cav = new Canvas(photo);
+            cav.drawText(stat, 5, 23, paint);
 
-        holder.getImageView(R.id.img).setEnabled(item.getEnable());
-        holder.getImageView(R.id.img).setImageBitmap(photo);
+            holder.getImageView(R.id.img).setEnabled(item.getEnable());
+            holder.getImageView(R.id.img).setImageBitmap(photo);
+        }
     }
     public Bitmap drawTextToBitmap(Context mContext,  int resourceId,  String mText) {
         try {

@@ -140,7 +140,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         }
 
         @Override
-        public void onBleReadResponse(Bluetooth bluetooth, BleLockerStatus status) {
+        public void onBleReadResponse(Bluetooth bluetooth, byte[] data, BleLockerStatus status) {
 
         }
 

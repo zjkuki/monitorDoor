@@ -6,6 +6,8 @@ import android.net.DhcpInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -172,6 +174,18 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                     pwdType, 0, mac, -1);
 
             FunWifiPassword.getInstance().saveWifiPassword(ssid, wifiPwd);
+
+            new CountDownTimer(30000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    Log.i("WifiConfigFragment", "seconds remaining: " + millisUntilFinished / 1000);
+                }
+
+                public void onFinish() {
+                    Log.i("WifiConfigFragment", "done!");
+                }
+            }.start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,6 +206,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             intent.setClass(getContext(), DeviceAddByUser.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+
+            popBackStack();
         }
     }
 }

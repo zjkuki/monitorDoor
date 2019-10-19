@@ -32,6 +32,7 @@ public abstract class JBaseSegmentFragment extends JBaseFragment {
 
     private Map<Integer, View> mPageMap = new HashMap<>();
     private List<View> mPageViews;
+    private List<String> mPageViewTitles;
     private int mDestPage = 0;
 
     private PagerAdapter mPagerAdapter = new PagerAdapter() {
@@ -84,11 +85,14 @@ public abstract class JBaseSegmentFragment extends JBaseFragment {
 
     private void initTabAndPager() {
         mPageViews = createPageViews();
+        mPageViewTitles = getPageTitles();
+
         if (mPageViews == null || mPageViews.size() == 0) return;
         mContentViewPager.setAdapter(mPagerAdapter);
         mContentViewPager.setCurrentItem(mDestPage, false);
         for (int i=0; i<mPageViews.size(); i++) {
-            mTabSegment.addTab(new QMUITabSegment.Tab("page"+i));
+            //mTabSegment.addTab(new QMUITabSegment.Tab("page"+i));
+            mTabSegment.addTab(new QMUITabSegment.Tab(mPageViewTitles.get(i)));
         }
         mTabSegment.setupWithViewPager(mContentViewPager, false);
         mTabSegment.setMode(QMUITabSegment.MODE_FIXED);
@@ -132,6 +136,7 @@ public abstract class JBaseSegmentFragment extends JBaseFragment {
 
     protected abstract String title();
     protected abstract List<View> createPageViews();
+    protected abstract List<String> getPageTitles();
     protected abstract void tabSelected(int index);
     protected abstract void tabUnSelected(int index);
 }

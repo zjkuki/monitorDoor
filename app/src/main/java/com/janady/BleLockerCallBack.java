@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
@@ -57,9 +58,12 @@ public class BleLockerCallBack implements BleLocker.IBleLockerListener {
     }
 
     @Override
-    public void onBleReadResponse(Bluetooth bluetooth, BleLockerStatus status) {
-        BluetoothLog.i(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
-        AppendText(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
+    public void onBleReadResponse(Bluetooth bluetooth, byte[] data, BleLockerStatus status) {
+        BluetoothLog.i(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg()
+                +" bodycontent"+String.format("read: %s", ByteUtils.byteToString(data))+"\n");
+
+        AppendText(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg()
+                +" bodycontent"+String.format("read: %s", ByteUtils.byteToString(data))+"\n");
     }
 
     @Override

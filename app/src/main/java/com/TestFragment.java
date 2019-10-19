@@ -26,6 +26,7 @@ import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
 import com.janady.RoundRect;
 import com.janady.adapter.FunDeviceAdapter;
@@ -37,12 +38,15 @@ import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
+import com.janady.device.BluetoothLockFragment;
+import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
 import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
+import com.janady.lkd.BleLocker;
 import com.janady.lkd.ClientManager;
 import com.janady.manager.DataManager;
 import com.janady.model.CategoryItemDescription;
@@ -54,6 +58,7 @@ import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.qmuiteam.qmui.layout.QMUILinearLayout;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -80,6 +85,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     protected View onCreateView() {
+        startBluetooth();
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
 
         mTopBar = rootView.findViewById(R.id.topbar);
@@ -216,9 +222,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     }
 
+    /**
+     * ExpandAdapter里的onItemClick重写，针对DataManager传入的ItemDescription响应点击事件
+     * @param itemDescription
+     */
     @Override
     public void onItemClick(ItemDescription itemDescription) {
-
+        ClientManager.getClient().stopSearch();
         Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
         try {
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
@@ -245,6 +255,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ((DeviceCameraFragment)fragment).setFunDevice(mFunDevice);
             }
 
+            //if (fragment instanceof BluetoothOperatorFragment && itemDescription.getItem() instanceof Bluetooth) {
+            if (fragment instanceof BluetoothLockFragment && itemDescription.getItem() instanceof Bluetooth) {
+                Bluetooth citem = (Bluetooth)itemDescription.getItem();
+                BleLocker bleLocker = new BleLocker(citem,false,800, new BleLockerCallBack(this.getContext(), false));
+                bleLocker.setmNoRssi(true);
+
+
+                //((BluetoothOperatorFragment)fragment).setBleLocker(bleLocker);
+                ((BluetoothLockFragment)fragment).title = citem.sceneName;
+                ((BluetoothLockFragment)fragment).bleLocker = bleLocker;
+                ((BluetoothLockFragment)fragment).isDebugViewOpen = true;
+            }
             startFragment(fragment);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -255,6 +277,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {
+        ClientManager.getClient().stopSearch();
         JBaseFragment fragment = null;
         Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
             fragment = mainItemDescription.getDemoClass().newInstance();
@@ -282,7 +305,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
     private void  refreshDataSet() {
-        startBluetooth();
         DataManager.getInstance().mBleDevices = mBleDevices;
         DataManager.getInstance().mFunDevices = FunSupport.getInstance().getLanDeviceList();
         mainItems = DataManager.getInstance().getDescriptions();
@@ -294,7 +316,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private void searchBleDevice() {
             if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(5000, 2).build();
+                    .searchBluetoothLeDevice(2000, 1).build();
 
             ClientManager.getClient().search(request, mSearchResponse);
         Log.i("DataManager","停止扫描设备....");
@@ -315,8 +337,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
 
                 if (mBleDevices.size() > 0) {
+                    List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
+                    if(blists.size()>0){
+                        refreshDataSet();
+                    }
                     Log.i("DataManager","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
-                    refreshDataSet();
+                    //refreshDataSet();
                 }
             } else {
                 Log.i("DataManager","非本产品蓝牙设备");

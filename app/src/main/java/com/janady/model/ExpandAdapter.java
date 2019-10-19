@@ -30,6 +30,9 @@ import com.example.funsdkdemo.R;
 import com.janady.RoundRect;
 import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
+import com.janady.base.JBaseSegmentFragment;
+import com.janady.device.BluetoothOperatorFragment;
+import com.janady.lkd.BleLocker;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.models.FunDevice;
 
@@ -167,7 +170,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             itemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View itemView, int pos) {
-                    if (onClickListener != null) onClickListener.onItemClick(items.get(pos));
+                    if (onClickListener != null) onClickListener.onItemClick( items.get(pos) );
                 }
             });
             layoutManager = new GridLayoutManager(context, 4);
