@@ -26,7 +26,13 @@
                 android:layout_height="32dp"
                 android:layout_margin="5dp"
                 android:src="@drawable/ic_camera" />
-
+            <ProgressBar
+                android:id="@+id/pbSearching"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="gone"/>
             <TextView
                 android:id="@+id/name"
                 android:layout_width="wrap_content"

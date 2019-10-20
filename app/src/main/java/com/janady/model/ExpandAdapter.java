@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,6 +69,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         final MainViewHolder mainViewHolder = (MainViewHolder) viewHolder;
         List<ItemDescription> items = new ArrayList<>();
         List<Object> l = mainItemDescription.getList();
+
         if (l != null) {
             for (Object o : l){
                 items.add((ItemDescription) o);
@@ -140,6 +142,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         private BaseItemAdapter itemAdapter;
         private List<ItemDescription> items;
         private ImageView expand;
+        private ProgressBar pbSearching;
 
         public void showItems(List<ItemDescription> cItems) {
             items = cItems;
@@ -151,6 +154,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             nameTv = itemView.findViewById(R.id.name);
             imgView = itemView.findViewById(R.id.img);
             recyclerView = itemView.findViewById(R.id.listview);
+            pbSearching = itemView.findViewById(R.id.pbSearching);
             exBtn = itemView.findViewById(R.id.expandBtn);
 
             expand = itemView.findViewById(R.id.expend);

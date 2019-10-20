@@ -390,8 +390,8 @@ public class BleLocker {
             String rtvMsg="";
 
             if(mBleNotifyValue.contains("STA")){
-                String stat = mBleNotifyValue.substring(4,4);
-                if(stat == "1") {
+                String stat = mBleNotifyValue.substring(3,4);
+                if(stat.contains("1")) {
                     if (mIBleLockerListener != null) {
                         mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.LOCKED);
                     }
@@ -455,14 +455,14 @@ public class BleLocker {
         @Override
         public void onResponse(int code) {
             if (code == REQUEST_SUCCESS) {
-                CommonUtils.toast("Ble Notify success");
+                //CommonUtils.toast("Ble Notify success");
                 BluetoothLog.v("Ble Notify success");
             } else {
-                CommonUtils.toast("Ble Notify failed");
+                //CommonUtils.toast("Ble Notify failed");
                 BluetoothLog.v("Ble Notify failed");
             }
 
-            //if(mIBleLockerListener!=null){ mIBleLockerListener.onBleNotifyResponse(code, mBleNotifyValue); }
+            if(mIBleLockerListener!=null){ mIBleLockerListener.onBleNotifyResponse(mBluetooth, "设备服务注册成功", BleLockerStatus.REDAY); }
         }
     };
 

@@ -108,7 +108,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mPullRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        refreshDataSet();
+                        mHandler.postDelayed(searchDevices, 0);
+                        //refreshDataSet();
                         mPullRefreshLayout.finishRefresh();
                     }
                 }, 2000);
@@ -229,6 +230,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onItemClick(ItemDescription itemDescription) {
         ClientManager.getClient().stopSearch();
+        if(!itemDescription.getEnable()){
+            return;
+        }
+
         Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
         try {
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
@@ -314,6 +319,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
 
     private void searchBleDevice() {
+            startBluetooth();
+
             if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
                     .searchBluetoothLeDevice(2000, 1).build();
