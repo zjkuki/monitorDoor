@@ -83,6 +83,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private Handler mHandler = new Handler();
 
+    private boolean isScanning = false;
+
     @Override
     protected View onCreateView() {
         startBluetooth();
@@ -321,6 +323,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private void searchBleDevice() {
             startBluetooth();
 
+            isScanning = true;
             if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
                     .searchBluetoothLeDevice(2000, 1).build();
@@ -348,6 +351,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     if(blists.size()>0){
                         refreshDataSet();
                     }
+
                     Log.i("DataManager","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
                     //refreshDataSet();
                 }
@@ -361,6 +365,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             Log.i("DataManager","扫描停止");
             if (mBleDevices.size() > 0) {
                 refreshDataSet();
+                isScanning = false;
             }
         }
 
@@ -369,6 +374,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             Log.i("DataManager","扫描取消");
             if (mBleDevices.size() > 0) {
                 refreshDataSet();
+                isScanning = false;
             }
         }
     };
@@ -380,7 +386,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             if(FunSupport.getInstance().requestLanDeviceList()){
                 refreshDataSet();
             }
-            mHandler.postDelayed(searchDevices, 30000);//每n秒执行一次runnable.
+            mHandler.postDelayed(searchDevices, 10000);//每n秒执行一次runnable.
         }
     };
 }

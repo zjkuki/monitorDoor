@@ -59,7 +59,8 @@ public abstract class DialogInputPasswd {
 
 		RelativeLayout.LayoutParams pointLp = (RelativeLayout.LayoutParams) mLayoutTipShow
 				.getLayoutParams();
-		pointLp.width = UIFactory.dip2px(context, 270);
+//		pointLp.width = UIFactory.dip2px(context, 270);
+		pointLp.width = UIFactory.dip2px(context, 320);
 		pointLp.height = UIFactory.dip2px(context, 200);
 		mLayoutTipShow.setLayoutParams(pointLp);
 

@@ -50,6 +50,11 @@ public abstract class JBaseFragment extends QMUIFragment {
             mWaitDialog.dismiss();
         }
     }
+    protected void setMsgText(String text){
+        if(mWaitDialog!=null){
+            mWaitDialog.setText(text);
+        }
+    }
 
 
 

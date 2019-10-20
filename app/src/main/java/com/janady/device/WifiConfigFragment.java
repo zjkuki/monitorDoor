@@ -17,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.R;
+import com.janady.Dialogs;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.FunWifiPassword;
@@ -26,6 +27,10 @@ import com.lib.funsdk.support.utils.DeviceWifiManager;
 import com.lib.funsdk.support.utils.MyUtils;
 import com.lib.funsdk.support.utils.StringUtils;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+
+import io.fogcloud.sdk.easylink.api.EasyLink;
+import io.fogcloud.sdk.easylink.helper.EasyLinkCallBack;
+import io.fogcloud.sdk.easylink.helper.EasyLinkParams;
 
 public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFiConfigListener {
     private QMUITopBarLayout mTopBar;
@@ -39,6 +44,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
     private TextView tvTips = null;
 
     private int mWifiDevice = 0;  //0-摄像头 1-控制板
+    private EasyLink el;
 
     @Override
     protected View onCreateView() {
@@ -84,6 +90,9 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
         });
         initTopBar();
         FunSupport.getInstance().registerOnFunDeviceWiFiConfigListener(this);
+
+        el = new EasyLink(getContext());
+
         return root;
     }
 
@@ -168,20 +177,48 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
 
             showWaitDialog();
 
-            FunSupport.getInstance().startWiFiQuickConfig(ssid,
-                    data.toString(), info.toString(),
-                    MyUtils.formatIpAddress(wifiDhcp.gateway),
-                    pwdType, 0, mac, -1);
+            if(mWifiDevice == 0) {
+                FunSupport.getInstance().startWiFiQuickConfig(ssid,
+                        data.toString(), info.toString(),
+                        MyUtils.formatIpAddress(wifiDhcp.gateway),
+                        pwdType, 0, mac, -1);
 
-            FunWifiPassword.getInstance().saveWifiPassword(ssid, wifiPwd);
+                FunWifiPassword.getInstance().saveWifiPassword(ssid, wifiPwd);
+            }else {
+                EasyLinkParams elp = new EasyLinkParams();
+                elp.ssid = ssid;
+                elp.password = wifiPwd;
+                el.startEasyLink(elp, new EasyLinkCallBack() {
+                    @Override
+                    public void onSuccess(int code, String message) {
+                        showToast(String.format(
+                                getResources().getString(R.string.device_opt_set_wifi_success),
+                                "wifi remoter ok!"));
+                        Intent intent = new Intent();
+                        intent.putExtra("DeviceTypsSpinnerNo",2);
+                        intent.setClass(getContext(), DeviceAddByUser.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
 
+                        popBackStack();
+                    }
+
+                    @Override
+                    public void onFailure(int code, String message) {
+                        Dialogs.alertMessage(getContext(), "WIFI配网失败",message);
+                    }
+                });
+            }
             new CountDownTimer(30000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.i("WifiConfigFragment", "seconds remaining: " + millisUntilFinished / 1000);
+                    setMsgText("正在进行WIFI配置，请稍候...."+String.valueOf(millisUntilFinished / 1000)+"秒");
                 }
 
                 public void onFinish() {
+                    hideWaitDialog();
+                    Dialogs.alertMessage(getContext(),"WIFI配置失败","设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
                     Log.i("WifiConfigFragment", "done!");
                 }
             }.start();
@@ -192,8 +229,25 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
     }
 
     private void stopQuickSetting() {
-        FunSupport.getInstance().stopWiFiQuickConfig();
+        if(mWifiDevice == 0) {
+            FunSupport.getInstance().stopWiFiQuickConfig();
+        }else{
+            hideWaitDialog();
+            el.stopEasyLink(new EasyLinkCallBack() {
+                @Override
+                public void onSuccess(int code, String message) {
+                    //Dialogs.alertMessage(getContext(), "WIFI配网已停止",message);
+                }
+
+                @Override
+                public void onFailure(int code, String message) {
+                    //Dialogs.alertMessage(getContext(), "WIFI配网失败",message);
+                }
+            });
+        }
+
     }
+
     @Override
     public void onDeviceWiFiConfigSetted(FunDevice funDevice) {
         hideWaitDialog();

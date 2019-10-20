@@ -77,7 +77,7 @@ public class DataManager {
         List<CategoryItemDescription> list = new ArrayList<>();
 
         CategoryItemDescription camera = new CategoryItemDescription(AddDeviceFragment.class, "摄像机", R.drawable.ic_camera, 0);
-        CategoryItemDescription remoteConfig = new CategoryItemDescription(ELinkWifiConfigFragment.class, "WIFI板配网", R.drawable.ic_remote, 0);
+        //CategoryItemDescription remoteConfig = new CategoryItemDescription(ELinkWifiConfigFragment.class, "WIFI板配网", R.drawable.ic_remote, 0);
         /*CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothEditFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, 0);
         CategoryItemDescription remote = new CategoryItemDescription(RemoteEditFragment.class, "远程控制", R.drawable.ic_remote, 0);
         CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "房间", R.drawable.ic_room, 0);*/
@@ -85,7 +85,7 @@ public class DataManager {
         CategoryItemDescription remote = new CategoryItemDescription(RemoteEditFragment.class, "远程控制", R.drawable.ic_remote_3, 0);
         CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "场景", R.drawable.ic_room2, 0);
         list.add(camera);
-        list.add(remoteConfig);
+        //list.add(remoteConfig);
         list.add(bluetooth);
         list.add(remote);
         list.add(room);

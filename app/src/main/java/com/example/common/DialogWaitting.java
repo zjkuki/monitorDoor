@@ -39,6 +39,10 @@ public class DialogWaitting {
 		mTextView.setText(hint);
 		mDialog.show();
 	}
+
+	public void setText(String text) {
+		mTextView.setText(text);
+	}
 	
 	public void dismiss() {
 		mDialog.dismiss();

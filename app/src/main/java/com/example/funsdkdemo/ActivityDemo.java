@@ -27,7 +27,13 @@ public class ActivityDemo extends FragmentActivity {
 	private Toast mToast = null;
 	
 	private View mNavRightView = null;
-	
+
+	public void setText(String text){
+		if ( null != mWaitDialog ) {
+			mWaitDialog.setText(text);
+		}
+	}
+
 	public void showWaitDialog() {
 		if ( null == mWaitDialog ) {
 			mWaitDialog = new DialogWaitting(this);

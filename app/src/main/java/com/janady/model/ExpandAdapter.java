@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,15 +28,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.inuker.bluetooth.library.search.SearchRequest;
+import com.inuker.bluetooth.library.search.SearchResult;
+import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.janady.RoundRect;
 import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.JBaseSegmentFragment;
+import com.janady.database.model.Bluetooth;
 import com.janady.device.BluetoothOperatorFragment;
 import com.janady.lkd.BleLocker;
+import com.janady.lkd.ClientManager;
 import com.janady.setup.JBaseFragment;
+import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevice;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +150,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         private GridLayoutManager layoutManager;
         private BaseItemAdapter itemAdapter;
         private List<ItemDescription> items;
+
         private ImageView expand;
         private ProgressBar pbSearching;
 
@@ -202,4 +212,5 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             valueAnimator.start();
         }
     }
+
 }
