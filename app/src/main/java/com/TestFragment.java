@@ -125,14 +125,15 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
 
         showWaitDialog();
-        setMsgText("正在检查摄像机在线状态，请稍等...");
+        setMsgText("正在检查设备在线状态，请稍等...");
         FunSupport.getInstance().requestLanDeviceList();
 
-        countDownTimer = new CountDownTimer(30000, 1000) {
+        countDownTimer = new CountDownTimer(5000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 Log.i("TestFragment", "seconds remaining: " + millisUntilFinished / 1000);
-                setMsgText("正在检查摄像机在线状态，请稍等..."+String.valueOf(millisUntilFinished / 1000)+"秒");
+                setMsgText("正在检查设备在线状态，请稍等..." + String.valueOf(millisUntilFinished / 1000) + "秒");
+
             }
 
             public void onFinish() {
@@ -154,6 +155,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ClientManager.getClient().stopSearch();
+                mHandler.removeCallbacksAndMessages(searchDevices);
                 startFragment(new JTabSegmentFragment());
             }
         });
@@ -336,6 +339,24 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         refreshDataSet();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        if(isVisibleToUser){
+            mHandler.postDelayed(searchDevices, 0);
+            refreshDataSet();
+        }else{
+
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden){
+        super.onHiddenChanged(hidden);
+        if(hidden) {
+            ClientManager.getClient().stopSearch();
+            mHandler.removeCallbacksAndMessages(searchDevices);
+        }
+    }
     private void  refreshDataSet() {
         if(FunSupport.getInstance().getLanDeviceList().size()>0){
             hideWaitDialog();

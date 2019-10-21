@@ -433,7 +433,6 @@ public class BleLocker {
                     mLastStatus = BleLockerStatus.ERROR_PASS;
                     mIsReday = false;
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onPasswdError(mBluetooth, BleLockerStatus.ERROR_PASS);}
-                    sta();
                     break;
                 case "ERROR COMM":
                     mIsReday = true;

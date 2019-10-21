@@ -2,6 +2,7 @@ package com.janady.device;
 
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -36,11 +37,13 @@ import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
+import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.AppConstants;
 import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
 import com.janady.HomeActivity;
 import com.janady.MainActivity;
+import com.janady.Util;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.lkd.BleLocker;
@@ -72,7 +75,8 @@ import static com.lib.funsdk.support.models.FunDevType.getType;
 
 public class DeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnFunDeviceOptListener, OnItemSelectedListener, OnItemClickListener,  OnAddSubDeviceResultListener {
 
-	
+	private Context mcontext = this;
+
 	private TextView mTextTitle = null;
 	private ImageButton mBtnBack = null;
     private TextView mTextTip = null;
@@ -103,6 +107,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private String inputPwd = "";
 
     private BleLocker bleLocker = null;
+    private boolean needCheckSTA = false;
+
+    DialogInputPasswd inputDialog = null;
 
 	//private final int MESSAGE_DELAY_FINISH = 0x100;
 	private final int MESSAGE_REFRESH_DEVICE_STATUS = 0x100;
@@ -190,6 +197,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		mSpinnerDevType.setOnItemSelectedListener(this);
 		
 		mEditDevSN = (EditText)findViewById(R.id.editDeviceSN);
+		mEditDevSN.setEnabled(false);
+
 		mEditSceneName = (EditText)findViewById(R.id.editSceneName);
 		mEditPassword = (EditText)findViewById(R.id.editDeviceLoginPassword);
 		mBtnDevAdd = (Button)findViewById(R.id.devAddBtn);
@@ -206,6 +215,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		mAdapterDev.setOnClickListener(new ListAdapterSimpleFunDevice.OnClickListener() {
 			@Override
 			public void OnClickedBle(SearchResult searchResult) {
+					needCheckSTA = true;
 					List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, searchResult.getAddress()));
 					if (bles != null && bles.size() > 0) {
 						/*bleOldPsw = bles.get(0).password;
@@ -213,6 +223,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						mEditPassword.setText(bles.get(0).password);
 						mEditSceneName.setText(bles.get(0).sceneName);
 						mBluetooth.isFirst = false;*/
+
+						mTextTitle.setText("修改设备");
+						mBtnDevAdd.setText("修改");
 
 						bleOldPsw = bles.get(0).password;
 						mBluetooth = bles.get(0);
@@ -248,9 +261,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
 					bleLocker.setmNoRssi(true);
 					bleLocker.connect();
-
 					//showInputPasswordDialog(EE_DEV_BLUETOOTH);
-
 					showWaitDialog();
 			}
 
@@ -603,7 +614,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
      * 显示输入设备密码对话框
      */
     private void showInputPasswordDialog(final FunDevType devType) {
-    	DialogInputPasswd inputDialog = new DialogInputPasswd(this,
+    	if(inputDialog!=null){return;}
+    	inputDialog = new DialogInputPasswd(this,
     			getResources().getString(R.string.device_login_input_password),
     			"",
     			R.string.common_confirm,
@@ -613,6 +625,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					@Override
 					public boolean confirm(String editText) {
 						if(devType==FunDevType.EE_DEV_BLUETOOTH) {
+							needCheckSTA = false;
 							if(mBluetooth!=null){
 								inputPwd = editText;
 								bleOldPsw = mBluetooth.password;
@@ -621,27 +634,38 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 									mEditPassword.setText(mBluetooth.password);
 									mEditSceneName.setText(mBluetooth.sceneName);
 									mBluetooth.isFirst = false;
+
 									bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
 									bleLocker.setmNoRssi(true);
 									bleLocker.connect();
-
-									mTextTitle.setText("修改设备");
-									mBtnDevAdd.setText("修改");
+									/*if(bleLocker!=null){
+										bleLocker.disconnect();
+										bleLocker.setmPassword(bleOldPsw);
+										bleLocker.connect();
+									}*/
 
 									showWaitDialog();
 								}else{
 									alertDialog("密码错误！蓝牙设备连接失败！", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog, int which) {
+											mEditDevSN.setText("");
+											mEditPassword.setText("");
+											mEditSceneName.setText("");
 											return;
 										}
 									}, new DialogInterface.OnCancelListener() {
 										@Override
 										public void onCancel(DialogInterface dialog) {
+											mEditDevSN.setText("");
+											mEditPassword.setText("");
+											mEditSceneName.setText("");
 											return;
 										}
 									});
+
 								}
+								super.hide();
 							}
 						}else {
 							//保存密码
@@ -654,6 +678,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							requestReloginByPasswd();
 						}
 
+						inputDialog = null;
 						return super.confirm(editText);
 					}
 
@@ -662,7 +687,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						super.cancel();
 						
 						// 取消输入密码,直接退出
-						finish();
+						//finish();
+
+						inputDialog = null;
 					}
     		
     	};
@@ -1019,7 +1046,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onBleReadResponse(Bluetooth bluetooth, byte[] data, BleLockerStatus status) {
-
+			BluetoothLog.i(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg()
+					+" bodycontent"+String.format("read: %s", ByteUtils.byteToString(data))+"\n");
 		}
 
 		@Override
@@ -1029,12 +1057,15 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onBleNotifyResponse(Bluetooth bluetooth, String NotifyValue, BleLockerStatus status) {
-
+			BluetoothLog.i(" 设备消息 onBleNotifyResponse：code="+ status.getSatusId() +"\n message=" + NotifyValue + "\n  status:" + status.getmStatusMsg() +"\n");
 		}
 
 		@Override
 		public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
-
+			BluetoothLog.i(" 连接设备，onConnected：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
+			if(status==BleLockerStatus.CONNECTED && needCheckSTA) {
+				bleLocker.sta();
+			}
 		}
 
 		@Override
@@ -1049,8 +1080,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
+			BluetoothLog.i(" 设备已准备，onReday：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			hideWaitDialog();
-			//bleLocker.sta();
+
 		}
 
 		@Override
@@ -1059,6 +1091,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}
 		@Override
 		public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
+			BluetoothLog.i(" 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			hideWaitDialog();
 			/*alertDialog("设备连接密码不正确，如果您忘记密码，可重置出厂设置后再添加此设备！", new DialogInterface.OnClickListener() {
 				@Override
@@ -1075,19 +1108,22 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}
 		@Override
 		public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
+			needCheckSTA=false;
 			if(Resetted ==1 ) {
-				//Dialogs.alertMessage(getApplicationContext(), "提示","设备已重置为出厂状态，输入新密码可重新激活本设备");
+				BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+				Dialogs.alertMessage(mcontext, "提示","设备已重置为出厂状态，输入新密码可重新激活本设备");
+				mTextTitle.setText("添加设备");
+				mBtnDevAdd.setText("添加");
 				bleOldPsw = "LKD.CN";
 				mBluetooth.password = "";
 				mBluetooth.isFirst = true;
-
-				if(bleLocker!=null){
-					bleLocker.disconnect();
-					bleLocker.setmPassword(bleOldPsw);
-					bleLocker.connect();
-				}
-			}else
-			{
+				bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
+				bleLocker.setmNoRssi(true);
+				bleLocker.connect();
+			}else{
+				BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+				mTextTitle.setText("修改设备");
+				mBtnDevAdd.setText("修改");
 				showInputPasswordDialog(EE_DEV_BLUETOOTH);
 			}
 		}
