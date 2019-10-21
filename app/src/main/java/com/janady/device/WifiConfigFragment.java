@@ -209,7 +209,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                     }
                 });
             }
-            new CountDownTimer(30000, 1000) {
+            new CountDownTimer(60000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.i("WifiConfigFragment", "seconds remaining: " + millisUntilFinished / 1000);
@@ -217,6 +217,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 }
 
                 public void onFinish() {
+                    FunSupport.getInstance().stopWiFiQuickConfig();
                     hideWaitDialog();
                     Dialogs.alertMessage(getContext(),"WIFI配置失败","设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
                     Log.i("WifiConfigFragment", "done!");

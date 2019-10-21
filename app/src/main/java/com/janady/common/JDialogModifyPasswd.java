@@ -118,6 +118,7 @@ public abstract class JDialogModifyPasswd {
 
 	public void hide() {
 		tip.dismiss();
+
 	}
 
 	public boolean confirm(String oldPasswd, String newPasswd, String confirmPasswd) {

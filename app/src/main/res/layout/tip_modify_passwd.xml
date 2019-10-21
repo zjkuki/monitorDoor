@@ -118,7 +118,6 @@
                         android:padding="6dp"
                         android:textColorHint="#ffd0d0d0"
                         android:textSize="16dp"
-                        android:inputType="textPassword"
                         android:gravity="center_vertical"
                         android:imeOptions="flagNoExtractUi"
                         />
@@ -149,7 +148,6 @@
                         android:padding="6dp"
                         android:textColorHint="#ffd0d0d0"
                         android:textSize="16dp"
-                        android:inputType="textPassword"
                         android:gravity="center_vertical"
                         android:imeOptions="flagNoExtractUi"
                         />
@@ -180,7 +178,6 @@
                         android:padding="6dp"
                         android:textColorHint="#ffd0d0d0"
                         android:textSize="16dp"
-                        android:inputType="textPassword"
                         android:gravity="center_vertical"
                         android:imeOptions="flagNoExtractUi"
                         />

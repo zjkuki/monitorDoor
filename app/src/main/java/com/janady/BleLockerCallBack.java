@@ -113,6 +113,16 @@ public class BleLockerCallBack implements BleLocker.IBleLockerListener {
         BluetoothLog.i(" 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
         AppendText(" 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
     }
+    @Override
+    public void onResetted(Bluetooth bluetooth, int Resetted , BleLockerStatus status) {
+        if(Resetted ==1 ) {
+            BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+            AppendText(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+        }else{
+            BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+            AppendText(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+        }
+    }
     private void AppendText(String text) {
         if(mIsTaost){
             Toast.makeText(context, text, Toast.LENGTH_LONG).show();

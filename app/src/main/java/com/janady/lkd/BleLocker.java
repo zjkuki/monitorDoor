@@ -44,11 +44,20 @@ public class BleLocker {
         return mConnected;
     }
 
+    private boolean mIsResetted = false;
+    public boolean getIsResetted() {
+        return mIsResetted;
+    }
+
+    private boolean mIsLocked = false;
+    public boolean getIsLocked() {
+        return mIsLocked;
+    }
+
     private boolean mIsReday = false;
     public boolean getIsReday() {
         return mIsReday;
     }
-
     private Bluetooth mBluetooth;
     public Bluetooth getmBluetooth() { return mBluetooth; }
     public void setmBluetooth(Bluetooth bluetooth) {
@@ -256,7 +265,6 @@ public class BleLocker {
                     if(mIBleLockerListener!=null){
                         mConnected = true;
                         mIBleLockerListener.onConnected(mBluetooth, BleLockerStatus.CONNECTED);
-
                         sendDataByString(getmPassword());
                         //mHandler.postDelayed(Heartbeat,0);
                         if(!mNoRssi) {
@@ -301,6 +309,11 @@ public class BleLocker {
             mHandler.removeCallbacks(Heartbeat);
             connect();
         }
+    }
+
+    public void sta(){
+        sendDataByString("STA");
+        BluetoothLog.v(String.format("查询蓝牙设备状态：STA"));
     }
 
     public void lock(){
@@ -390,17 +403,28 @@ public class BleLocker {
             String rtvMsg="";
 
             if(mBleNotifyValue.contains("STA")){
+                //检查锁标志 0-无锁，1-有锁
                 String stat = mBleNotifyValue.substring(3,4);
                 if(stat.contains("1")) {
-                    if (mIBleLockerListener != null) {
-                        mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.LOCKED);
-                    }
+                    if (mIBleLockerListener != null) { mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.LOCKED); }
+                    mLastStatus = BleLockerStatus.LOCKED;
+                    mIsLocked = true;
                 }else{
-                    if (mIBleLockerListener != null) {
-                        mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.UNLOCKED);
-                    }
+                    mIsLocked = false;
+                    mLastStatus = BleLockerStatus.UNLOCKED;
+                    if (mIBleLockerListener != null) { mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.UNLOCKED);}
                 }
-
+                //检查重置标志 0-正常  1-已重置
+                stat = mBleNotifyValue.substring(4,5);
+                if(stat.contains("1")) {
+                    mLastStatus = BleLockerStatus.RESETTED;
+                    if (mIBleLockerListener != null) {mIBleLockerListener.onResetted(mBluetooth, 1, BleLockerStatus.RESETTED);}
+                    mIsResetted = true;
+                }else{
+                    mIsResetted = false;
+                    mLastStatus = BleLockerStatus.NORESETTED;
+                    if (mIBleLockerListener != null) {mIBleLockerListener.onResetted(mBluetooth, 0, BleLockerStatus.NORESETTED); }
+                }
             }
 
             switch (mBleNotifyValue) {
@@ -409,6 +433,7 @@ public class BleLocker {
                     mLastStatus = BleLockerStatus.ERROR_PASS;
                     mIsReday = false;
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onPasswdError(mBluetooth, BleLockerStatus.ERROR_PASS);}
+                    sta();
                     break;
                 case "ERROR COMM":
                     mIsReday = true;
@@ -519,5 +544,7 @@ public class BleLocker {
         void onGetRssi(Bluetooth bluetooth, int Rssi, BleLockerStatus status);
 
         void onPasswdError(Bluetooth bluetooth, BleLockerStatus status);
+
+        void onResetted(Bluetooth bluetooth, int Reseetted, BleLockerStatus status);
     }
 }

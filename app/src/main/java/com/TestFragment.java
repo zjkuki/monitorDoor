@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.Image;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
@@ -55,6 +56,8 @@ import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.OnFunDeviceListener;
+import com.lib.funsdk.support.OnFunDeviceOptListener;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
@@ -72,7 +75,7 @@ import java.util.List;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_UNKNOWN;
 
-public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener {
+public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener, OnFunDeviceListener  {
     QMUITopBarLayout mTopBar;
     RecyclerView mRecyclerView;
     QMUIPullRefreshLayout mPullRefreshLayout;
@@ -84,6 +87,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private Handler mHandler = new Handler();
 
     private boolean isScanning = false;
+
+    private CountDownTimer countDownTimer = null;
 
     @Override
     protected View onCreateView() {
@@ -117,6 +122,26 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }, 2000);
             }
         });
+
+
+        showWaitDialog();
+        setMsgText("正在检查摄像机在线状态，请稍等...");
+        FunSupport.getInstance().requestLanDeviceList();
+
+        countDownTimer = new CountDownTimer(30000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                Log.i("TestFragment", "seconds remaining: " + millisUntilFinished / 1000);
+                setMsgText("正在检查摄像机在线状态，请稍等..."+String.valueOf(millisUntilFinished / 1000)+"秒");
+            }
+
+            public void onFinish() {
+                //FunSupport.getInstance().stopWiFiQuickConfig();
+                hideWaitDialog();
+                refreshDataSet();
+                Log.i("TestFragment", "done!");
+            }
+        }.start();
 
         mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
 
@@ -312,8 +337,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
     private void  refreshDataSet() {
+        if(FunSupport.getInstance().getLanDeviceList().size()>0){
+            hideWaitDialog();
+            DataManager.getInstance().mFunDevices = FunSupport.getInstance().getLanDeviceList();
+            countDownTimer.cancel();
+        }
+
         DataManager.getInstance().mBleDevices = mBleDevices;
-        DataManager.getInstance().mFunDevices = FunSupport.getInstance().getLanDeviceList();
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter.setData(mainItems);
         mItemAdapter.notifyDataSetChanged();
@@ -326,7 +356,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             isScanning = true;
             if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(2000, 1).build();
+                    .searchBluetoothLeDevice(3000, 1).build();
 
             ClientManager.getClient().search(request, mSearchResponse);
         Log.i("DataManager","停止扫描设备....");
@@ -347,10 +377,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
 
                 if (mBleDevices.size() > 0) {
-                    List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
-                    if(blists.size()>0){
+                    //List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
+                    //if(blists.size()>0){
                         refreshDataSet();
-                    }
+                    //}
 
                     Log.i("DataManager","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
                     //refreshDataSet();
@@ -383,10 +413,51 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         @Override
         public void run() {
             searchBleDevice();
-            if(FunSupport.getInstance().requestLanDeviceList()){
-                refreshDataSet();
-            }
+            //if(FunSupport.getInstance().requestLanDeviceList()){
+            FunSupport.getInstance().requestLanDeviceList();
+            refreshDataSet();
+            //}
             mHandler.postDelayed(searchDevices, 10000);//每n秒执行一次runnable.
         }
     };
+
+    @Override
+    public void onDeviceListChanged() {
+        refreshDataSet();
+    }
+
+    @Override
+    public void onDeviceStatusChanged(FunDevice funDevice) {
+        refreshDataSet();
+    }
+
+    @Override
+    public void onDeviceAddedSuccess() {
+
+    }
+
+    @Override
+    public void onDeviceAddedFailed(Integer errCode) {
+
+    }
+
+    @Override
+    public void onDeviceRemovedSuccess() {
+
+    }
+
+    @Override
+    public void onDeviceRemovedFailed(Integer errCode) {
+
+    }
+
+    @Override
+    public void onAPDeviceListChanged() {
+        refreshDataSet();
+    }
+
+    @Override
+    public void onLanDeviceListChanged() {
+        refreshDataSet();
+    }
 }

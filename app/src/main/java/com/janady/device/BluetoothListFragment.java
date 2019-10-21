@@ -16,6 +16,7 @@ import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.JBaseGroupedListFragment;
 import com.janady.base.JTabSegmentFragment;
 import com.janady.database.model.Bluetooth;
+import com.janady.lkd.BleLocker;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
@@ -92,9 +93,15 @@ public class BluetoothListFragment extends JBaseFragment {
         mItemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int pos) {
-                BluetoothOperatorFragment bluetoothOperatorFragment = new BluetoothOperatorFragment();
+                /*BluetoothOperatorFragment bluetoothOperatorFragment = new BluetoothOperatorFragment();
                 bluetoothOperatorFragment.setBluetoothDevice(mBluetooths.get(pos));
-                startFragment(bluetoothOperatorFragment);
+                startFragment(bluetoothOperatorFragment);*/
+                BluetoothLockFragment bluetoothLockFragment = new BluetoothLockFragment();
+                bluetoothLockFragment.bleLocker = new BleLocker(mBluetooths.get(pos),false,800,null);
+                bluetoothLockFragment.bleLocker.setmNoRssi(true);
+                bluetoothLockFragment.isDebugViewOpen = true;
+                startFragment(bluetoothLockFragment);
+                //popBackStack();
             }
         });
         mRecyclerView.setAdapter(mItemAdapter);

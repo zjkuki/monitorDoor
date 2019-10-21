@@ -38,6 +38,7 @@ import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.janady.AppConstants;
 import com.janady.BleLockerCallBack;
+import com.janady.Dialogs;
 import com.janady.HomeActivity;
 import com.janady.MainActivity;
 import com.janady.database.model.Bluetooth;
@@ -66,9 +67,10 @@ import java.util.List;
 
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
+import static com.lib.funsdk.support.models.FunDevType.getType;
 
 
-public class DeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnItemSelectedListener, OnItemClickListener, OnFunDeviceOptListener, OnAddSubDeviceResultListener {
+public class DeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnFunDeviceOptListener, OnItemSelectedListener, OnItemClickListener,  OnAddSubDeviceResultListener {
 
 	
 	private TextView mTextTitle = null;
@@ -211,10 +213,19 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						mEditPassword.setText(bles.get(0).password);
 						mEditSceneName.setText(bles.get(0).sceneName);
 						mBluetooth.isFirst = false;*/
+
 						bleOldPsw = bles.get(0).password;
 						mBluetooth = bles.get(0);
-						showInputPasswordDialog(EE_DEV_BLUETOOTH);
-						return;
+						mEditDevSN.setText(searchResult.getName());
+						mEditSceneName.setText(bles.get(0).sceneName);
+
+						mBluetooth.name = searchResult.getName();
+						mBluetooth.mac = searchResult.getAddress();
+						mBluetooth.writeUuid = AppConstants.bleWriteCharacter;
+						mBluetooth.notifyUuid = AppConstants.bleNotifitesCharacter;
+						mBluetooth.serviceUuid = AppConstants.bleService;
+						//showInputPasswordDialog(EE_DEV_BLUETOOTH);
+						//return;
 					} else {
 						mTextTitle.setText("添加设备");
 						mBtnDevAdd.setText("添加");
@@ -237,6 +248,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
 					bleLocker.setmNoRssi(true);
 					bleLocker.connect();
+
+					//showInputPasswordDialog(EE_DEV_BLUETOOTH);
 
 					showWaitDialog();
 			}
@@ -409,7 +422,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								bluetooth.isFirst = mBluetooth.isFirst;
 							} else {
 								bluetooth = mBluetooth;
-							}
+							}*/
 
 							if(bleLocker.getIsReday()) {bleLocker.changePassword(mBluetooth.password);}else{
 								alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
@@ -423,7 +436,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 										return;
 									}
 								});
-							}*/
+							}
 
 							MyApplication.liteOrm.save(mBluetooth);
 						}
@@ -1037,6 +1050,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		@Override
 		public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
 			hideWaitDialog();
+			//bleLocker.sta();
 		}
 
 		@Override
@@ -1046,7 +1060,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		@Override
 		public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
 			hideWaitDialog();
-			alertDialog("设备连接密码不正确，如果您忘记密码，可重置出厂设置后再添加此设备！", new DialogInterface.OnClickListener() {
+			/*alertDialog("设备连接密码不正确，如果您忘记密码，可重置出厂设置后再添加此设备！", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					return;
@@ -1056,7 +1070,26 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				public void onCancel(DialogInterface dialog) {
 					return;
 				}
-			});
+			});*/
+			//bleLocker.sta();
+		}
+		@Override
+		public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
+			if(Resetted ==1 ) {
+				//Dialogs.alertMessage(getApplicationContext(), "提示","设备已重置为出厂状态，输入新密码可重新激活本设备");
+				bleOldPsw = "LKD.CN";
+				mBluetooth.password = "";
+				mBluetooth.isFirst = true;
+
+				if(bleLocker!=null){
+					bleLocker.disconnect();
+					bleLocker.setmPassword(bleOldPsw);
+					bleLocker.connect();
+				}
+			}else
+			{
+				showInputPasswordDialog(EE_DEV_BLUETOOTH);
+			}
 		}
 	};
 }

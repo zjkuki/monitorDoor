@@ -209,6 +209,11 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name.substring(0,5) + "...\n   onPasswdError：" + status.getmStatusMsg());
         }
+        @Override
+        public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onResetted：" + Resetted
+                    +"\n  status:" + status.getmStatusMsg());
+        }
     };
 
 

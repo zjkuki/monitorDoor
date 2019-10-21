@@ -19,12 +19,14 @@ import com.example.funsdkdemo.R;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.janady.AppConstants;
 import com.janady.BleLockerCallBack;
+import com.janady.Dialogs;
 import com.janady.Util;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.common.JDialogModifyPasswd;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
+import com.janady.device.BluetoothLockFragment;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.lib.funsdk.support.FunPath;
@@ -105,9 +107,9 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                 bleLocker = new BleLocker(mCurrBleDev.mac, false, AppConstants.bleService,
                         AppConstants.bleNotifitesCharacter, AppConstants.bleWriteCharacter , mCurrBleDev.password,800, iBleLockerListener);
 
+                //bleLocker.disconnect();
                 bleLocker.connect();
                 bleLocker.setmNoRssi(true);
-
                 mWaitDialog.show();
             }
         });
@@ -117,7 +119,12 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
     private BleLocker.IBleLockerListener iBleLockerListener = new BleLocker.IBleLockerListener() {
         @Override
         public void onPasswordChanged(Bluetooth bluetooth, BleLockerStatus status) {
-
+            Dialogs.alertDialogBtn(context, "提示", "密码修改成功！", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(bleLocker!=null){ bleLocker.disconnect();}
+                }
+            });
         }
 
         @Override
@@ -161,7 +168,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
 
         @Override
         public void onDisconnected(Bluetooth bluetooth, BleLockerStatus status) {
-            tvMac.setText("未连接");
+            //tvMac.setText("未连接");
         }
 
         @Override
@@ -183,6 +190,9 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         @Override
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
         }
+        @Override
+        public void onResetted(Bluetooth bluetooth, int Resetted ,BleLockerStatus status) {
+        }
     };
 
     /**
@@ -203,6 +213,10 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                         bleLocker.connect();
 
                         bleLocker.changePassword(newPasswd);
+
+                        mCurrBleDev.password = newPasswd;
+
+                        MyApplication.liteOrm.save(mCurrBleDev);
                     }else{
                         this.mMessages.setText("密码错误！蓝牙设备未连接成功！");
                         this.mMessages.setVisibility(View.VISIBLE);

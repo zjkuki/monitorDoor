@@ -22,7 +22,9 @@ public enum BleLockerStatus {
     DEVICE_RSSI_GETTING(16,"获取Rssi\n"),
     LOCKED(17,"已锁\n"),
     UNLOCKED(18,"无锁\n"),
-    REDAY(19,"设备已就绪\n");
+    REDAY(19,"设备已就绪\n"),
+    RESETTED(20,"设备已重置为出厂状态\n"),
+    NORESETTED(21,"正常配置状态\n");
 
 
     private int mStatusId;

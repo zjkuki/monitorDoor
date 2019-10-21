@@ -301,17 +301,22 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
             hideWaitDialog();
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onReday feed back：" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onReday：" + status.getmStatusMsg());
 
         }
 
         @Override
         public void onGetRssi(Bluetooth bluetooth, int Rssi, BleLockerStatus status) {
-            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onGetRssi feed back：" + status.getmStatusMsg());
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onGetRssi：" + status.getmStatusMsg());
         }
         @Override
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onPasswdError：" + status.getmStatusMsg());
+        }
+        @Override
+        public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
+            Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onResetted：" + Resetted
+                    +"\n  status:" + status.getmStatusMsg());
         }
     };
 
