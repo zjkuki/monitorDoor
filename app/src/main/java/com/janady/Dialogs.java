@@ -46,17 +46,23 @@ public class Dialogs {
 
     //错误警示
     public static void alertMessage(Context context, String title, String message){
-        alertDialogBtn(context,title,message,BtnOkClick);
+        alertDialogBtn(context,title,message,BtnOkClick,null);
+    }
+
+    //错误警示,带取消监听
+    public static void alertMessage(Context context, String title, String message, DialogInterface.OnCancelListener onCancle){
+        alertDialogBtn(context,title,message,BtnOkClick, onCancle);
     }
 
     //单按钮Dialog（确定）
-    public static void alertDialogBtn(Context context, String title, String content, DialogInterface.OnClickListener btnOk){
+    public static void alertDialogBtn(Context context, String title, String content, DialogInterface.OnClickListener btnOk, DialogInterface.OnCancelListener onCancle){
         alert = null;
         builder = new AlertDialog.Builder(context);
         alert = builder.setIcon(R.drawable.xmjp_camera)
                 .setTitle(title)
                 .setMessage(content)
                 .setPositiveButton("确定", btnOk)
+                .setOnCancelListener(onCancle)
                 .create();
         alert.show();
     }

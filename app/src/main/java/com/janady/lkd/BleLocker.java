@@ -447,29 +447,39 @@ public class BleLocker {
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onReday(mBluetooth, BleLockerStatus.SET_ERROR);}
                     break;
                 case "CHA OK":
+                    mIsReday = true;
                     mLastStatus = BleLockerStatus.CHA_OK;
                     rtvMsg = "更改密码成功";
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onPasswordChanged(mBluetooth, BleLockerStatus.CHA_OK);}
+                    sta();
                     break;
                 case "SET OPEN":
+                    mIsReday = true;
                     mLastStatus = BleLockerStatus.SET_OPEN;
                     rtvMsg = "控制开";
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onOpened(mBluetooth, BleLockerStatus.SET_OPEN);}
+                    sta();
                     break;
                 case "SET CLOSE":
+                    mIsReday = true;
                     mLastStatus = BleLockerStatus.SET_CLOSE;
                     rtvMsg = "控制关";
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onClosed(mBluetooth, BleLockerStatus.SET_CLOSE);}
+                    sta();
                     break;
                 case "SET LOCK":
+                    mIsReday = true;
                     rtvMsg = "控制锁";
                     mLastStatus = BleLockerStatus.SET_LOCK;
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onLock(mBluetooth, BleLockerStatus.SET_LOCK);}
+                    sta();
                     break;
                 case "SET STOP":
                     rtvMsg = "控制停";
+                    mIsReday = true;
                     mLastStatus = BleLockerStatus.SET_STOP;
                     if(mIBleLockerListener!=null){ mIBleLockerListener.onStoped(mBluetooth, BleLockerStatus.SET_STOP);}
+                    sta();
                     break;
             }
 

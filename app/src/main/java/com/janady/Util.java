@@ -17,6 +17,7 @@ import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.R;
+import com.janady.lkd.BleLocker;
 
 import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;

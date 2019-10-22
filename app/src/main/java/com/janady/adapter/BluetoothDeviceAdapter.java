@@ -124,7 +124,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                 public void onClick(DialogInterface dialog, int which) {
                     if(bleLocker!=null){ bleLocker.disconnect();}
                 }
-            });
+            }, null);
         }
 
         @Override
@@ -203,7 +203,8 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                 context.getResources().getString(R.string.device_login_input_password),
                 "","","",
                 R.string.common_confirm,
-                R.string.common_cancel
+                R.string.common_cancel,
+                false
         ){
             @Override
             public boolean confirm(String oldPasswd, String newPasswd, String confirmPasswd) {

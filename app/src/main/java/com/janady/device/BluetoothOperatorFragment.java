@@ -1,5 +1,6 @@
 package com.janady.device;
 
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -70,6 +71,7 @@ public class BluetoothOperatorFragment extends JBaseSegmentFragment implements V
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.jbluetooth_operator_layout, null);
 
             tvresult = view.findViewById(R.id.result);
+            tvresult.setMovementMethod(ScrollingMovementMethod.getInstance());
 
             view.findViewById(R.id.open).setOnClickListener(this);
             view.findViewById(R.id.close).setOnClickListener(this);

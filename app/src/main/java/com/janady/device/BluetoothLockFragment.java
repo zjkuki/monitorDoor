@@ -1,21 +1,30 @@
 package com.janady.device;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.CountDownTimer;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
 import com.janady.Util;
 import com.janady.base.JTabSegmentFragment;
+import com.janady.common.JDialogModifyPasswd;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
@@ -25,6 +34,9 @@ import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 
 public class BluetoothLockFragment extends JBaseFragment implements View.OnClickListener {
     private static final String MAC = "D0:D3:86:72:4D:42";
@@ -43,10 +55,17 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     private com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton lockBtn;
     private com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton stopBtn;
     private ImageButton mBtnBack;
+
+    private ImageView imgLockStat;
+    private TextView tvLockStat;
+
     private TextView mTextTitle;
     private TextView tvresult;
 
     private boolean isLocked = false;
+
+    private String bleOldPsw = "LKD.CN";
+    private boolean needCheckSTA = false;
 
     QMUITopBarLayout mTopBar;
     @Override
@@ -71,7 +90,12 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         stopBtn = root.findViewById(R.id.unlock);
         stopBtn.setOnClickListener(this);
 
+        imgLockStat = root.findViewById(R.id.imgLockStat);
+        tvLockStat = root.findViewById(R.id.tvLockStat);
+
         tvresult = root.findViewById(R.id.result);
+        tvresult.setMovementMethod(ScrollingMovementMethod.getInstance());
+
         if(isDebugViewOpen){
             tvresult.setVisibility(View.VISIBLE);
         }else{
@@ -103,9 +127,18 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     }
 
     @Override
+    public void onDestroyView() {
+        if(bleLocker!=null){bleLocker.disconnect();}
+        super.onDestroyView();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
-        if(bleLocker != null) {bleLocker.connect();}
+        if(bleLocker != null) {
+            needCheckSTA = true;
+            bleLocker.connect();
+        }
     }
 
     @Override
@@ -133,7 +166,6 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         });
     }
 
-
     private boolean isScanning = false;
     @Override
     public void onClick(View v) {
@@ -145,9 +177,9 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             }
             break;
             case R.id.open:
-                if(isLocked){
+/*                if(isLocked){
                     Dialogs.alertMessage(this.getContext(),"提示", "操作失败，请先开锁！");
-                }
+                }*/
                 bleLocker.open();
                 break;
             case R.id.close:
@@ -176,6 +208,21 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                 bleLocker.disconnect();
                 break;
         }
+    }
+
+    private void setLockedBtns(boolean isLocked){
+        openBtn.setEnabled(!isLocked);
+        closeBtn.setEnabled(!isLocked);
+        if(isLocked) {
+            openBtn.setTextColor(Color.GRAY);
+            closeBtn.setTextColor(Color.GRAY);
+            stopBtn.setText("开锁");
+        }else{
+            openBtn.setTextColor(stopBtn.getTextColors());
+            closeBtn.setTextColor(stopBtn.getTextColors());
+            stopBtn.setText("停");
+        }
+
     }
 
     /**
@@ -234,24 +281,30 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onClosed(Bluetooth bluetooth, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onClose：" + status.getmStatusMsg());
-            mTextTitle.setText(title + " - 关门操作");
+            mTextTitle.setText(title + " - 关门");
         }
 
         @Override
         public void onStoped(Bluetooth bluetooth, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onStop：" + status.getmStatusMsg());
-            mTextTitle.setText(title + " - 停止操作");
+            mTextTitle.setText(title + " - 停止");
         }
 
         @Override
         public void onLock(Bluetooth bluetooth, BleLockerStatus status) {
             if(status==BleLockerStatus.LOCKED){
                 isLocked = true;
+                imgLockStat.setImageResource(R.drawable.ic_locked);
+                tvLockStat.setText("有锁");
+                mTextTitle.setText(title + " - 有锁");
             }else{
+                imgLockStat.setImageResource(R.drawable.ic_unlocked);
+                tvLockStat.setText("无锁");
                 isLocked = false;
             }
+
+            setLockedBtns(isLocked);
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onLock：" + status.getmStatusMsg());
-            mTextTitle.setText(title + " - 锁操作");
         }
 
         @Override
@@ -286,6 +339,9 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
             mTextTitle.setText(title+" - 正在连接");
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onConnected：" + status.getmStatusMsg());
+            if(status==BleLockerStatus.CONNECTED && needCheckSTA) {
+                bleLocker.sta();
+            }
         }
 
         @Override
@@ -317,7 +373,78 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onResetted：" + Resetted
                     +"\n  status:" + status.getmStatusMsg());
+            needCheckSTA=false;
+            if(Resetted ==1 ) {
+                BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+                Dialogs.alertDialogBtn(getContext(), "提示", "设备已重置为出厂状态，输入新密码可重新激活本设备", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        bleOldPsw = "LKD.CN";
+                        bleLocker = new BleLocker(bleLocker.getmBluetooth(), false, 800, iBleLockerListener);
+                        bleLocker.setmPassword(bleOldPsw);
+                        bleLocker.setmNoRssi(true);
+                        bleLocker.connect();
+                        showInputPasswordDialog();
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        popBackStack();
+                    }
+                });
+            }else{
+                BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+            }
         }
     };
 
+    /**
+     * 显示输入设备密码对话框
+     */
+    private void showInputPasswordDialog() {
+        JDialogModifyPasswd inputDialog = new JDialogModifyPasswd(getContext(),
+                getContext().getResources().getString(R.string.device_login_input_password),
+                "","","",
+                R.string.common_confirm,
+                R.string.common_cancel,
+                true
+        ){
+            @Override
+            public boolean confirm(String oldPasswd, String newPasswd, String confirmPasswd) {
+
+                if(confirmPasswd.equals(newPasswd)){
+                    while (!bleLocker.getIsReday()) {
+                    }
+                    bleLocker.changePassword(newPasswd);
+                    bleLocker.getmBluetooth().password = newPasswd;
+                    MyApplication.liteOrm.save(bleLocker.getmBluetooth());
+
+                    tvresult.setText("");
+                    bleLocker = new BleLocker(bleLocker.getmBluetooth(), false, 800, iBleLockerListener);
+                    bleLocker.setmPassword(newPasswd);
+                    bleLocker.setmNoRssi(true);
+                    bleLocker.connect();
+
+                }else{
+                    this.mMessages.setText("两次密码输入不正确！");
+                    this.mMessages.setVisibility(View.VISIBLE);
+                    return false;
+                }
+
+                return super.confirm(oldPasswd,newPasswd,confirmPasswd);
+
+            }
+
+            @Override
+            public void cancel() {
+                super.cancel();
+                if(bleLocker!=null){bleLocker.disconnect();}
+                popBackStack();
+                // 取消输入密码,直接退出
+            }
+
+        };
+
+        inputDialog.show();
+    }
 }

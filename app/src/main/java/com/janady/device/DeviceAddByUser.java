@@ -1118,6 +1118,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				mBluetooth.password = "";
 				mBluetooth.isFirst = true;
 				bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
+				bleLocker.setmPassword(bleOldPsw);
 				bleLocker.setmNoRssi(true);
 				bleLocker.connect();
 			}else{

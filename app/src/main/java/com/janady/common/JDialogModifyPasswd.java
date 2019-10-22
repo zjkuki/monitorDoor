@@ -28,16 +28,21 @@ public abstract class JDialogModifyPasswd {
 	TextView mTextConfirm;
 	TextView mTextCancel;
 	RelativeLayout mLayoutTipShow;
+	LinearLayout llOldPasswd;
 	LinearLayout mLayoutConfirm;
 	LinearLayout mLayoutCancel;
 	EditText edtOldPasswd;
 	EditText edtNewPasswd;
 	EditText edtComfirmPasswd;
+	public boolean isOnlyNewPasswd = false;
 
 	private final int MESSAGE_SHOW_IM = 0x102;
 
+
 	public JDialogModifyPasswd(Context context, String titleRes, String oldPasswd, String newPasswd, String comfirmPasswd, int confirmRes,
-                               int cancelRes) {
+                               int cancelRes, boolean OnlyNewPasswd) {
+
+		this.isOnlyNewPasswd = OnlyNewPasswd;
 		this.context = context;
 
 		tip = new AlertDialog.Builder(context).create();
@@ -53,6 +58,13 @@ public abstract class JDialogModifyPasswd {
 		mLayoutTipShow = (RelativeLayout) view.findViewById(R.id.tipShow);
 		mLayoutConfirm = (LinearLayout) view.findViewById(R.id.confirmLayout);
 		mLayoutCancel = (LinearLayout) view.findViewById(R.id.cancelLayout);
+		llOldPasswd = (LinearLayout) view.findViewById(R.id.ll_oldPasswd);
+		if(isOnlyNewPasswd){
+			llOldPasswd.setVisibility(View.GONE);
+		}else {
+			llOldPasswd.setVisibility(View.VISIBLE);
+		}
+
 		edtOldPasswd = (EditText) view.findViewById(R.id.editOldPasswd);
 		edtNewPasswd = (EditText) view.findViewById(R.id.editNewPasswd);
 		edtComfirmPasswd = (EditText) view.findViewById(R.id.editComfirmPasswd);
@@ -79,6 +91,16 @@ public abstract class JDialogModifyPasswd {
 		
 		tip.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM); 
 		tip.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+		if(edtOldPasswd.getVisibility()==View.VISIBLE){
+			edtOldPasswd.setFocusableInTouchMode(true);
+			edtOldPasswd.setFocusable(true);
+			edtOldPasswd.requestFocus();
+		}else{
+			edtNewPasswd.setFocusableInTouchMode(true);
+			edtNewPasswd.setFocusable(true);
+			edtNewPasswd.requestFocus();
+		}
 	}
 	
 

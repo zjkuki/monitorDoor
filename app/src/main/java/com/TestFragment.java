@@ -144,8 +144,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         }.start();
 
-        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
-
         initTopBar();
         initRecyclerView();
         return rootView;
@@ -260,6 +258,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onItemClick(ItemDescription itemDescription) {
         ClientManager.getClient().stopSearch();
+        mHandler.removeCallbacksAndMessages(null);
         if(!itemDescription.getEnable()){
             return;
         }
@@ -313,6 +312,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {
         ClientManager.getClient().stopSearch();
+        mHandler.removeCallbacksAndMessages(searchDevices);
         JBaseFragment fragment = null;
         Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
             fragment = mainItemDescription.getDemoClass().newInstance();
@@ -332,6 +332,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     //***********************************************************
     // item class
     //***********************************************************
+
+    @Override
+    public void onResume() {
+        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
+        super.onResume();
+    }
 
     @Override
     public void onStart() {
@@ -403,17 +409,17 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         refreshDataSet();
                     //}
 
-                    Log.i("DataManager","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
+                    Log.i("TestFragment","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
                     //refreshDataSet();
                 }
             } else {
-                Log.i("DataManager","非本产品蓝牙设备");
+                Log.i("TestFragment","非本产品蓝牙设备");
             }
         }
 
         @Override
         public void onSearchStopped() {
-            Log.i("DataManager","扫描停止");
+            Log.i("TestFragment","扫描停止");
             if (mBleDevices.size() > 0) {
                 refreshDataSet();
                 isScanning = false;
@@ -422,7 +428,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         @Override
         public void onSearchCanceled() {
-            Log.i("DataManager","扫描取消");
+            Log.i("TestFragment","扫描取消");
             if (mBleDevices.size() > 0) {
                 refreshDataSet();
                 isScanning = false;
