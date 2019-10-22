@@ -347,6 +347,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onDisconnected(Bluetooth bluetooth, BleLockerStatus status) {
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onDisconnected：" + status.getmStatusMsg());
+            popBackStack();
         }
 
         @Override
