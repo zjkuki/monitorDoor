@@ -59,6 +59,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:launchMode="singleInstance"
             android:name="com.janady.HomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait">

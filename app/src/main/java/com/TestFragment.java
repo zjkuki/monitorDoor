@@ -126,7 +126,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         showWaitDialog();
         setMsgText("正在检查设备在线状态，请稍等...");
-        FunSupport.getInstance().requestLanDeviceList();
+        //FunSupport.getInstance().requestLanDeviceList();
 
         countDownTimer = new CountDownTimer(5000, 1000) {
 
@@ -364,9 +364,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     }
     private void  refreshDataSet() {
-        if(FunSupport.getInstance().getLanDeviceList().size()>0){
+        if(FunSupport.getInstance().getDeviceList().size()>0){
             hideWaitDialog();
-            DataManager.getInstance().mFunDevices = FunSupport.getInstance().getLanDeviceList();
+            DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
             countDownTimer.cancel();
         }
 
@@ -381,7 +381,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             startBluetooth();
 
             isScanning = true;
-            if(mBleDevices.size()>0){mBleDevices.clear();}
+            //if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
                     .searchBluetoothLeDevice(3000, 1).build();
 
@@ -441,7 +441,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         public void run() {
             searchBleDevice();
             //if(FunSupport.getInstance().requestLanDeviceList()){
-            FunSupport.getInstance().requestLanDeviceList();
+            FunSupport.getInstance().requestDeviceList();
             refreshDataSet();
             //}
             mHandler.postDelayed(searchDevices, 10000);//每n秒执行一次runnable.

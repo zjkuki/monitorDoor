@@ -74,7 +74,8 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
                     Intent intent = new Intent();
 
                     intent.setClass(getContext(), HomeActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
                     startActivity(intent);
 

@@ -19,6 +19,7 @@ import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.CommonUtils;
 import com.janady.StringUtils;
+import com.janady.Util;
 import com.janady.database.model.Bluetooth;
 
 import java.util.UUID;
@@ -312,6 +313,7 @@ public class BleLocker {
     }
 
     public void sta(){
+        Util.sleep(300);
         sendDataByString("STA");
         BluetoothLog.v(String.format("查询蓝牙设备状态：STA"));
     }
