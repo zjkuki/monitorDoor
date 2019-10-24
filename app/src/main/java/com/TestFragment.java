@@ -381,14 +381,44 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             startBluetooth();
 
             isScanning = true;
+
             //if(mBleDevices.size()>0){mBleDevices.clear();}
-            SearchRequest request = new SearchRequest.Builder()
+            /*SearchRequest request = new SearchRequest.Builder()
                     .searchBluetoothLeDevice(3000, 1).build();
 
-            ClientManager.getClient().search(request, mSearchResponse);
+            ClientManager.getClient().search(request, mSearchResponse);*/
+
+            ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
+            List<Object> bitems = new ArrayList<>();
+            for (Bluetooth bluetooth : blists) {
+                matchBleLockerOnline(bluetooth);
+            }
         Log.i("DataManager","停止扫描设备....");
     }
 
+    /**
+     * 查找蓝牙设备列表是否有这个设备
+     *
+     *
+     */
+    public void matchBleLockerOnline(Bluetooth bluetooth) {
+        if(bluetooth==null){return;}
+        final BleLocker bleLocker = new BleLocker(bluetooth,false,800, null);
+        bleLocker.connect(new BleLocker.OnCheckOnlineCallBack() {
+            @Override
+            public void onSuccess(Bluetooth bluetooth) {
+                bleLocker.disconnect();
+
+                return;
+            }
+
+            @Override
+            public void onFail(Bluetooth bluetooth) {
+                return;
+            }
+        });
+        return;
+    }
     private final SearchResponse mSearchResponse = new SearchResponse() {
         @Override
         public void onSearchStarted() {

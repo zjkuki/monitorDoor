@@ -1,14 +1,8 @@
 package com.janady.manager;
 
-import android.util.Log;
-
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
-import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
-import com.inuker.bluetooth.library.search.response.SearchResponse;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.janady.AppConstants;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
@@ -17,27 +11,21 @@ import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
 import com.janady.device.BluetoothLockFragment;
-import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
 import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
-import com.janady.device.ELinkWifiConfigFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
 import com.janady.lkd.BleLocker;
-import com.janady.lkd.ClientManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.lib.funsdk.support.FunSupport;
-import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
 
 public class DataManager {
     public List<SearchResult> mBleDevices;
@@ -122,7 +110,8 @@ public class DataManager {
             //ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
             ItemDescription itemDescription = new ItemDescription(BluetoothLockFragment.class, bluetooth.sceneName, R.drawable.icon_check);
 
-            itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
+            //itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
+            itemDescription.setEnable(true);
             itemDescription.setItem(bluetooth);
             //itemDescription.setItem(new BleLocker(bluetooth,false,800,null));
 
@@ -170,6 +159,7 @@ public class DataManager {
             return false;
         }
     }
+
 
     /**
      * 查找摄像设备列表是否有这个设备

@@ -81,6 +81,8 @@ public class BluetoothListFragment extends JBaseFragment {
                 intent.setClass(getContext(), DeviceAddByUser.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+
+                popBackStack();
             }
         });
 

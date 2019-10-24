@@ -5,7 +5,6 @@ import android.os.Handler;
 
 import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.listener.BluetoothStateListener;
 import com.inuker.bluetooth.library.connect.options.BleConnectOptions;
 import com.inuker.bluetooth.library.connect.response.BleMtuResponse;
 import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
@@ -19,7 +18,6 @@ import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.CommonUtils;
 import com.janady.StringUtils;
-import com.janady.Util;
 import com.janady.database.model.Bluetooth;
 
 import java.util.UUID;
@@ -29,6 +27,7 @@ import static com.inuker.bluetooth.library.Constants.STATUS_CONNECTED;
 
 public class BleLocker {
     private IBleLockerListener mIBleLockerListener;
+    private OnCheckOnlineCallBack OnCheckOnlineCallBack;
 
     public void setBleLockerCallBack(IBleLockerListener iBleLockerListener){
         this.mIBleLockerListener = iBleLockerListener;
@@ -239,15 +238,20 @@ public class BleLocker {
     };
 
     public void connect(){
+        this.connect(null);
+    }
+    public void connect(final OnCheckOnlineCallBack onCheckOnlineCallBack){
         mIsReday=false;
 
         BluetoothLog.v(String.format("onBluetooth Connecting... %s", mMac));
 
         BleConnectOptions options = new BleConnectOptions.Builder()
                 .setConnectRetry(3)
-                .setConnectTimeout(20000)
+                //.setConnectTimeout(20000)
+                .setConnectTimeout(5000)
                 .setServiceDiscoverRetry(3)
-                .setServiceDiscoverTimeout(10000)
+                //.setServiceDiscoverTimeout(10000)
+                .setServiceDiscoverTimeout(3000)
                 .build();
 
         ClientManager.getClient().registerConnectStatusListener(mMac, mConnectStatusListener);
@@ -258,6 +262,9 @@ public class BleLocker {
                 BluetoothLog.v(String.format("profile:\n%s", profile));
 
                 if (code == REQUEST_SUCCESS) {
+                    if(onCheckOnlineCallBack!=null){
+                        onCheckOnlineCallBack.onSuccess(mBluetooth);
+                    }
                     //mAdapter.setGattProfile(profile);
                     mBleGattProfile = profile;
                     BluetoothLog.v(String.format("mBleGattProfile:\n%s", mBleGattProfile));
@@ -271,6 +278,10 @@ public class BleLocker {
                         if(!mNoRssi) {
                             mHandler.postDelayed(GetBluetoothRssi, 800);//每n秒执行一次runnable.
                         }
+                    }
+                }else{
+                    if(onCheckOnlineCallBack!=null){
+                        onCheckOnlineCallBack.onFail(mBluetooth);
                     }
                 }
             }
@@ -352,6 +363,7 @@ public class BleLocker {
                     content.getBytes(), mWriteRsp);
         }else{
             BluetoothLog.v(String.format("设备未连接"));
+            disconnect();
         }
     }
 
@@ -526,6 +538,10 @@ public class BleLocker {
         }
     };
 
+    public interface OnCheckOnlineCallBack {
+        void onSuccess(Bluetooth bluetooth);
+        void onFail(Bluetooth bluetooth);
+    }
 
     public interface IBleLockerListener {
         void onPasswordChanged(Bluetooth bluetooth, BleLockerStatus status);

@@ -26,6 +26,7 @@ import com.janady.device.BluetoothLockFragment;
 import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
+import com.janady.lkd.BleLocker;
 
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         int textColor= Color.BLACK;
         Bitmap photo = null;
         //if(item.getDemoClass()== BluetoothOperatorFragment.class) {
+
         if(item.getDemoClass()== BluetoothLockFragment.class) {
             if(item.getEnable()) {
                 stat = "在线";
@@ -63,6 +65,8 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
             }
+
+            matchBleLockerOnline(item, holder);
         }
 
         if(item.getDemoClass()== DeviceCameraFragment.class){
@@ -129,5 +133,70 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
 
             return null;
         }
+    }
+
+    /**
+     * 查找蓝牙设备列表是否有这个设备
+     *
+     *
+     */
+    public void matchBleLockerOnline(final ItemDescription item, final RecyclerViewHolder holder) {
+
+        final RoundRect roundRect = new RoundRect(100,100,10);
+
+        final String[] stat = {"未就绪"};
+        final int[] textColor = {Color.BLACK};
+        final Bitmap[] photo = {null};
+
+        if((Bluetooth)item.getItem()==null){return;}
+        final Bluetooth ble = (Bluetooth) item.getItem();
+        final BleLocker bleLocker = new BleLocker(ble,false,800, null);
+        bleLocker.connect(new BleLocker.OnCheckOnlineCallBack() {
+            @Override
+            public void onSuccess(Bluetooth bluetooth) {
+                bleLocker.disconnect();
+
+                stat[0] = "在线";
+                textColor[0] = 0xFF00bfa5;
+                photo[0] = roundRect.toRoundRect(context, R.drawable.btlocker3);
+
+                item.setEnable(true);
+
+                if(photo!=null) {
+                    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    paint.setTextSize(16);
+                    paint.setColor(textColor[0]);
+
+                    Canvas cav = new Canvas(photo[0]);
+                    cav.drawText(stat[0], 5, 23, paint);
+
+                    holder.getImageView(R.id.img).setEnabled(item.getEnable());
+                    holder.getImageView(R.id.img).setImageBitmap(photo[0]);
+                }
+                return;
+            }
+
+            @Override
+            public void onFail(Bluetooth bluetooth) {
+                stat[0] = "离线";
+                textColor[0] = Color.RED;
+                photo[0] = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
+                item.setEnable(false);
+
+                if(photo!=null) {
+                    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                    paint.setTextSize(16);
+                    paint.setColor(textColor[0]);
+
+                    Canvas cav = new Canvas(photo[0]);
+                    cav.drawText(stat[0], 5, 23, paint);
+
+                    holder.getImageView(R.id.img).setEnabled(item.getEnable());
+                    holder.getImageView(R.id.img).setImageBitmap(photo[0]);
+                }
+                return;
+            }
+        });
+        return;
     }
 }
