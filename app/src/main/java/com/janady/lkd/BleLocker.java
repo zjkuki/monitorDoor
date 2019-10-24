@@ -313,7 +313,7 @@ public class BleLocker {
     }
 
     public void sta(){
-        Util.sleep(300);
+        //Util.sleep(300);
         sendDataByString("STA");
         BluetoothLog.v(String.format("查询蓝牙设备状态：STA"));
     }

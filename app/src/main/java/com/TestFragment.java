@@ -124,11 +124,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         });
 
 
-        showWaitDialog();
-        setMsgText("正在检查设备在线状态，请稍等...");
+        //showWaitDialog();
+        //setMsgText("正在检查设备在线状态，请稍等...");
         //FunSupport.getInstance().requestLanDeviceList();
 
-        countDownTimer = new CountDownTimer(5000, 1000) {
+        /*countDownTimer = new CountDownTimer(5000, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 Log.i("TestFragment", "seconds remaining: " + millisUntilFinished / 1000);
@@ -142,7 +142,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 refreshDataSet();
                 Log.i("TestFragment", "done!");
             }
-        }.start();
+        }.start();*/
 
         initTopBar();
         initRecyclerView();
@@ -154,7 +154,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             @Override
             public void onClick(View view) {
                 ClientManager.getClient().stopSearch();
-                mHandler.removeCallbacksAndMessages(searchDevices);
+                mHandler.removeCallbacksAndMessages(null);
                 startFragment(new JTabSegmentFragment());
             }
         });
@@ -312,7 +312,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {
         ClientManager.getClient().stopSearch();
-        mHandler.removeCallbacksAndMessages(searchDevices);
+        mHandler.removeCallbacksAndMessages(null);
         JBaseFragment fragment = null;
         Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
             fragment = mainItemDescription.getDemoClass().newInstance();
@@ -360,14 +360,14 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         super.onHiddenChanged(hidden);
         if(hidden) {
             ClientManager.getClient().stopSearch();
-            mHandler.removeCallbacksAndMessages(searchDevices);
+            mHandler.removeCallbacksAndMessages(null);
         }
     }
     private void  refreshDataSet() {
         if(FunSupport.getInstance().getDeviceList().size()>0){
             hideWaitDialog();
             DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
-            countDownTimer.cancel();
+            //countDownTimer.cancel();
         }
 
         DataManager.getInstance().mBleDevices = mBleDevices;
@@ -406,7 +406,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 if (mBleDevices.size() > 0) {
                     //List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
                     //if(blists.size()>0){
-                        refreshDataSet();
+                        //refreshDataSet();
                     //}
 
                     Log.i("TestFragment","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
@@ -444,7 +444,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             FunSupport.getInstance().requestDeviceList();
             refreshDataSet();
             //}
-            mHandler.postDelayed(searchDevices, 10000);//每n秒执行一次runnable.
+            mHandler.postDelayed(searchDevices, 6000);//每n秒执行一次runnable.
         }
     };
 

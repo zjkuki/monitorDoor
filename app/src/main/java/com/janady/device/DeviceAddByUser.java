@@ -111,6 +111,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
     DialogInputPasswd inputDialog = null;
 
+    private int step = 0;  //0-没事，1-密码输入
+
 	//private final int MESSAGE_DELAY_FINISH = 0x100;
 	private final int MESSAGE_REFRESH_DEVICE_STATUS = 0x100;
 
@@ -625,11 +627,14 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					@Override
 					public boolean confirm(String editText) {
 						if(devType==FunDevType.EE_DEV_BLUETOOTH) {
+							step = 1;
 							needCheckSTA = false;
 							if(mBluetooth!=null){
 								inputPwd = editText;
-								bleOldPsw = mBluetooth.password;
-								if(editText.equals(bleOldPsw)) {
+								//bleOldPsw = mBluetooth.password;
+								//if(editText.equals(bleOldPsw)) {
+									bleOldPsw = editText;
+									mBluetooth.password = editText;
 									mEditDevSN.setText(mBluetooth.name);
 									mEditPassword.setText(mBluetooth.password);
 									mEditSceneName.setText(mBluetooth.sceneName);
@@ -645,7 +650,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 									}*/
 
 									showWaitDialog();
-								}else{
+								/*}else{
 									alertDialog("密码错误！蓝牙设备连接失败！", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog, int which) {
@@ -664,7 +669,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 										}
 									});
 
-								}
+								}*/
 								super.hide();
 							}
 						}else {
@@ -1093,6 +1098,28 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
 			BluetoothLog.i(" 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			hideWaitDialog();
+
+			if (step == 1) {
+				alertDialog("密码错误！蓝牙设备连接失败！", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mEditDevSN.setText("");
+						mEditPassword.setText("");
+						mEditSceneName.setText("");
+						return;
+					}
+				}, new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						mEditDevSN.setText("");
+						mEditPassword.setText("");
+						mEditSceneName.setText("");
+						return;
+					}
+				});
+
+				step=0;
+			}
 			/*alertDialog("设备连接密码不正确，如果您忘记密码，可重置出厂设置后再添加此设备！", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {

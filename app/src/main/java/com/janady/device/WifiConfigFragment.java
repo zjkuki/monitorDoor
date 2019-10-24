@@ -167,7 +167,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 submask = MyUtils.formatIpAddress(wifiDhcp.netmask);
             }
 
-            String mac = wifiInfo.getMacAddress();
+            final String mac = wifiInfo.getMacAddress();
             StringBuffer info = new StringBuffer();
             info.append("gateway:").append(MyUtils.formatIpAddress(wifiDhcp.gateway)).append(" ip:")
                     .append(MyUtils.formatIpAddress(wifiDhcp.ipAddress)).append(" submask:").append(submask)
@@ -188,19 +188,24 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 EasyLinkParams elp = new EasyLinkParams();
                 elp.ssid = ssid;
                 elp.password = wifiPwd;
+                elp.runSecond = 60000;
+                elp.sleeptime = 20;
                 el.startEasyLink(elp, new EasyLinkCallBack() {
                     @Override
                     public void onSuccess(int code, String message) {
+                        hideWaitDialog();
                         showToast(String.format(
                                 getResources().getString(R.string.device_opt_set_wifi_success),
                                 "wifi remoter ok!"));
-                        Intent intent = new Intent();
+
+                        Log.i("WifiConfigFragment", "code="+ code +"    message=" + message);
+                        /*Intent intent = new Intent();
                         intent.putExtra("DeviceTypsSpinnerNo",2);
                         intent.setClass(getContext(), DeviceAddByUser.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
 
-                        popBackStack();
+                        popBackStack();*/
                     }
 
                     @Override
@@ -217,7 +222,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 }
 
                 public void onFinish() {
-                    FunSupport.getInstance().stopWiFiQuickConfig();
+                    //FunSupport.getInstance().stopWiFiQuickConfig();
                     hideWaitDialog();
                     Dialogs.alertMessage(getContext(),"WIFI配置失败","设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
                     Log.i("WifiConfigFragment", "done!");

@@ -2,6 +2,7 @@ package com.janady.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -104,13 +105,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         ibChaPasswd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bleLocker = new BleLocker(mCurrBleDev.mac, false, AppConstants.bleService,
-                        AppConstants.bleNotifitesCharacter, AppConstants.bleWriteCharacter , mCurrBleDev.password,800, iBleLockerListener);
-
-                //bleLocker.disconnect();
-                bleLocker.connect();
-                bleLocker.setmNoRssi(true);
-                mWaitDialog.show();
+                 showInputModifyPasswordDialog();
             }
         });
 
@@ -122,9 +117,20 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             Dialogs.alertDialogBtn(context, "提示", "密码修改成功！", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if(bleLocker!=null){ bleLocker.disconnect();}
+                    if (bleLocker != null) {
+                        bleLocker.disconnect();
+                    }
+                    return;
                 }
-            }, null);
+            }, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    if (bleLocker != null) {
+                        bleLocker.disconnect();
+                    }
+                    return;
+                }
+            });
         }
 
         @Override
@@ -180,7 +186,6 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
             mWaitDialog.dismiss();
             //ibChaPasswd.setEnabled(true);
-            showInputPasswordDialog();
         }
 
         @Override
@@ -189,16 +194,37 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         }
         @Override
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
+            alertDialog("原密码输入不正确，请重新输入！", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showInputModifyPasswordDialog();
+                    return;
+                }
+            }, new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    return;
+                }
+            });
         }
         @Override
         public void onResetted(Bluetooth bluetooth, int Resetted ,BleLockerStatus status) {
         }
     };
 
+    public void alertDialog(String text, DialogInterface.OnClickListener onClickListener, DialogInterface.OnCancelListener onCancelListener){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.app_name));
+        builder.setMessage(text);
+        builder.setPositiveButton("确定", onClickListener);
+        builder.setOnCancelListener(onCancelListener);
+        builder.show();
+    }
+
     /**
      * 显示输入设备密码对话框
      */
-    private void showInputPasswordDialog() {
+    private void showInputModifyPasswordDialog() {
         JDialogModifyPasswd inputDialog = new JDialogModifyPasswd(context,
                 context.getResources().getString(R.string.device_login_input_password),
                 "","","",
@@ -210,12 +236,19 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             public boolean confirm(String oldPasswd, String newPasswd, String confirmPasswd) {
 
                     if(confirmPasswd.equals(newPasswd)){
+                        bleLocker = new BleLocker(mCurrBleDev.mac, false, AppConstants.bleService,
+                                AppConstants.bleNotifitesCharacter, AppConstants.bleWriteCharacter , oldPasswd,800, iBleLockerListener);
 
+                        bleLocker.disconnect();
                         bleLocker.connect();
+                        bleLocker.setmNoRssi(true);
+
+                        while(!bleLocker.getIsReday()){}
 
                         bleLocker.changePassword(newPasswd);
-
                         mCurrBleDev.password = newPasswd;
+
+                        bleLocker.setmPassword(newPasswd);
 
                         MyApplication.liteOrm.save(mCurrBleDev);
                     }else{

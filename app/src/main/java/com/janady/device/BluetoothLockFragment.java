@@ -1,5 +1,6 @@
 package com.janady.device;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -30,6 +32,9 @@ import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.ClientManager;
 import com.janady.setup.JBaseFragment;
+import com.lib.FunSDK;
+import com.lib.funsdk.support.FunDevicePassword;
+import com.lib.funsdk.support.models.FunDevType;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
 import java.text.SimpleDateFormat;
@@ -67,6 +72,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     private String bleOldPsw = "LKD.CN";
     private boolean needCheckSTA = false;
 
+    private int step = 0; //0-正常   1-输入密码
     QMUITopBarLayout mTopBar;
     @Override
     protected View onCreateView() {
@@ -213,13 +219,16 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     private void setLockedBtns(boolean isLocked){
         openBtn.setEnabled(!isLocked);
         closeBtn.setEnabled(!isLocked);
+        lockBtn.setEnabled(!isLocked);
         if(isLocked) {
             openBtn.setTextColor(Color.GRAY);
             closeBtn.setTextColor(Color.GRAY);
+            lockBtn.setTextColor(Color.GRAY);
             stopBtn.setText("开锁");
         }else{
             openBtn.setTextColor(stopBtn.getTextColors());
             closeBtn.setTextColor(stopBtn.getTextColors());
+            lockBtn.setTextColor(stopBtn.getTextColors());
             stopBtn.setText("停");
         }
 
@@ -368,7 +377,18 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         }
         @Override
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
+            hideWaitDialog();
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onPasswdError：" + status.getmStatusMsg());
+            showInputPasswordDialog();
+        }
+
+        private void alertDialog(String text, DialogInterface.OnClickListener onClickListener, DialogInterface.OnCancelListener onCancelListener){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(getString(R.string.app_name));
+            builder.setMessage(text);
+            builder.setPositiveButton("确定", onClickListener);
+            builder.setOnCancelListener(onCancelListener);
+            builder.show();
         }
         @Override
         public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
@@ -385,7 +405,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                         bleLocker.setmPassword(bleOldPsw);
                         bleLocker.setmNoRssi(true);
                         bleLocker.connect();
-                        showInputPasswordDialog();
+                        showInputNewPasswordDialog();
                     }
                 }, new DialogInterface.OnCancelListener() {
                     @Override
@@ -402,7 +422,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     /**
      * 显示输入设备密码对话框
      */
-    private void showInputPasswordDialog() {
+    private void showInputNewPasswordDialog() {
         JDialogModifyPasswd inputDialog = new JDialogModifyPasswd(getContext(),
                 getContext().getResources().getString(R.string.device_login_input_password),
                 "","","",
@@ -426,6 +446,10 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                     bleLocker.setmNoRssi(true);
                     bleLocker.connect();
 
+                    MyApplication.liteOrm.save(bleLocker.getmBluetooth());
+
+                    showWaitDialog();
+
                 }else{
                     this.mMessages.setText("两次密码输入不正确！");
                     this.mMessages.setVisibility(View.VISIBLE);
@@ -442,6 +466,53 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                 if(bleLocker!=null){bleLocker.disconnect();}
                 popBackStack();
                 // 取消输入密码,直接退出
+            }
+
+        };
+
+        inputDialog.show();
+    }
+
+    /**
+     * 显示输入设备密码对话框
+     */
+    private void showInputPasswordDialog() {
+        DialogInputPasswd inputDialog = new DialogInputPasswd(getContext(),
+                getResources().getString(R.string.device_login_input_password),
+                "",
+                R.string.common_confirm,
+                R.string.common_cancel
+        ){
+
+            @Override
+            public boolean confirm(String editText) {
+                    step = 1;
+                    needCheckSTA = false;
+                    if(bleLocker.getmBluetooth()!=null){
+                        //bleOldPsw = mBluetooth.password;
+                        //if(editText.equals(bleOldPsw)) {
+                        bleOldPsw = editText;
+                        bleLocker.getmBluetooth().password = editText;
+                        bleLocker.getmBluetooth().isFirst = false;
+
+                        bleLocker = new BleLocker(bleLocker.getmBluetooth(), false, 800, iBleLockerListener);
+                        bleLocker.setmNoRssi(true);
+                        bleLocker.connect();
+
+                        MyApplication.liteOrm.save(bleLocker.getmBluetooth());
+
+                        showWaitDialog();
+                        super.hide();
+                    }
+                return super.confirm(editText);
+            }
+
+            @Override
+            public void cancel() {
+                super.cancel();
+
+                // 取消输入密码,直接退出
+                popBackStack();
             }
 
         };
