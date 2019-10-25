@@ -364,11 +364,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     }
     private void  refreshDataSet() {
-        if(FunSupport.getInstance().getDeviceList().size()>0){
+        /*if(FunSupport.getInstance().getDeviceList().size()>0){
             hideWaitDialog();
             DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
             //countDownTimer.cancel();
-        }
+        }*/
 
         DataManager.getInstance().mBleDevices = mBleDevices;
         mainItems = DataManager.getInstance().getDescriptions();
@@ -383,16 +383,16 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             isScanning = true;
 
             //if(mBleDevices.size()>0){mBleDevices.clear();}
-            /*SearchRequest request = new SearchRequest.Builder()
-                    .searchBluetoothLeDevice(3000, 1).build();
+            SearchRequest request = new SearchRequest.Builder()
+                  .searchBluetoothLeDevice(2000, 1).build();
 
-            ClientManager.getClient().search(request, mSearchResponse);*/
+            ClientManager.getClient().search(request, mSearchResponse);
 
-            ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
+            /*ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
             List<Object> bitems = new ArrayList<>();
             for (Bluetooth bluetooth : blists) {
                 matchBleLockerOnline(bluetooth);
-            }
+            }*/
         Log.i("DataManager","停止扫描设备....");
     }
 
@@ -434,10 +434,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
 
                 if (mBleDevices.size() > 0) {
-                    //List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
-                    //if(blists.size()>0){
-                        //refreshDataSet();
-                    //}
+                    /*List<Bluetooth> blists = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, device.getAddress()));
+                    if(blists.size()>0){
+                        refreshDataSet();
+                    }*/
 
                     Log.i("TestFragment","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
                     //refreshDataSet();
@@ -466,15 +466,17 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     };
 
+
+
     Runnable searchDevices=new Runnable() {
         @Override
         public void run() {
             searchBleDevice();
             //if(FunSupport.getInstance().requestLanDeviceList()){
-            FunSupport.getInstance().requestDeviceList();
+            //FunSupport.getInstance().requestDeviceList();
             refreshDataSet();
             //}
-            mHandler.postDelayed(searchDevices, 6000);//每n秒执行一次runnable.
+            mHandler.postDelayed(searchDevices, 3000);//每n秒执行一次runnable.
         }
     };
 

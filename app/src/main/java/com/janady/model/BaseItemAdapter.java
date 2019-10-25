@@ -15,7 +15,9 @@ import android.text.TextPaint;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
+import com.janady.AppManager;
 import com.janady.RoundRect;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
@@ -27,6 +29,7 @@ import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
 import com.janady.lkd.BleLocker;
+import com.litesuits.orm.LiteOrm;
 
 import java.util.List;
 
@@ -53,7 +56,6 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         int textColor= Color.BLACK;
         Bitmap photo = null;
         //if(item.getDemoClass()== BluetoothOperatorFragment.class) {
-
         if(item.getDemoClass()== BluetoothLockFragment.class) {
             if(item.getEnable()) {
                 stat = "在线";
@@ -66,7 +68,7 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
                 photo = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
             }
 
-            matchBleLockerOnline(item, holder);
+            //matchBleLockerOnline(item, holder);
         }
 
         if(item.getDemoClass()== DeviceCameraFragment.class){
@@ -151,49 +153,28 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         if((Bluetooth)item.getItem()==null){return;}
         final Bluetooth ble = (Bluetooth) item.getItem();
         final BleLocker bleLocker = new BleLocker(ble,false,800, null);
-        bleLocker.connect(new BleLocker.OnCheckOnlineCallBack() {
+        bleLocker.fastConnect(1, 2000,1, 2000, new BleLocker.OnCheckOnlineCallBack() {
             @Override
             public void onSuccess(Bluetooth bluetooth) {
                 bleLocker.disconnect();
 
-                stat[0] = "在线";
-                textColor[0] = 0xFF00bfa5;
-                photo[0] = roundRect.toRoundRect(context, R.drawable.btlocker3);
+                ble.isOnline=true;
+
+                MyApplication.liteOrm.save(ble);
 
                 item.setEnable(true);
 
-                if(photo!=null) {
-                    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    paint.setTextSize(16);
-                    paint.setColor(textColor[0]);
-
-                    Canvas cav = new Canvas(photo[0]);
-                    cav.drawText(stat[0], 5, 23, paint);
-
-                    holder.getImageView(R.id.img).setEnabled(item.getEnable());
-                    holder.getImageView(R.id.img).setImageBitmap(photo[0]);
-                }
                 return;
             }
 
             @Override
             public void onFail(Bluetooth bluetooth) {
-                stat[0] = "离线";
-                textColor[0] = Color.RED;
-                photo[0] = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
+
                 item.setEnable(false);
 
-                if(photo!=null) {
-                    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    paint.setTextSize(16);
-                    paint.setColor(textColor[0]);
+                ble.isOnline=false;
+                MyApplication.liteOrm.save(ble);
 
-                    Canvas cav = new Canvas(photo[0]);
-                    cav.drawText(stat[0], 5, 23, paint);
-
-                    holder.getImageView(R.id.img).setEnabled(item.getEnable());
-                    holder.getImageView(R.id.img).setImageBitmap(photo[0]);
-                }
                 return;
             }
         });

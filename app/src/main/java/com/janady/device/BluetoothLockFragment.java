@@ -379,7 +379,10 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
             hideWaitDialog();
             Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onPasswdError：" + status.getmStatusMsg());
-            showInputPasswordDialog();
+            if (step == 1) {
+                showInputPasswordDialog();
+            }
+            step = 0;
         }
 
         private void alertDialog(String text, DialogInterface.OnClickListener onClickListener, DialogInterface.OnCancelListener onCancelListener){
@@ -410,10 +413,11 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                 }, new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        popBackStack();
+                        //popBackStack();
                     }
                 });
             }else{
+                step=1;
                 BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
             }
         }

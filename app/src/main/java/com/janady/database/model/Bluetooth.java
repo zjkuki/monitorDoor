@@ -29,6 +29,7 @@ public class Bluetooth {
     public boolean isFirst = true;
     public String name;
     public String sceneName;
+    public boolean isOnline = true;
 
     @Mapping(Relation.OneToOne)
     public Door door;

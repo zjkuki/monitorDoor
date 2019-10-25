@@ -237,6 +237,37 @@ public class BleLocker {
         }
     };
 
+    public void fastConnect(final int ConnectRetry, final int ConnectTimeOut, final int ServiceDiscoverRetry, final int ServiceDiscoverTimeOut, final OnCheckOnlineCallBack onCheckOnlineCallBack) {
+        mIsReday=false;
+
+        BluetoothLog.v(String.format("onBluetooth Connecting... %s", mMac));
+
+        BleConnectOptions options = new BleConnectOptions.Builder()
+                .setConnectRetry(ConnectRetry)
+                .setConnectTimeout(ConnectTimeOut)
+                .setServiceDiscoverRetry(ServiceDiscoverRetry)
+                .setServiceDiscoverTimeout(ServiceDiscoverTimeOut)
+                .build();
+
+        ClientManager.getClient().registerConnectStatusListener(mMac, mConnectStatusListener);
+
+        ClientManager.getClient().connect(mMac, options, new BleConnectResponse() {
+            @Override
+            public void onResponse(int code, BleGattProfile profile) {
+                BluetoothLog.v(String.format("profile:\n%s", profile));
+
+                if (code == REQUEST_SUCCESS) {
+                    if(onCheckOnlineCallBack!=null){
+                        onCheckOnlineCallBack.onSuccess(mBluetooth);
+                    }
+                }else{
+                    if(onCheckOnlineCallBack!=null){
+                        onCheckOnlineCallBack.onFail(mBluetooth);
+                    }
+                }
+            }
+        });
+    }
     public void connect(){
         this.connect(null);
     }

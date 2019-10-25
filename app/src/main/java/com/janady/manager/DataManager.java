@@ -22,6 +22,7 @@ import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevice;
 
 import java.util.ArrayList;
@@ -93,7 +94,8 @@ public class DataManager {
         for (Camera camera : camlists) {
             ItemDescription itemDescription = new ItemDescription(DeviceCameraFragment.class, camera.sceneName, R.drawable.icon_check);
 
-            itemDescription.setEnable(matchFunDevOnline(camera.sn));
+            //itemDescription.setEnable(matchFunDevOnline(camera.sn));
+            itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(camera)));
             itemDescription.setItem(camera);
 
             camitems.add(itemDescription);
@@ -110,8 +112,10 @@ public class DataManager {
             //ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
             ItemDescription itemDescription = new ItemDescription(BluetoothLockFragment.class, bluetooth.sceneName, R.drawable.icon_check);
 
-            //itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
-            itemDescription.setEnable(true);
+            itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
+
+            //默认online为true，在BaseItemAdapter里进行连接检测后保存
+            //itemDescription.setEnable(bluetooth.isOnline);
             itemDescription.setItem(bluetooth);
             //itemDescription.setItem(new BleLocker(bluetooth,false,800,null));
 
@@ -181,5 +185,23 @@ public class DataManager {
         }else{
             return false;
         }
+    }
+
+    private FunDevice BuildFunDevice(Camera camera){
+        //FunDevice funDevice = mFunDevices.get(pos);
+        // 虚拟一个设备, 只需要序列号和设备类型即可添加
+        FunDevice mFunDevice =new FunDevice();
+        mFunDevice.devSn = camera.sn;
+        mFunDevice.devName = camera.name;
+        mFunDevice.devIp = camera.devIp;
+        mFunDevice.devMac = camera.mac;
+        mFunDevice.tcpPort = 34567;
+        mFunDevice.devType = camera.type;
+        mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
+        mFunDevice.isRemote = true;
+        mFunDevice.loginName = camera.loginName;
+        mFunDevice.loginPsw = camera.loginPsw;
+
+        return mFunDevice;
     }
 }
