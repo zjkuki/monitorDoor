@@ -95,7 +95,8 @@ public class DataManager {
             ItemDescription itemDescription = new ItemDescription(DeviceCameraFragment.class, camera.sceneName, R.drawable.icon_check);
 
             //itemDescription.setEnable(matchFunDevOnline(camera.sn));
-            itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(camera)));
+            //itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(camera)));
+            itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(camera.type,camera.mac));
             itemDescription.setItem(camera);
 
             camitems.add(itemDescription);
@@ -197,7 +198,7 @@ public class DataManager {
         mFunDevice.devMac = camera.mac;
         mFunDevice.tcpPort = 34567;
         mFunDevice.devType = camera.type;
-        mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
+        //mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
         mFunDevice.isRemote = true;
         mFunDevice.loginName = camera.loginName;
         mFunDevice.loginPsw = camera.loginPsw;

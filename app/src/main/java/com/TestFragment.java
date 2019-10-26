@@ -232,6 +232,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private void startBluetooth(){
         if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
+            ClientManager.getClient().openBluetooth();
+        }
+        /*if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
             Dialogs.alertDialog2Btn(this.getContext(), "提示", "您的蓝牙未开启，需要现在打开蓝牙吗？", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -248,7 +251,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
             });
 
-        }
+        }*/
     }
 
     /**
