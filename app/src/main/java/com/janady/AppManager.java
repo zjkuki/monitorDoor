@@ -30,7 +30,7 @@ public class AppManager {
     /**
      * 添加Activity到堆栈
      */
-    public void addActivity(Activity activity) {
+    public  void addActivity(Activity activity) {
         if (activityStack == null) {
             activityStack = new Stack<Activity>();
         }

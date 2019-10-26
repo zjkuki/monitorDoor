@@ -96,7 +96,8 @@ public class DataManager {
 
             //itemDescription.setEnable(matchFunDevOnline(camera.sn));
             //itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(camera)));
-            itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(camera.type,camera.mac));
+            //itemDescription.setEnable(FunSupport.getInstance().requestDeviceStatus(camera.type,camera.mac));
+            itemDescription.setEnable(camera.isOnline);
             itemDescription.setItem(camera);
 
             camitems.add(itemDescription);
@@ -188,21 +189,5 @@ public class DataManager {
         }
     }
 
-    private FunDevice BuildFunDevice(Camera camera){
-        //FunDevice funDevice = mFunDevices.get(pos);
-        // 虚拟一个设备, 只需要序列号和设备类型即可添加
-        FunDevice mFunDevice =new FunDevice();
-        mFunDevice.devSn = camera.sn;
-        mFunDevice.devName = camera.name;
-        mFunDevice.devIp = camera.devIp;
-        mFunDevice.devMac = camera.mac;
-        mFunDevice.tcpPort = 34567;
-        mFunDevice.devType = camera.type;
-        //mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
-        mFunDevice.isRemote = true;
-        mFunDevice.loginName = camera.loginName;
-        mFunDevice.loginPsw = camera.loginPsw;
 
-        return mFunDevice;
-    }
 }

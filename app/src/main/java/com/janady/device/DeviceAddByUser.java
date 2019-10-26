@@ -9,6 +9,8 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +25,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.TestFragment;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ActivityGuideUserLogin;
@@ -39,6 +42,7 @@ import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.AppConstants;
+import com.janady.AppManager;
 import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
 import com.janady.HomeActivity;
@@ -49,6 +53,7 @@ import com.janady.database.model.Camera;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.ClientManager;
+import com.janady.setup.JBaseFragment;
 import com.janady.view.PullRefreshListView;
 import com.janady.view.PullToRefreshFrameLayout;
 import com.lib.FunSDK;
@@ -320,8 +325,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 
 		// 设置登录方式为互联网方式
-		//FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
-		FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
+		FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
+		//FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
 		
 		// 监听设备类事件
 		FunSupport.getInstance().registerOnFunDeviceListener(this);
@@ -452,6 +457,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							}
 
 							MyApplication.liteOrm.save(mBluetooth);
+
+							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							intent.putExtra("data","ble_list_refresh");
+							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+							sendBroadcast(intent);
 						}
 					} else {
 						List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
@@ -479,11 +489,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							mCamera.loginPsw = "";
 						}
 						MyApplication.liteOrm.save(mCamera);
+
+						Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+						intent.putExtra("data","cam_list_refresh");
+						LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+						sendBroadcast(intent);
 					}
 
-					Intent intent = new Intent();
-					intent.setClass(this, HomeActivity.class);
-					startActivity(intent);
 
 					finish();
 				}
@@ -503,7 +515,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 				case MESSAGE_REFRESH_DEVICE_STATUS: {
-					FunSupport.getInstance().requestAllLanDeviceStatus();
+					//FunSupport.getInstance().requestAllLanDeviceStatus();
+					FunSupport.getInstance().requestAllDeviceStatus();
 				}
 				break;
 			/*case MESSAGE_DELAY_FINISH:
@@ -925,13 +938,15 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private void refreshLanDeviceList() {
 		hideWaitDialog();
 		mTextTip.setText("扫描设备");
-		mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
+		//mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
+		mAdapterDev.updateDevice(FunSupport.getInstance().getDeviceList());
 		mListViewDev.onRefreshComplete(true);
 		mRefreshLayout.showState(AppConstants.LIST);
 
 		// 延时100毫秒更新设备消息
 		mHandler.removeMessages(MESSAGE_REFRESH_DEVICE_STATUS);
-		if (FunSupport.getInstance().getLanDeviceList().size() > 0) {
+		//if (FunSupport.getInstance().getLanDeviceList().size() > 0) {
+		if (FunSupport.getInstance().getDeviceList().size() > 0) {
 			mHandler.sendEmptyMessageDelayed(MESSAGE_REFRESH_DEVICE_STATUS, 100);
 		}
 	}

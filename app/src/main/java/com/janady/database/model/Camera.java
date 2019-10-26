@@ -35,6 +35,7 @@ public class Camera {
     public boolean isFirst = true;
     public FunDevType type;
     public String sceneName;
+    public boolean isOnline = true;
     @Unique
     public String name;
     @Mapping(Relation.ManyToMany)

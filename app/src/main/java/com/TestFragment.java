@@ -1,14 +1,20 @@
 package com;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.Image;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -123,6 +129,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });
 
+
+        // 监听设备列表类事件
+        FunSupport.getInstance().registerOnFunDeviceListener(this);
 
         //showWaitDialog();
         //setMsgText("正在检查设备在线状态，请稍等...");
@@ -358,6 +367,24 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     }
 
+/*    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.CART_BROADCAST");
+        BroadcastReceiver mItemViewListClickReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent){
+                String msg = intent.getStringExtra("data");
+                if("tf_refresh".equals(msg)){
+
+                }
+            }
+        };
+
+    }*/
+
     @Override
     public void onHiddenChanged(boolean hidden){
         super.onHiddenChanged(hidden);
@@ -373,6 +400,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             //countDownTimer.cancel();
         }*/
 
+        //DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
         DataManager.getInstance().mBleDevices = mBleDevices;
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter.setData(mainItems);
@@ -471,17 +499,42 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
 
 
+
     Runnable searchDevices=new Runnable() {
         @Override
         public void run() {
             searchBleDevice();
             //if(FunSupport.getInstance().requestLanDeviceList()){
             //FunSupport.getInstance().requestDeviceList();
+            List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
+            for(Camera cam : cams) {
+                //FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(cam));
+                FunSupport.getInstance().requestDeviceStatus(cam.type, cam.sn);
+            }
+
             refreshDataSet();
             //}
             mHandler.postDelayed(searchDevices, 3000);//每n秒执行一次runnable.
         }
     };
+
+    private FunDevice BuildFunDevice(Camera camera){
+        //FunDevice funDevice = mFunDevices.get(pos);
+        // 虚拟一个设备, 只需要序列号和设备类型即可添加
+        FunDevice mFunDevice =new FunDevice();
+        mFunDevice.devSn = camera.sn;
+        mFunDevice.devName = camera.name;
+        mFunDevice.devIp = camera.devIp;
+        mFunDevice.devMac = camera.mac;
+        mFunDevice.tcpPort = 34567;
+        mFunDevice.devType = null;
+        mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
+        mFunDevice.isRemote = true;
+        mFunDevice.loginName = camera.loginName;
+        mFunDevice.loginPsw = camera.loginPsw;
+
+        return mFunDevice;
+    }
 
     @Override
     public void onDeviceListChanged() {
@@ -490,7 +543,19 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onDeviceStatusChanged(FunDevice funDevice) {
-        refreshDataSet();
+        List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, funDevice.devSn.toString()));
+        if (cams != null && cams.size() > 0) {
+            if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
+                cams.get(0).isOnline = true;
+            }else {
+                cams.get(0).isOnline = false;
+            }
+
+            MyApplication.liteOrm.save(cams);
+
+            refreshDataSet();
+        }
+
     }
 
     @Override
@@ -522,4 +587,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     public void onLanDeviceListChanged() {
         refreshDataSet();
     }
+
+
 }

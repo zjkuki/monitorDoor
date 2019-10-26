@@ -1,6 +1,12 @@
 package com.janady.device;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -117,4 +123,23 @@ public class CameraListFragment extends JBaseFragment {
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.CART_BROADCAST");
+        BroadcastReceiver mDeviceAddByUserReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent){
+                String msg = intent.getStringExtra("data");
+                if("cam_list_refresh".equals(msg)){
+                    initRecyclerView();
+                }
+            }
+        };
+
+        broadcastManager.registerReceiver(mDeviceAddByUserReceiver, intentFilter);
+
+    }
 }

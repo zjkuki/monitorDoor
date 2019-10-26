@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -45,6 +46,13 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
         holder.getTextView(R.id.item_name).setText("场景："+item.sceneName);
         holder.getTextView(R.id.item_sn).setText("SN："+item.name);
 
+        if(mCurrCamDev.isOnline){
+            holder.getTextView(R.id.item_status).setText("在线");
+            holder.getTextView(R.id.item_status).setTextColor(Color.BLUE);
+        }else{
+            holder.getTextView(R.id.item_status).setTextColor(Color.RED);
+            holder.getTextView(R.id.item_status).setText("离线");
+        }
         ImageView iv = holder.getImageView(R.id.cover);
         String path = FunPath.getCoverPath(item.sn);
 

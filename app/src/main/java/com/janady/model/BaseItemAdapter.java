@@ -22,6 +22,7 @@ import com.janady.RoundRect;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.database.model.Bluetooth;
+import com.janady.database.model.Camera;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
 import com.janady.device.BluetoothLockFragment;
@@ -29,7 +30,12 @@ import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
 import com.janady.lkd.BleLocker;
+import com.lib.funsdk.support.FunSupport;
+import com.lib.funsdk.support.OnFunDeviceListener;
+import com.lib.funsdk.support.models.FunDevStatus;
+import com.lib.funsdk.support.models.FunDevice;
 import com.litesuits.orm.LiteOrm;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.util.List;
 
@@ -81,6 +87,8 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera_disable);
             }
+
+            //checkFunDeviceStatus(item, holder);
         }
 
         if(photo!=null) {
@@ -180,4 +188,5 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         });
         return;
     }
+
 }
