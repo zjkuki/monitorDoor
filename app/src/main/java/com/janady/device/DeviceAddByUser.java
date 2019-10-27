@@ -160,6 +160,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		
 		setContentView(R.layout.jdevice_add_by_user);
 
+		setStatusBar();
+
 		mBleDevices = new ArrayList<SearchResult>();
 		mBluetooth = new Bluetooth();
 		mCamera = new Camera();

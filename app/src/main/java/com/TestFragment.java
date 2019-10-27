@@ -48,6 +48,7 @@ import com.janady.device.BluetoothListFragment;
 import com.janady.device.BluetoothLockFragment;
 import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
+import com.janady.device.DeviceCameraActivity;
 import com.janady.device.DeviceCameraFragment;
 import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
@@ -299,6 +300,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 //FunSupport.getInstance().requestDeviceLogin(citem.camDevice);
 
                 ((DeviceCameraFragment)fragment).setFunDevice(mFunDevice);
+
+                Intent intent = new Intent();
+                intent.setClass(getContext(), DeviceCameraActivity.class);
+                intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
 
             //if (fragment instanceof BluetoothOperatorFragment && itemDescription.getItem() instanceof Bluetooth) {
@@ -312,8 +319,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ((BluetoothLockFragment)fragment).title = citem.sceneName;
                 ((BluetoothLockFragment)fragment).bleLocker = bleLocker;
                 ((BluetoothLockFragment)fragment).isDebugViewOpen = true;
+
+                startFragment(fragment);
             }
-            startFragment(fragment);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (java.lang.InstantiationException e) {

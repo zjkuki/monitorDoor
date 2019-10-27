@@ -2,6 +2,7 @@ package com.example.funsdkdemo;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,6 +79,13 @@ public class ActivityDemo extends FragmentActivity {
 			}
 			mToast = Toast.makeText(this, resid, Toast.LENGTH_SHORT);
 			mToast.show();
+		}
+	}
+
+	protected void setStatusBar() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			this.getWindow().setStatusBarColor(getResources().getColor(R.color.theme_color));//设置状态栏颜色
+			//this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//实现状态栏图标和文字颜色为暗色
 		}
 	}
 
