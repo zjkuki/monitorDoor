@@ -4,7 +4,11 @@ buildscript {
     
     repositories {
         google()
-        jcenter()
+        //jcenter()
+        jcenter {
+            url 'https://maven.aliyun.com/repository/jcenter'
+            name 'jcenter'
+        }
         flatDir {
             dirs 'libs'
         }

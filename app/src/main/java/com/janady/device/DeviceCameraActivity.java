@@ -3,12 +3,14 @@ package com.janady.device;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
@@ -18,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.graphics.ColorUtils;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -51,6 +54,8 @@ import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;
 import com.janady.database.model.Camera;
+import com.janady.view.CustomCircle;
+import com.janady.view.RoundMenuView;
 import com.lib.EPTZCMD;
 import com.lib.FunSDK;
 import com.lib.funsdk.support.FunDevicePassword;
@@ -115,6 +120,9 @@ public class DeviceCameraActivity
 	private CheckBox mCbDoubleTalk = null;
 	private RelativeLayout mLayoutRecording = null;
 
+	//private RoundMenuView roundMenuView = null;
+	private CustomCircle roundMenuView = null;
+
 	private LinearLayout mLayoutControls = null;
 	private LinearLayout mLayoutChannel = null;
 	private RelativeLayout mBtnVoiceTalk = null;
@@ -155,14 +163,20 @@ public class DeviceCameraActivity
 	private TourActivity mTourFragment;
 
 	private Camera camera;
+
+	private Context mContext;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.device_camera_activity);
 
+		mContext = this;
+
 		int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
-		camera = getIntent().getParcelableExtra("camera");
+        String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
+
+		//camera = getIntent().getParcelableExtra("camera");
 
 		mFunDevice = FunSupport.getInstance().findDeviceById(devId);
 
@@ -200,8 +214,14 @@ public class DeviceCameraActivity
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
 		mBtnVoiceTalk = (RelativeLayout) findViewById(R.id.btnVoiceTalk);
+		mBtnVoiceTalk.setVisibility(View.VISIBLE);
+
 		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
+		mBtnVoice.setVisibility(View.GONE);
+
         mBtnQuitVoice = (ImageButton) findViewById(R.id.btn_quit_voice);
+        mBtnQuitVoice.setVisibility(View.GONE);
+
 		mBtnDevCapture = (ImageButton) findViewById(R.id.btnDevCapture);
 		mBtnDevRecord = (ImageButton) findViewById(R.id.btnDevRecord);
 		mBtnGetPreset = (Button) findViewById(R.id.btnGetPreset);
@@ -210,26 +230,30 @@ public class DeviceCameraActivity
 
 		mSplitView = findViewById(R.id.splitView);
 		mCbDoubleTalk = findViewById(R.id.cb_double_talk_switch);
+		mCbDoubleTalk.setChecked(true);
+		mCbDoubleTalk.setVisibility(View.GONE);
+
 
 		mLayoutDirectionControl = (RelativeLayout) findViewById(R.id.layoutDirectionControl);
-		mPtz_up = (ImageButton) findViewById(R.id.ptz_up);
+		/*mPtz_up = (ImageButton) findViewById(R.id.ptz_up);
 		mPtz_down = (ImageButton) findViewById(R.id.ptz_down);
 		mPtz_left = (ImageButton) findViewById(R.id.ptz_left);
-		mPtz_right = (ImageButton) findViewById(R.id.ptz_right);
+		mPtz_right = (ImageButton) findViewById(R.id.ptz_right);*/
 		mBtnVoiceTalk.setOnClickListener(this);
 		mBtnVoiceTalk.setOnTouchListener(mIntercomTouchLs);
 		mBtnVoice.setOnClickListener(this);
         mBtnQuitVoice.setOnClickListener(this);
 		mBtnDevCapture.setOnClickListener(this);
 		mBtnDevRecord.setOnClickListener(this);
-		mBtnGetPreset.setOnClickListener(this);
-		mBtnSetPreset.setOnClickListener(this);
+		//mBtnGetPreset.setOnClickListener(this);
+		//mBtnSetPreset.setOnClickListener(this);
 
 		mCbDoubleTalk.setOnClickListener(this);
-		mPtz_up.setOnTouchListener(onPtz_up);
+		/*mPtz_up.setOnTouchListener(onPtz_up);
 		mPtz_down.setOnTouchListener(onPtz_down);
 		mPtz_left.setOnTouchListener(onPtz_left);
-		mPtz_right.setOnTouchListener(onPtz_right);
+		mPtz_right.setOnTouchListener(onPtz_right);*/
+
 
 		mLayoutControls = (LinearLayout) findViewById(R.id.layoutFunctionControl);
 		mLayoutChannel = (LinearLayout) findViewById(R.id.layoutChannelBtn);
@@ -247,7 +271,8 @@ public class DeviceCameraActivity
 			mLayoutDirectionControl.setVisibility(View.VISIBLE);
 		}
 
-		mFunVideoView.setOnTouchListener(new OnVideoViewTouchListener());
+		//mFunVideoView.setOnTouchListener(new OnVideoViewTouchListener());
+        mFunVideoView.setGestureListner(this);
 		mFunVideoView.setOnPreparedListener(this);
 		mFunVideoView.setOnErrorListener(this);
 		mFunVideoView.setOnInfoListener(this);
@@ -263,12 +288,16 @@ public class DeviceCameraActivity
 		FunSupport.getInstance().registerOnFunDeviceOptListener(this);
 
 
-		mTextTitle.setText(mFunDevice.devName);
+		//mTextTitle.setText(mFunDevice.devName);
+        mTextTitle.setText(sceneName+"-摄像机");
 
 		// 允许横竖屏切换
 		// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
-		showVideoControlBar();
+		//showVideoControlBar();
+        hideVideoControlBar();
+
+		mFunVideoView.setMediaSound(false);			//关闭本地音频
 
 		mTalkManager = new TalkManager(mFunDevice.getDevSn(), new TalkManager.OnTalkButtonListener() {
 			@Override
@@ -345,7 +374,8 @@ public class DeviceCameraActivity
 	@Override
 	protected void onPause() {
 		destroyTalk();
-		closeVoiceChannel(0);
+		//closeVoiceChannel(0);
+		closeVoiceChannel1(0);
 		stopMedia();
 		super.onPause();
 	}
@@ -993,11 +1023,11 @@ public class DeviceCameraActivity
 					if (mCbDoubleTalk.isChecked()) {
 						if (!mIsDoubleTalkPress) {
 							startTalkByDoubleDirection();
-							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk_selected);
+							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk_selected_60dp);
 							mIsDoubleTalkPress = true;
 						}else {
 							stopTalkByDoubleDirection();
-							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk);
+							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk_normal_60dp);
 							mIsDoubleTalkPress = false;
 						}
 					}else {
@@ -1083,6 +1113,15 @@ public class DeviceCameraActivity
             mHandler.sendEmptyMessageDelayed(MESSAGE_OPEN_VOICE, delayTime);
         }
     }
+
+	private void openVoiceChannel1(){
+			mFunVideoView.setMediaSound(false);			//关闭本地音频
+	}
+
+	private void closeVoiceChannel1(int delayTime){
+			destroyTalk();
+			mHandler.sendEmptyMessageDelayed(MESSAGE_OPEN_VOICE, delayTime);
+	}
 
 	/**
 	 * 显示输入设备密码对话框
@@ -1221,6 +1260,9 @@ public class DeviceCameraActivity
 			// 重新获取预置点列表
 //			requestPTZPreset();
 		}
+
+		//打开双向对讲
+		openVoiceChannel1();
 	}
 
 	private String getType(int i){

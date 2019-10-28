@@ -304,6 +304,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 Intent intent = new Intent();
                 intent.setClass(getContext(), DeviceCameraActivity.class);
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
+                intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
