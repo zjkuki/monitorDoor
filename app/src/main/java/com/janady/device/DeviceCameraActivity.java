@@ -83,6 +83,7 @@ import java.util.Arrays;
 public class DeviceCameraActivity
 				extends ActivityDemo
 				implements OnClickListener,
+							FunVideoView.GestureListner,
 							OnFunDeviceOptListener,
 							OnPreparedListener,
 							OnErrorListener,
@@ -1285,6 +1286,30 @@ public class DeviceCameraActivity
 	public void onDeviceFileListChanged(FunDevice funDevice) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onGestureRight() {
+		onContrlPTZ1(EPTZCMD.PAN_RIGHT, false);
+	}
+
+	@Override
+	public void onGestureLeft() {
+		onContrlPTZ1(EPTZCMD.PAN_LEFT, false);
+	}
+
+	@Override
+	public void onGestureUp() {
+		onContrlPTZ1(EPTZCMD.TILT_UP, false);
+	}
+
+	@Override
+	public void onGestureDown() {
+		onContrlPTZ1(EPTZCMD.TILT_DOWN, false);
+	}
+	@Override
+	public void onGestureStop() {
+		onContrlPTZ1(EPTZCMD.TILT_DOWN, true);
 	}
 
 	@Override

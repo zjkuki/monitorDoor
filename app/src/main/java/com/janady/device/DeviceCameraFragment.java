@@ -56,11 +56,6 @@ import com.lib.funsdk.support.widget.FunVideoView;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
-import me.yokeyword.fragmentation.ISupportFragment;
-import me.yokeyword.fragmentation.SupportFragmentDelegate;
-import me.yokeyword.fragmentation.anim.DefaultNoAnimator;
-import me.yokeyword.fragmentation.anim.FragmentAnimator;
-
 public class DeviceCameraFragment extends JBaseFragment
         implements OnFunDeviceOptListener,
         OnFunDeviceCaptureListener,
