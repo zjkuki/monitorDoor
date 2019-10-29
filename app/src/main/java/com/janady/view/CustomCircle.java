@@ -26,12 +26,12 @@ public class CustomCircle extends View {
     public static final String IR_RIGHT = "right";
 
     //背景图片，以及覆盖图片
-    private int mIdRoundBg = R.drawable.bottom_shadow_bg;
+    private int mIdRoundBg = R.drawable.btlocker2;
     private int mIdUp = R.drawable.icon_arrow_up;
     private int mIdDown = R.drawable.icon_arrow_down;
-    private int mIdLeft = R.drawable.ic_arrow_left;
+    private int mIdLeft = R.drawable.icon_arrow_left;
     private int mIdRight = R.drawable.icon_arrow_right;
-    private int mIdDefine = R.drawable.btlocker2;
+    private int mIdDefine = R.drawable.icon_back;
 
     private Paint mPaint;
 
@@ -89,7 +89,7 @@ public class CustomCircle extends View {
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
         mPaint.setStrokeWidth(7);
-        mPaint.setColor(getResources().getColor(R.color.gray_e9_dddddd));
+        mPaint.setColor(getResources().getColor(R.color.red_primary_color));
 
         bitmap = BitmapFactory.decodeResource(this.getResources(), mIdRoundBg);
         upBitMap = BitmapFactory.decodeResource(this.getResources(), mIdUp);
@@ -101,9 +101,11 @@ public class CustomCircle extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        mWidth = bitmap.getWidth();
+        //mWidth = bitmap.getWidth();
+        mWidth = 240;
         mRadio = mWidth / 2;
-        defineRadio = defineBitMap.getWidth() / 2;
+        //defineRadio = defineBitMap.getWidth() / 2;
+        defineRadio = 120 / 2;
 
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
