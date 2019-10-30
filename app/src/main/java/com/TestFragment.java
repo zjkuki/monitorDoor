@@ -136,7 +136,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         //showWaitDialog();
         //setMsgText("正在检查设备在线状态，请稍等...");
-        //FunSupport.getInstance().requestLanDeviceList();
+        FunSupport.getInstance().requestLanDeviceList();
 
         /*countDownTimer = new CountDownTimer(5000, 1000) {
 
@@ -291,7 +291,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mFunDevice.devIp = citem.devIp;
                 mFunDevice.devMac = citem.mac;
                 mFunDevice.tcpPort = 34567;
-                mFunDevice.devType = citem.type;
+                mFunDevice.devType = FunDevType.getType(citem.type);
                 mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
                 mFunDevice.isRemote = true;
                 mFunDevice.loginName = citem.loginName;
@@ -305,6 +305,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 intent.setClass(getContext(), DeviceCameraActivity.class);
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
                 intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
+                intent.putExtra("FUN_DEVICE_TYPE", citem.type);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -518,7 +519,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
             for(Camera cam : cams) {
                 //FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(cam));
-                FunSupport.getInstance().requestDeviceStatus(cam.type, cam.sn);
+                FunSupport.getInstance().requestDeviceStatus(FunDevType.getType(cam.type), cam.sn);
             }
 
             refreshDataSet();
@@ -552,7 +553,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onDeviceStatusChanged(FunDevice funDevice) {
-        List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, funDevice.devSn.toString()));
+        String sn= funDevice.devSn;
+        if(sn!=null) {
+            sn = funDevice.devName;
+        }
+        List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));
         if (cams != null && cams.size() > 0) {
             if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
                 cams.get(0).isOnline = true;

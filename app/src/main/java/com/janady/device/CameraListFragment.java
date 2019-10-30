@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,6 +25,7 @@ import com.janady.database.model.Camera;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevStatus;
+import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
@@ -107,7 +109,7 @@ public class CameraListFragment extends JBaseFragment {
                 mFunDevice.devIp = mFunDevices.get(pos).devIp;
                 mFunDevice.devMac = mFunDevices.get(pos).mac;
                 mFunDevice.tcpPort = 34567;
-                mFunDevice.devType = mFunDevices.get(pos).type;
+                mFunDevice.devType = FunDevType.getType(mFunDevices.get(pos).type);
                 mFunDevice.devStatus = FunDevStatus.STATUS_UNKNOWN;
                 mFunDevice.isRemote = true;
                 mFunDevice.loginName = mFunDevices.get(pos).loginName;
@@ -115,7 +117,15 @@ public class CameraListFragment extends JBaseFragment {
                 DeviceCameraFragment deviceCameraFragment = new DeviceCameraFragment();
                 //deviceCameraFragment.setFunDevice(funDevice);
                 deviceCameraFragment.setFunDevice(mFunDevice);
-                startFragment(deviceCameraFragment);
+
+                Intent intent = new Intent();
+                intent.setClass(getContext(), DeviceCameraActivity.class);
+                intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
+                intent.putExtra("FUN_DEVICE_SCENE", mFunDevices.get(pos).sceneName);
+                intent.putExtra("FUN_DEVICE_TYPE", mFunDevices.get(pos).type);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                //startFragment(deviceCameraFragment);
             }
         });
         mRecyclerView.setAdapter(mItemAdapter);

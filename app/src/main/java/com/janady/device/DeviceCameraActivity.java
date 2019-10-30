@@ -45,6 +45,7 @@ import android.widget.Toast;
 import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
+import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
@@ -74,9 +75,11 @@ import com.lib.funsdk.support.utils.FileUtils;
 import com.lib.funsdk.support.utils.TalkManager;
 import com.lib.funsdk.support.widget.FunVideoView;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
 
@@ -173,12 +176,19 @@ public class DeviceCameraActivity
 
 		mContext = this;
 
+
 		int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
         String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
+		int devTypeId = getIntent().getIntExtra("FUN_DEVICE_TYPE",0);
 
-		//camera = getIntent().getParcelableExtra("camera");
+		List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_DEVID, devId));
+		if(cams.size()>0){camera = cams.get(0);}
 
-		mFunDevice = FunSupport.getInstance().findDeviceById(devId);
+		if(FunDevType.getType(devTypeId)!=FunDevType.EE_DEV_BOUTIQUEROTOT) {
+			mFunDevice = FunSupport.getInstance().findDeviceById(camera.devId);
+		}else{
+			mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
+		}
 
 		if (null == mFunDevice) {
 			finish();

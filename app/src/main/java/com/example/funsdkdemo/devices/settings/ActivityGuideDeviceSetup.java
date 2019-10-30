@@ -97,7 +97,7 @@ public class ActivityGuideDeviceSetup extends ActivityGuide {
 		//mGuideModules.add(new DemoModule(-1, R.string.device_opt_tour, -1, TourActivity.class));
 
 		//人形检测
-		//mGuideModules.add(new DemoModule(-1,R.string.human_detect,-1,ActivityHumanDetect.class));
+		mGuideModules.add(new DemoModule(R.drawable.ic_directions_run_120dp,R.string.human_detect,-1,ActivityHumanDetect.class));
 
 		//一键遮蔽
 		//mGuideModules.add(new DemoModule(-1,R.string.One_Key_Mask_Video,-1,ActivityOneKeyMaskVideo.class));

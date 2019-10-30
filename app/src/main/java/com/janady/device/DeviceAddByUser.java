@@ -75,6 +75,7 @@ import java.util.List;
 
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_NORMAL_MONITOR;
 import static com.lib.funsdk.support.models.FunDevType.getType;
 
 
@@ -146,8 +147,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			FunDevType.EE_DEV_IDR,
 			FunDevType.EE_DEV_BULLET,
 			FunDevType.EE_DEV_DRUM,
-			FunDevType.EE_DEV_CAMERA,
-			FunDevType.EE_DEV_BOUTIQUEROTOT,*/
+			FunDevType.EE_DEV_CAMERA,*/
+			FunDevType.EE_DEV_BOUTIQUEROTOT,
 			FunDevType.EE_DEV_BLUETOOTH,
 			FunDevType.EE_DEV_REMOTER
 
@@ -326,9 +327,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}
 
 
-		// 设置登录方式为互联网方式
-		FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
-		//FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
+		if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
+			// 设置登录方式为互联网方式
+			FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
+		}else {
+				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
+		}
 		
 		// 监听设备类事件
 		FunSupport.getInstance().registerOnFunDeviceListener(this);
@@ -341,6 +345,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			startLogin();
 		}
 
+		requestToGetLanDeviceList();
 
 
 	}
@@ -474,7 +479,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							mCamera.mac = mFunDevice.getDevMac();
 							mCamera.name = mFunDevice.getDevName();
 							mCamera.serialNo = mFunDevice.getSerialNo();
-							mCamera.type = mFunDevice.getDevType();
+							mCamera.type = mCurrDevType.getDevIndex();
 							mCamera.sceneName = mEditSceneName.getText().toString();
 							mCamera.loginName = "admin";
 							mCamera.loginPsw = "";
@@ -485,7 +490,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							mCamera.name = mFunDevice.getDevName();
 							mCamera.sn = mFunDevice.getDevSn();
 							mCamera.serialNo = mFunDevice.getSerialNo();
-							mCamera.type = mFunDevice.getDevType();
+							mCamera.type = mCurrDevType.getDevIndex();
 							mCamera.sceneName = mEditSceneName.getText().toString();
 							mCamera.loginName = "admin";
 							mCamera.loginPsw = "";
@@ -618,12 +623,17 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	}
 
 	private void requestToGetLanDeviceList() {
-		if (!FunSupport.getInstance().requestLanDeviceList()) {
+		if(mCurrDevType==EE_DEV_BOUTIQUEROTOT){
+			FunSupport.getInstance().requestLanDeviceList();
+		}else{
+			FunSupport.getInstance().requestDeviceList();
+		}
+/*		if (!FunSupport.getInstance().requestLanDeviceList()) {
 			showToast(R.string.guide_message_error_call);
 		} else {
 			//showWaitDialog();
 			//mRefreshLayout.showState(AppConstants.LOADING);
-		}
+		}*/
 	}
 
 
@@ -786,11 +796,20 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			mCurrDevType = mSupportDevTypes[position];
 			mAdapterDev.setCurrentDevType(mCurrDevType);
 
+			if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
+				// 设置登录方式为互联网方式
+				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
+			}else {
+				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
+			}
+
 			if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
 				mEditPassword.setVisibility(View.VISIBLE);
 			}else{
 				mEditPassword.setVisibility(View.GONE);
 			}
+
+			searchDevice();
 		}
 	}
 	
@@ -940,15 +959,19 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private void refreshLanDeviceList() {
 		hideWaitDialog();
 		mTextTip.setText("扫描设备");
-		//mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
-		mAdapterDev.updateDevice(FunSupport.getInstance().getDeviceList());
+		if(mCurrDevType==EE_DEV_BOUTIQUEROTOT) {
+			mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
+		}else {
+			mAdapterDev.updateDevice(FunSupport.getInstance().getDeviceList());
+		}
 		mListViewDev.onRefreshComplete(true);
 		mRefreshLayout.showState(AppConstants.LIST);
 
 		// 延时100毫秒更新设备消息
 		mHandler.removeMessages(MESSAGE_REFRESH_DEVICE_STATUS);
 		//if (FunSupport.getInstance().getLanDeviceList().size() > 0) {
-		if (FunSupport.getInstance().getDeviceList().size() > 0) {
+		//if (FunSupport.getInstance().getDeviceList().size() > 0) {
+		if (mAdapterDev.getCount() > 0) {
 			mHandler.sendEmptyMessageDelayed(MESSAGE_REFRESH_DEVICE_STATUS, 100);
 		}
 	}
@@ -967,7 +990,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}else{
 			//requestToGetLanDeviceList();
 			// 以局域网内搜索过的设备,显示在下方作为测试设备添加
-			if ( null != mAdapterDev && (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR || mCurrDevType == EE_DEV_BOUTIQUEROTOT)) {
+			if ( null != mAdapterDev &&  (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR || mCurrDevType == EE_DEV_BOUTIQUEROTOT)) {
 				//mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
 				requestToGetLanDeviceList();
 			}
