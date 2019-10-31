@@ -45,10 +45,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:name="com.example.funsdkdemo.MyApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@drawable/xmjp_camera"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
         <activity
             android:name="com.janady.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

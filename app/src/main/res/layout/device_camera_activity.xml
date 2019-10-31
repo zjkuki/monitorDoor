@@ -203,18 +203,6 @@
                         android:src="@drawable/icon_close" />
                 </RelativeLayout>
             </RelativeLayout>
-
-            <ImageButton
-                android:id="@+id/btnDevRecord"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="24dp"
-                android:layout_toRightOf="@+id/VoiceTalk"
-                android:background="@color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/icon_record" />
-
             <ImageButton
                 android:id="@+id/btnDevCapture"
                 android:layout_width="40dp"
@@ -227,6 +215,40 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_devcapture" />
 
+            <ImageButton
+                android:id="@+id/btnDevRecord"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="24dp"
+                android:layout_toLeftOf="@id/btnDevCapture"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_record" />
+
+
+            <ImageButton
+                android:id="@+id/btnDevAddLocker"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignTop="@+id/btnDevRecord"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="24dp"
+                android:layout_toRightOf="@+id/VoiceTalk"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_devcapture" />
+            <ImageButton
+                android:id="@+id/btnDevRemoveLocker"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignTop="@+id/btnDevRecord"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="24dp"
+                android:layout_toRightOf="@+id/btnDevAddLocker"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_devcapture" />
             <View
                 android:id="@+id/splitView"
                 android:layout_width="match_parent"
@@ -251,8 +273,13 @@
                 android:id="@+id/ll_functions"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <include
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    layout="@layout/jcamrea_direction_pad" />
 
             </LinearLayout>
         </RelativeLayout>

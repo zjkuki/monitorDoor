@@ -6,6 +6,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityGuideDeviceList;
 import com.example.funsdkdemo.R;
@@ -16,12 +17,19 @@ import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 
+import org.w3c.dom.Text;
+
 public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
     private final int MESSAGE_ENTER_MAINMENU = 0x100;
     private final int MESSAGE_LOGIN_FUNISHED = 0x101;
+
+    private TextView setupContent;
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.jsetup, null);
+
+        setupContent = root.findViewById(R.id.setup_content);
+
         //startPushAlarmNotification();
         //startLanAlarmNotification();
         FunSupport.getInstance().registerOnFunLoginListener(this);
@@ -43,13 +51,14 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
     @Override
     public void onStart() {
         super.onStart();
+
+        setupContent.setText("正在初始化设备，请稍候...");
+        FunSupport.getInstance().requestDeviceList();
+        FunSupport.getInstance().requestLanDeviceList();
+
         // 最小延时2秒打开主界面
         mHandler.sendEmptyMessageDelayed(MESSAGE_ENTER_MAINMENU, 3000);
-        if ( !FunSupport.getInstance().getAutoLogin()
-                || !FunSupport.getInstance().loginByLastUser() ) {
-            // 之前没有账号成功登录或者没有设置为自动登录,结束登录流程
-            mHandler.sendEmptyMessage(MESSAGE_ENTER_MAINMENU);
-        }
+
     }
 
     @Override
@@ -65,8 +74,16 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
             switch(msg.what) {
                 case MESSAGE_ENTER_MAINMENU:
                 {
-                    // login
-                    startFragmentAndDestroyCurrent(new FragmentUserLogin());
+                    setupContent.setText("登录中...");
+                    if ( !FunSupport.getInstance().getAutoLogin()
+                            || !FunSupport.getInstance().loginByLastUser() ) {
+                        // 之前没有账号成功登录或者没有设置为自动登录,结束登录流程
+                        //mHandler.sendEmptyMessage(MESSAGE_ENTER_MAINMENU);
+                        // login
+                        startFragmentAndDestroyCurrent(new FragmentUserLogin());
+                    }else{
+
+                    }
                 }
                 break;
                 case MESSAGE_LOGIN_FUNISHED:

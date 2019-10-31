@@ -94,7 +94,7 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         MyApplication.liteOrm.delete(mCurrCamDev);
-                        CameraDeviceAdapter.super.notifyItemRemoved(position);
+                        //CameraDeviceAdapter.super.notifyItemRemoved(position);
                         mDevs = MyApplication.liteOrm.query(Camera.class);
                         CameraDeviceAdapter.super.setData(mDevs);
                         CameraDeviceAdapter.super.notifyDataSetChanged();

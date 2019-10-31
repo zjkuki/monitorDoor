@@ -309,6 +309,12 @@
                         android:layout_toLeftOf="@+id/ptz_right"
                         android:background="@drawable/ptzup_selector" />
                 </RelativeLayout>
+                <include
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:gravity="center"
+                    layout="@layout/jcamrea_direction_pad" />
+
             </LinearLayout>
         </RelativeLayout>
     </ScrollView>

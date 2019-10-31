@@ -66,8 +66,8 @@ public class ActivityGuideDeviceSetup extends ActivityGuide {
 		//mGuideModules.add(new DemoModule(-1, R.string.device_setup_frontctr, -1, ActivityGuideDeviceDevFrontCtr.class));
 
 		// 报警中心
-		/*mGuideModules.add(
-				new DemoModule(-1, R.string.device_setup_alarm_center, -1, ActivityGuideDeviceSetupAlarmCenter.class));*/
+		mGuideModules.add(
+				new DemoModule(R.drawable.ic_warning_120dp, R.string.device_setup_alarm_center, -1, ActivityGuideDeviceSetupAlarmCenter.class));
 		// GB设置
 		/*mGuideModules.add(
 				new DemoModule(-1, R.string.device_setup_spvmn_cfg_json, -1, ActivityGuideDeviceSPVMNCfgJson.class));*/
@@ -94,7 +94,7 @@ public class ActivityGuideDeviceSetup extends ActivityGuide {
 		/*mGuideModules.add(new DemoModule(-1,R.string.ap_to_wifi,-1,ActivityGuideDeviceAPToWiFi.class));*/
 
 		//巡航操作
-		//mGuideModules.add(new DemoModule(-1, R.string.device_opt_tour, -1, TourActivity.class));
+		mGuideModules.add(new DemoModule(R.drawable.ic_data_usage_120dp, R.string.device_opt_tour, -1, TourActivity.class));
 
 		//人形检测
 		mGuideModules.add(new DemoModule(R.drawable.ic_directions_run_120dp,R.string.human_detect,-1,ActivityHumanDetect.class));

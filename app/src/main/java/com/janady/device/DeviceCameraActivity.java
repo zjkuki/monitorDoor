@@ -184,15 +184,18 @@ public class DeviceCameraActivity
 		List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_DEVID, devId));
 		if(cams.size()>0){camera = cams.get(0);}
 
-		if(FunDevType.getType(devTypeId)!=FunDevType.EE_DEV_BOUTIQUEROTOT) {
+		//if(FunDevType.getType(devTypeId)!=FunDevType.EE_DEV_BOUTIQUEROTOT) {
 			mFunDevice = FunSupport.getInstance().findDeviceById(camera.devId);
-		}else{
-			mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
-		}
+		//}else{
+		//	mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
+		//}
 
 		if (null == mFunDevice) {
-			finish();
-			return;
+			mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
+			if(mFunDevice == null) {
+				finish();
+				return;
+			}
 		}
 
 		mLayoutTop = (RelativeLayout) findViewById(R.id.layoutTop);
@@ -249,6 +252,12 @@ public class DeviceCameraActivity
 		mPtz_down = (ImageButton) findViewById(R.id.ptz_down);
 		mPtz_left = (ImageButton) findViewById(R.id.ptz_left);
 		mPtz_right = (ImageButton) findViewById(R.id.ptz_right);*/
+
+		mPtz_up = (ImageButton) findViewById(R.id.btnCamUp);
+		mPtz_down = (ImageButton) findViewById(R.id.btnCamDown);
+		mPtz_left = (ImageButton) findViewById(R.id.btnCamLeft);
+		mPtz_right = (ImageButton) findViewById(R.id.btnCamRight);
+
 		mBtnVoiceTalk.setOnClickListener(this);
 		mBtnVoiceTalk.setOnTouchListener(mIntercomTouchLs);
 		mBtnVoice.setOnClickListener(this);
@@ -870,7 +879,8 @@ public class DeviceCameraActivity
 
 	// 获取设备预置点列表
 	private void requestPTZPreset() {
-		FunSupport.getInstance().requestDeviceConfig(mFunDevice, OPPTZPreset.CONFIG_NAME, 0);
+		//FunSupport.getInstance().requestDeviceConfig(mFunDevice, OPPTZPreset.CONFIG_NAME, 0);
+		FunSupport.getInstance().requestDeviceConfig(mFunDevice, "Uart.PTZPreset", 0);
 	}
 
 	private void startPictureList() {
@@ -1302,7 +1312,7 @@ public class DeviceCameraActivity
 	@Override
 	public void onDeviceSetConfigSuccess(final FunDevice funDevice,
 			final String configName) {
-
+			Log.d("-DCA-",configName);
 	}
 
 
@@ -1327,11 +1337,13 @@ public class DeviceCameraActivity
 	@Override
 	public void onDeviceOptionSuccess(final FunDevice funDevice, final String option) {
 		// TODO Auto-generated method stub
+		Log.d("-DCA-",option);
 	}
 
 	@Override
 	public void onDeviceOptionFailed(final FunDevice funDevice, final String option, final Integer errCode) {
 		// TODO Auto-generated method stub
+		Log.d("-DCA-",option);
 	}
 
 	@Override

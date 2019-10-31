@@ -147,8 +147,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			FunDevType.EE_DEV_IDR,
 			FunDevType.EE_DEV_BULLET,
 			FunDevType.EE_DEV_DRUM,
-			FunDevType.EE_DEV_CAMERA,*/
-			FunDevType.EE_DEV_BOUTIQUEROTOT,
+			FunDevType.EE_DEV_CAMERA,
+			FunDevType.EE_DEV_BOUTIQUEROTOT,*/
 			FunDevType.EE_DEV_BLUETOOTH,
 			FunDevType.EE_DEV_REMOTER
 
@@ -327,12 +327,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}
 
 
-		if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
+		//if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
 			// 设置登录方式为互联网方式
-			FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
-		}else {
+		//	FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
+		//}else {
 				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
-		}
+		//}
 		
 		// 监听设备类事件
 		FunSupport.getInstance().registerOnFunDeviceListener(this);
@@ -522,8 +522,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 				case MESSAGE_REFRESH_DEVICE_STATUS: {
-					//FunSupport.getInstance().requestAllLanDeviceStatus();
-					FunSupport.getInstance().requestAllDeviceStatus();
+					FunSupport.getInstance().requestAllLanDeviceStatus();
+					//FunSupport.getInstance().requestAllDeviceStatus();
 				}
 				break;
 			/*case MESSAGE_DELAY_FINISH:
@@ -623,11 +623,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	}
 
 	private void requestToGetLanDeviceList() {
-		if(mCurrDevType==EE_DEV_BOUTIQUEROTOT){
+		//if(mCurrDevType==EE_DEV_BOUTIQUEROTOT){
 			FunSupport.getInstance().requestLanDeviceList();
-		}else{
-			FunSupport.getInstance().requestDeviceList();
-		}
+		//}else{
+		//	FunSupport.getInstance().requestDeviceList();
+		//}
+
 /*		if (!FunSupport.getInstance().requestLanDeviceList()) {
 			showToast(R.string.guide_message_error_call);
 		} else {
@@ -796,12 +797,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			mCurrDevType = mSupportDevTypes[position];
 			mAdapterDev.setCurrentDevType(mCurrDevType);
 
-			if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
+			//if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
 				// 设置登录方式为互联网方式
-				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
-			}else {
+			//	FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
+			//}else {
 				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
-			}
+			//}
 
 			if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
 				mEditPassword.setVisibility(View.VISIBLE);
@@ -959,11 +960,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private void refreshLanDeviceList() {
 		hideWaitDialog();
 		mTextTip.setText("扫描设备");
-		if(mCurrDevType==EE_DEV_BOUTIQUEROTOT) {
+		//if(mCurrDevType==EE_DEV_BOUTIQUEROTOT) {
 			mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
-		}else {
-			mAdapterDev.updateDevice(FunSupport.getInstance().getDeviceList());
-		}
+		//}else {
+		//	mAdapterDev.updateDevice(FunSupport.getInstance().getDeviceList());
+		//}
 		mListViewDev.onRefreshComplete(true);
 		mRefreshLayout.showState(AppConstants.LIST);
 

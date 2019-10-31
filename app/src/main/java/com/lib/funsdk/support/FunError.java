@@ -64,7 +64,7 @@ public class FunError {
 	public static final int EE_DVR_OPT_CAPS_ERROR			= -11403;			// 配置特性不支持
 	public static final int EE_DVR_OPT_VALIDATE_ERROR		= -11404;			// 配置校验失败
 	public static final int EE_DVR_OPT_CONFIG_NOT_EXIST		= -11405;			// 请求或者设置的配置不存在
-
+	public static final int EE_DVR_OPT_CONFIG_PARSE_ERROR   = -11406;           // 配置解析出错
 	// 
 	public static final int EE_DVR_CTRL_PAUSE_ERROR		= -11500;			  // 暂停失败
 	public static final int EE_DVR_SDK_NOTFOUND			= -11501;			  // 查找失败，没有找到对应文件
