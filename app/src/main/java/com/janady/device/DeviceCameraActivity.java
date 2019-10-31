@@ -119,6 +119,7 @@ public class DeviceCameraActivity
 	private Button mBtnFishEyeInfo = null;
 	private Button mBtnGetPreset = null;
 	private Button mBtnSetPreset = null;
+
 	private View mSplitView = null;
 	private CheckBox mCbDoubleTalk = null;
 	private RelativeLayout mLayoutRecording = null;
@@ -133,6 +134,8 @@ public class DeviceCameraActivity
     private ImageButton mBtnQuitVoice = null;
 	private ImageButton mBtnDevCapture = null;
 	private ImageButton mBtnDevRecord = null;
+	private ImageButton mBtnLocker = null;
+
 
 	private RelativeLayout mLayoutDirectionControl = null;
 	private ImageButton mPtz_up = null;
@@ -148,6 +151,7 @@ public class DeviceCameraActivity
 	private int mChannelCount;
 	private boolean isGetSysFirst = true;
 
+	private boolean mIsLocked = false;
 
 	private final int MESSAGE_PLAY_MEDIA = 0x100;
 	private final int MESSAGE_AUTO_HIDE_CONTROL_BAR = 0x102;
@@ -214,6 +218,7 @@ public class DeviceCameraActivity
 		mBtnRecord = (Button) findViewById(R.id.btnRecord);
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
+		mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
 
 		mLayoutRecording = (RelativeLayout) findViewById(R.id.layout_recording);
 		mBtnPlay.setOnClickListener(this);
@@ -223,6 +228,8 @@ public class DeviceCameraActivity
 		mBtnRecord.setOnClickListener(this);
 		mBtnScreenRatio.setOnClickListener(this);
 		mBtnFishEyeInfo.setOnClickListener(this);
+
+
 
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
@@ -273,6 +280,8 @@ public class DeviceCameraActivity
 		mPtz_left.setOnTouchListener(onPtz_left);
 		mPtz_right.setOnTouchListener(onPtz_right);*/
 
+		mBtnLocker.setOnClickListener(this);
+		mBtnLocker.setOnTouchListener(mLockerTouchLs);
 
 		mLayoutControls = (LinearLayout) findViewById(R.id.layoutFunctionControl);
 		mLayoutChannel = (LinearLayout) findViewById(R.id.layoutChannelBtn);
@@ -1562,4 +1571,24 @@ public class DeviceCameraActivity
 		// TODO Auto-generated method stub
 		
 	}
+
+	private OnTouchListener mLockerTouchLs = new OnTouchListener() {
+
+		@Override
+		public boolean onTouch(View arg0, MotionEvent arg1) {
+			try {
+						if (!mIsLocked) {
+							mBtnLocker.setBackgroundResource(R.drawable.icon_unlock_btn_normal);
+							mIsLocked = true;
+						}else {
+							//stopTalkByDoubleDirection();
+							mBtnLocker.setBackgroundResource(R.drawable.icon_lock_btn_normal);
+							mIsLocked = false;						}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+	};
+
 }
