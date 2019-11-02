@@ -305,7 +305,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 intent.setClass(getContext(), DeviceCameraActivity.class);
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
                 intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
-                intent.putExtra("FUN_DEVICE_TYPE", citem.type);
+                intent.putExtra("FUN_DEVICE_SN", citem.sn);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -410,7 +410,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             //countDownTimer.cancel();
         }*/
 
-        //DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
+        DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
         DataManager.getInstance().mBleDevices = mBleDevices;
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter.setData(mainItems);
@@ -554,7 +554,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onDeviceStatusChanged(FunDevice funDevice) {
         String sn= funDevice.devSn;
-        if(sn!=null) {
+        if(sn==null) {
             sn = funDevice.devName;
         }
         List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));

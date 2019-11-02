@@ -228,7 +228,7 @@
 
 
             <ImageButton
-                android:id="@+id/btnDevAddLocker"
+                android:id="@+id/btnDevPre"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignTop="@+id/btnDevRecord"
@@ -237,18 +237,18 @@
                 android:layout_toRightOf="@+id/VoiceTalk"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/icon_devcapture" />
+                android:src="@drawable/icon_devskipprevios" />
             <ImageButton
-                android:id="@+id/btnDevRemoveLocker"
+                android:id="@+id/btnDevNext"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignTop="@+id/btnDevRecord"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="24dp"
-                android:layout_toRightOf="@+id/btnDevAddLocker"
+                android:layout_toRightOf="@+id/btnDevPre"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/icon_devcapture" />
+                android:src="@drawable/icon_devskipnext" />
             <View
                 android:id="@+id/splitView"
                 android:layout_width="match_parent"

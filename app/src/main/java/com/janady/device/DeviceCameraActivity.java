@@ -54,6 +54,8 @@ import com.example.funsdkdemo.devices.monitor.ActivityGuideDevicePreview;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;
+import com.janady.Dialogs;
+import com.janady.HomeActivity;
 import com.janady.database.model.Camera;
 import com.janady.view.CustomCircle;
 import com.janady.view.RoundMenuView;
@@ -136,6 +138,9 @@ public class DeviceCameraActivity
 	private ImageButton mBtnDevRecord = null;
 	private ImageButton mBtnLocker = null;
 
+	private ImageButton mBtnSkipNext = null;
+    private ImageButton mBtnSkipPrevious = null;
+
 
 	private RelativeLayout mLayoutDirectionControl = null;
 	private ImageButton mPtz_up = null;
@@ -170,8 +175,130 @@ public class DeviceCameraActivity
 	private TourActivity mTourFragment;
 
 	private Camera camera;
+    List<Camera> cams = null;
+    private int currIndex = 0;
 
 	private Context mContext;
+
+	private Camera getCamera(int index){
+        if(cams.size()>0 && index>=0 && index<cams.size()){
+            return cams.get(index);
+        }else{
+            return null;
+        }
+    }
+	private void initCamera(int devId, String sn){
+        //cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));
+        cams = MyApplication.liteOrm.query(Camera.class);
+        if(cams.size()>0){
+            currIndex = 0;
+            for(int i=0;i<cams.size();i++){
+                if(cams.get(i).sn.equals(sn)) {
+                    camera = cams.get(i);
+                    currIndex = i;
+                }
+            }
+        }
+		//mTextTitle.setText(mFunDevice.devName);
+		if(!camera.isOnline){
+			mTextTitle.setText(camera.sceneName+"-摄像机(离线)");
+		}else{
+			mTextTitle.setText(camera.sceneName+"-摄像机");
+		}
+
+        mFunDevice = FunSupport.getInstance().findDeviceById(devId);
+        if (null == mFunDevice) {
+            mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
+            if(mFunDevice == null) {
+                mFunDevice = FunSupport.getInstance().findLanDevice(camera.name);
+                if(mFunDevice == null) {
+                    mFunDevice = FunSupport.getInstance().findDeviceBySn(camera.sn);
+                    if(mFunDevice == null) {
+                        mFunDevice = FunSupport.getInstance().findTempDevice(camera.mac);
+                        if(mFunDevice == null) {
+                            finish();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+		mCanToPlay = false;
+        isGetSysFirst = true;
+
+		mFunVideoView = (FunVideoView) findViewById(R.id.funVideoView);
+        mFunVideoView.clearVideo();
+		mFunVideoView.stopPlayback();
+		//playRealMedia();
+
+		//if (mFunDevice.devType == FunDevType.EE_DEV_LAMP_FISHEYE) {
+		if (mFunDevice.devType == FunDevType.EE_DEV_CAMERA) {
+			// 鱼眼灯泡,设置鱼眼效果
+			mFunVideoView.setFishEye(true);
+		}
+
+		// 如果支持云台控制，显示方向键和预置点按钮
+		if (mFunDevice.isSupportPTZ()) {
+			mSplitView.setVisibility(View.VISIBLE);
+			mLayoutDirectionControl.setVisibility(View.VISIBLE);
+		}
+
+		//mFunVideoView.setOnTouchListener(new OnVideoViewTouchListener());
+		mFunVideoView.setGestureListner(this);
+		mFunVideoView.setOnPreparedListener(this);
+		mFunVideoView.setOnErrorListener(this);
+		mFunVideoView.setOnInfoListener(this);
+		mVideoControlLayout = (LinearLayout) findViewById(R.id.layoutVideoControl);
+
+
+		// 允许横竖屏切换
+		// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+
+		//showVideoControlBar();
+		hideVideoControlBar();
+
+		mFunVideoView.setMediaSound(false);			//关闭本地音频
+
+		mTalkManager = new TalkManager(mFunDevice.getDevSn(), new TalkManager.OnTalkButtonListener() {
+			@Override
+			public boolean isPressed() {
+				return false;
+			}
+
+			@Override
+			public void onUpdateUI() {
+
+			}
+
+			@Override
+			public void OnCreateLinkResult(int Result) {
+
+			}
+
+			@Override
+			public void OnCloseTalkResult(int Result) {
+
+			}
+
+			@Override
+			public void OnVoiceOperateResult(int Type, int result) {
+
+			}
+		});
+
+		mCanToPlay = false;
+
+		// 如果设备未登录,先登录设备
+		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
+			loginDevice();
+		} else {
+			requestSystemInfo();
+		}
+
+		// 注册设备操作回调
+		FunSupport.getInstance().registerOnFunDeviceOptListener(this);
+    }
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -179,28 +306,6 @@ public class DeviceCameraActivity
 		setContentView(R.layout.device_camera_activity);
 
 		mContext = this;
-
-
-		int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
-        String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
-		int devTypeId = getIntent().getIntExtra("FUN_DEVICE_TYPE",0);
-
-		List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_DEVID, devId));
-		if(cams.size()>0){camera = cams.get(0);}
-
-		//if(FunDevType.getType(devTypeId)!=FunDevType.EE_DEV_BOUTIQUEROTOT) {
-			mFunDevice = FunSupport.getInstance().findDeviceById(camera.devId);
-		//}else{
-		//	mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
-		//}
-
-		if (null == mFunDevice) {
-			mFunDevice = FunSupport.getInstance().findLanDevice(camera.sn);
-			if(mFunDevice == null) {
-				finish();
-				return;
-			}
-		}
 
 		mLayoutTop = (RelativeLayout) findViewById(R.id.layoutTop);
 
@@ -219,6 +324,8 @@ public class DeviceCameraActivity
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
 		mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
+        mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
+        mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
 
 		mLayoutRecording = (RelativeLayout) findViewById(R.id.layout_recording);
 		mBtnPlay.setOnClickListener(this);
@@ -228,8 +335,8 @@ public class DeviceCameraActivity
 		mBtnRecord.setOnClickListener(this);
 		mBtnScreenRatio.setOnClickListener(this);
 		mBtnFishEyeInfo.setOnClickListener(this);
-
-
+		mBtnSkipNext.setOnClickListener(this);
+		mBtnSkipPrevious.setOnClickListener(this);
 
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
@@ -280,31 +387,13 @@ public class DeviceCameraActivity
 		mPtz_left.setOnTouchListener(onPtz_left);
 		mPtz_right.setOnTouchListener(onPtz_right);*/
 
-		mBtnLocker.setOnClickListener(this);
-		mBtnLocker.setOnTouchListener(mLockerTouchLs);
+		mBtnLocker.setImageResource(R.drawable.icon_button_empty);
+		//mBtnLocker.setOnClickListener(this);
+		//mBtnLocker.setOnTouchListener(mLockerTouchLs);
 
 		mLayoutControls = (LinearLayout) findViewById(R.id.layoutFunctionControl);
 		mLayoutChannel = (LinearLayout) findViewById(R.id.layoutChannelBtn);
 
-		mFunVideoView = (FunVideoView) findViewById(R.id.funVideoView);
-		//if (mFunDevice.devType == FunDevType.EE_DEV_LAMP_FISHEYE) {
-		if (mFunDevice.devType == FunDevType.EE_DEV_CAMERA) {
-			// 鱼眼灯泡,设置鱼眼效果
-			mFunVideoView.setFishEye(true);
-		}
-
-		// 如果支持云台控制，显示方向键和预置点按钮
-		if (mFunDevice.isSupportPTZ()) {
-			mSplitView.setVisibility(View.VISIBLE);
-			mLayoutDirectionControl.setVisibility(View.VISIBLE);
-		}
-
-		//mFunVideoView.setOnTouchListener(new OnVideoViewTouchListener());
-        mFunVideoView.setGestureListner(this);
-		mFunVideoView.setOnPreparedListener(this);
-		mFunVideoView.setOnErrorListener(this);
-		mFunVideoView.setOnInfoListener(this);
-		mVideoControlLayout = (LinearLayout) findViewById(R.id.layoutVideoControl);
 
 		mTextStreamType = (TextView) findViewById(R.id.textStreamStat);
 
@@ -312,56 +401,11 @@ public class DeviceCameraActivity
 		mBtnSetup = (ImageButton) findViewById(R.id.btnSettings);
 		mBtnSetup.setOnClickListener(this);
 
-		// 注册设备操作回调
-		FunSupport.getInstance().registerOnFunDeviceOptListener(this);
+		int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
+		String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
+		String sn = getIntent().getStringExtra("FUN_DEVICE_SN");
 
-
-		//mTextTitle.setText(mFunDevice.devName);
-        mTextTitle.setText(sceneName+"-摄像机");
-
-		// 允许横竖屏切换
-		// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-
-		//showVideoControlBar();
-        hideVideoControlBar();
-
-		mFunVideoView.setMediaSound(false);			//关闭本地音频
-
-		mTalkManager = new TalkManager(mFunDevice.getDevSn(), new TalkManager.OnTalkButtonListener() {
-			@Override
-			public boolean isPressed() {
-				return false;
-			}
-
-			@Override
-			public void onUpdateUI() {
-
-			}
-
-			@Override
-			public void OnCreateLinkResult(int Result) {
-
-			}
-
-			@Override
-			public void OnCloseTalkResult(int Result) {
-
-			}
-
-			@Override
-			public void OnVoiceOperateResult(int Type, int result) {
-
-			}
-		});
-
-		mCanToPlay = false;
-
-		// 如果设备未登录,先登录设备
-		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
-			loginDevice();
-		} else {
-			requestSystemInfo();
-		}
+		initCamera(devId, sn);
 
 		setStatusBar();
 	}
@@ -616,6 +660,41 @@ public class DeviceCameraActivity
 				showFishEyeInfo();
 			}
 			break;
+        case R.id.btnDevPre:
+            {
+                currIndex --;
+                if(currIndex<0){
+					showToast("已是第一个摄像机！");
+					currIndex=0;
+					return;
+				}
+
+                if(getCamera(currIndex)!=null){
+                    camera=getCamera(currIndex);
+                    initCamera(camera.devId, camera.sn);
+                }else{
+                	currIndex++;
+                	Log.d("---DCA----","切换摄像机失败");
+				}
+            }
+            break;
+        case R.id.btnDevNext:
+            {
+                currIndex ++;
+				if(currIndex > cams.size()-1){
+					showToast("已是最后一个摄像机！");
+					currIndex =cams.size()-1;
+					return;
+				}
+                if(getCamera(currIndex)!=null){
+                    camera=getCamera(currIndex);
+                    initCamera(camera.devId, camera.sn);
+                }else{
+					currIndex --;
+					Log.d("---DCA----","切换摄像机失败");
+                }
+            }
+            break;
         default:
             break;
 		}
@@ -929,7 +1008,7 @@ public class DeviceCameraActivity
 		}
 
 		// 打开声音
-		mFunVideoView.setMediaSound(true);
+		//mFunVideoView.setMediaSound(true);
 
 		// 设置当前播放的码流类型
 		if (FunStreamType.STREAM_SECONDARY == mFunVideoView.getStreamType()) {
@@ -1210,6 +1289,7 @@ public class DeviceCameraActivity
 
 	@Override
 	public void onDeviceLoginSuccess(final FunDevice funDevice) {
+		hideWaitDialog();
 		System.out.println("TTT---->>>> loginsuccess");
 		
 		if (null != mFunDevice && null != funDevice) {

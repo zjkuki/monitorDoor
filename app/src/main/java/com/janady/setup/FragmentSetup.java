@@ -53,7 +53,7 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
         super.onStart();
 
         setupContent.setText("正在初始化设备，请稍候...");
-        FunSupport.getInstance().requestDeviceList();
+        //FunSupport.getInstance().requestDeviceList();
         FunSupport.getInstance().requestLanDeviceList();
 
         // 最小延时2秒打开主界面
@@ -82,7 +82,7 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
                         // login
                         startFragmentAndDestroyCurrent(new FragmentUserLogin());
                     }else{
-
+                        startFragmentAndDestroyCurrent(new FragmentUserLogin());
                     }
                 }
                 break;

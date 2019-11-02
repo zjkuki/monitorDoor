@@ -1030,4 +1030,14 @@ public class FunVideoView extends LinearLayout implements IFunSDKResult {
 			}
 		}
 	}
+
+	public void clearVideo(){
+    	this.removeAllViews();
+		mSufaceView = null;
+
+		mIsPlaying = false;
+
+		initSurfaceView();
+    	openVideo();
+	}
 }
