@@ -179,7 +179,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
 
         for (int i = 0; i < 2; i++) {
-            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, "remote-"+i, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
+            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment_old.class, "remote-"+i, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
             List<Object> remote_items = new ArrayList<>();
             for (int j =0; j < 3; j++) {
                 ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, "remote-"+i, R.drawable.ic_remote_3);

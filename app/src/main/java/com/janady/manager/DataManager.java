@@ -17,7 +17,8 @@ import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
-import com.janady.lkd.WifiRemoterBoard;
+import com.janady.device.RemoteListFragment_old;
+import com.janady.device.WifiRemoterBoardFragment;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
@@ -51,9 +52,9 @@ public class DataManager {
         ArrayList<Door> dlists = MyApplication.liteOrm.query(Door.class);
         CategoryItemDescription camera = new CategoryItemDescription(CameraListFragment.class, "摄像机", R.drawable.ic_camera, funDevices.size());
         //CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, blists.size());
-        //CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment.class, "远程控制", R.drawable.ic_remote, rlists.size());
+        //CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment_old.class, "远程控制", R.drawable.ic_remote, rlists.size());
         CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, blists.size());
-        CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment.class, "远程控制", R.drawable.ic_remote_3, rlists.size());
+        CategoryItemDescription remote = new CategoryItemDescription(RemoteListFragment_old.class, "远程控制", R.drawable.ic_remote_3, rlists.size());
         CategoryItemDescription room = new CategoryItemDescription(DoorListFragment.class, "场景", R.drawable.ic_room2, dlists.size());
         list.add(camera);
         list.add(bluetooth);
@@ -125,21 +126,26 @@ public class DataManager {
         bleDescription.setList(bitems);
         list.add(bleDescription);
 
+        MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, "WIFI远程控制器", R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
         ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
+        List<Object> ritems = new ArrayList<>();
         for (WifiRemoter remote : rlists) {
-            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, remote.name, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
             remoteDescription.setDevice(remote);
-            if (remote.doorList != null) {
+            ItemDescription itemDescription = new ItemDescription(WifiRemoterBoardFragment.class, remote.sceneName, R.drawable.icon_check);
+            itemDescription.setEnable(true);
+            itemDescription.setItem(remote);
+/*            if (remote.doorList != null) {
                 List<Object> ritems = new ArrayList<>();
                 for (Door door : remote.doorList) {
                     ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, door.name, R.drawable.icon_check);
                     itemDescription.setItem(door);
                     ritems.add(itemDescription);
-                }
-                remoteDescription.setList(ritems);
-            }
-            list.add(remoteDescription);
+                }*/
+                ritems.add(itemDescription);
         }
+        remoteDescription.setList(ritems);
+        list.add(remoteDescription);
+
         return list;
     }
 

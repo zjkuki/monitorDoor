@@ -29,6 +29,7 @@ import com.janady.device.BluetoothLockFragment;
 import com.janady.device.BluetoothOperatorFragment;
 import com.janady.device.CameraListFragment;
 import com.janady.device.DeviceCameraFragment;
+import com.janady.device.WifiRemoterBoardFragment;
 import com.janady.lkd.BleLocker;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunDeviceListener;
@@ -86,6 +87,18 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
                 stat = "离线";
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera_disable);
+            }
+
+            if(item.getDemoClass()== WifiRemoterBoardFragment.class) {
+                if (item.getEnable()) {
+                    textColor = 0xFF00bfa5;
+                    stat = "在线";
+                    photo = roundRect.toRoundRect(context, R.drawable.wifiremote);
+                } else {
+                    stat = "离线";
+                    textColor = Color.RED;
+                    photo = roundRect.toRoundRect(context, R.drawable.wifiremote_disable);
+                }
             }
 
             //checkFunDeviceStatus(item, holder);
