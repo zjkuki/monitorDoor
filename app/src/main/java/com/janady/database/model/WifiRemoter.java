@@ -16,9 +16,16 @@ public class WifiRemoter {// 指定一对多关系
     @Column("_id") // 指定列名
     private int id;
 
+    public static final String COL_NAME = "name";
+    public static final String COL_SN = "devName";
     public static final String COL_MAC = "mac";
 
+    @Column(COL_NAME)
+    @Unique
     public String name;
+
+    @Column(COL_SN)
+    @Unique
     public String devName;
 
     @Column(COL_MAC) // 指定列名

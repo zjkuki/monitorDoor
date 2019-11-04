@@ -307,20 +307,21 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 			@Override
 			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
-				mWifiRemoterBoard = wifiRemoterBoard;
-				List<WifiRemoterBoard> wrbs = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoterBoard>(WifiRemoterBoard.class).whereEquals(Bluetooth.COL_MAC,
-						wifiRemoterBoard.getWifiRemoter().mac));
-				if (wrbs != null && wrbs.size() > 0) {
+				//mWifiRemoterBoard = wifiRemoterBoard;
+				mWifiRemoter = wifiRemoterBoard.getWifiRemoter();
+				List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+						mWifiRemoter.mac));
+				if (wr != null && wr.size() > 0) {
 					mTextTitle.setText("修改设备");
 					mBtnDevAdd.setText("修改");
 
-					mWifiRemoterBoard = wrbs.get(0);
-					mEditDevSN.setText(wrbs.get(0).getWifiRemoter().name);
-					mEditSceneName.setText(wrbs.get(0).getWifiRemoter().sceneName);
+					mEditDevSN.setText(wr.get(0).name);
+					mEditSceneName.setText(wr.get(0).sceneName);
 				}else{
 					mTextTitle.setText("添加设备");
 					mBtnDevAdd.setText("添加");
 					mEditSceneName.setText("");
+					mEditDevSN.setText(mWifiRemoter.name);
 				}
 
 				Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoterBoard.getWifiRemoter().name
@@ -506,36 +507,52 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							sendBroadcast(intent);
 						}
 					} else {
-						List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
-						if (cams != null && cams.size() > 0) {
-							mCamera = cams.get(0);
-							mCamera.devId = mFunDevice.getId();
-							mCamera.devIp = mFunDevice.getDevIP();
-							mCamera.mac = mFunDevice.getDevMac();
-							mCamera.name = mFunDevice.getDevName();
-							mCamera.serialNo = mFunDevice.getSerialNo();
-							mCamera.type = mCurrDevType.getDevIndex();
-							mCamera.sceneName = mEditSceneName.getText().toString();
-							mCamera.loginName = "admin";
-							mCamera.loginPsw = "";
-						} else {
-							mCamera.devId = mFunDevice.getId();
-							mCamera.devIp = mFunDevice.getDevIP();
-							mCamera.mac = mFunDevice.getDevMac();
-							mCamera.name = mFunDevice.getDevName();
-							mCamera.sn = mFunDevice.getDevSn();
-							mCamera.serialNo = mFunDevice.getSerialNo();
-							mCamera.type = mCurrDevType.getDevIndex();
-							mCamera.sceneName = mEditSceneName.getText().toString();
-							mCamera.loginName = "admin";
-							mCamera.loginPsw = "";
-						}
-						MyApplication.liteOrm.save(mCamera);
+						if (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
+							List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
+							if (cams != null && cams.size() > 0) {
+								mCamera = cams.get(0);
+								mCamera.devId = mFunDevice.getId();
+								mCamera.devIp = mFunDevice.getDevIP();
+								mCamera.mac = mFunDevice.getDevMac();
+								mCamera.name = mFunDevice.getDevName();
+								mCamera.serialNo = mFunDevice.getSerialNo();
+								mCamera.type = mCurrDevType.getDevIndex();
+								mCamera.sceneName = mEditSceneName.getText().toString();
+								mCamera.loginName = "admin";
+								mCamera.loginPsw = "";
+							} else {
+								mCamera.devId = mFunDevice.getId();
+								mCamera.devIp = mFunDevice.getDevIP();
+								mCamera.mac = mFunDevice.getDevMac();
+								mCamera.name = mFunDevice.getDevName();
+								mCamera.sn = mFunDevice.getDevSn();
+								mCamera.serialNo = mFunDevice.getSerialNo();
+								mCamera.type = mCurrDevType.getDevIndex();
+								mCamera.sceneName = mEditSceneName.getText().toString();
+								mCamera.loginName = "admin";
+								mCamera.loginPsw = "";
+							}
+							MyApplication.liteOrm.save(mCamera);
 
-						Intent intent = new Intent("android.intent.action.CART_BROADCAST");
-						intent.putExtra("data","cam_list_refresh");
-						LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-						sendBroadcast(intent);
+							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							intent.putExtra("data", "cam_list_refresh");
+							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+							sendBroadcast(intent);
+						}else {
+							List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_NAME, mEditDevSN.getText().toString()));
+							if (wr != null && wr.size() > 0) {
+								mWifiRemoter = wr.get(0);
+								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
+							} else {
+								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
+							}
+							MyApplication.liteOrm.save(mWifiRemoter);
+
+							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							intent.putExtra("data", "remoter_list_refresh");
+							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+							sendBroadcast(intent);
+						}
 					}
 
 
@@ -612,6 +629,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 									Log.d("DeviceAddByUser", "Found Device in List");
 								}else{
 									mWifiRemoterBoards.add(wrb);
+									mAdapterDev.updateWifiRemoterBoards(mWifiRemoterBoards);
 								}
 							}
 						}catch(Exception e){
