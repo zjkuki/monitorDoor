@@ -106,5 +106,6 @@ dependencies {
     implementation 'io.fogcloud.sdk:easylinkv3:0.2.6'
     //implementation 'ru.alexbykov:nopermission:1.1.2'
     implementation 'io.fogcloud.sdk:mdns:0.0.3'
+    implementation 'io.fogcloud.sdk:mqtt:0.0.3'
 }
 

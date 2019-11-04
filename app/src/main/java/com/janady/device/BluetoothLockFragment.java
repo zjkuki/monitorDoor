@@ -3,16 +3,12 @@ package com.janady.device;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.CountDownTimer;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.MyApplication;
@@ -22,26 +18,15 @@ import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
 import com.janady.Util;
-import com.janady.base.JTabSegmentFragment;
 import com.janady.common.JDialogModifyPasswd;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.ClientManager;
 import com.janady.setup.JBaseFragment;
-import com.lib.FunSDK;
-import com.lib.funsdk.support.FunDevicePassword;
-import com.lib.funsdk.support.models.FunDevType;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.CountDownLatch;
-
-import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 
 public class BluetoothLockFragment extends JBaseFragment implements View.OnClickListener {
     private static final String MAC = "D0:D3:86:72:4D:42";

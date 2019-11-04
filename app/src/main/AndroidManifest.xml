@@ -49,7 +49,8 @@
         android:icon="@drawable/xmjp_camera"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        tools:replace="android:allowBackup">
+        tools:replace="android:allowBackup"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name="com.janady.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -461,6 +462,8 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </service>
+
+        <service android:name="io.fogcloud.fog_mqtt.service.MqttService" />
     </application>
 
 </manifest>

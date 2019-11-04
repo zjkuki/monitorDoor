@@ -8,7 +8,6 @@ import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.janady.base.JBaseGroupedListFragment;
 import com.janady.database.model.Door;
-import com.janady.database.model.Remote;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;

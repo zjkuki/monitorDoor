@@ -6,7 +6,7 @@ import com.inuker.bluetooth.library.search.SearchResult;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
-import com.janady.database.model.Remote;
+import com.janady.database.model.WifiRemoter;
 import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.BluetoothListFragment;
@@ -17,12 +17,11 @@ import com.janady.device.DoorEditFragment;
 import com.janady.device.DoorListFragment;
 import com.janady.device.RemoteEditFragment;
 import com.janady.device.RemoteListFragment;
-import com.janady.lkd.BleLocker;
+import com.janady.lkd.WifiRemoterBoard;
 import com.janady.model.CategoryItemDescription;
 import com.janady.model.ItemDescription;
 import com.janady.model.MainItemDescription;
 import com.lib.funsdk.support.FunSupport;
-import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevice;
 
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class DataManager {
         // ArrayList<Camera> clists = MyApplication.liteOrm.query(Camera.class);
         List<FunDevice> funDevices = FunSupport.getInstance().getDeviceList();
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
-        ArrayList<Remote> rlists = MyApplication.liteOrm.query(Remote.class);
+        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
         ArrayList<Door> dlists = MyApplication.liteOrm.query(Door.class);
         CategoryItemDescription camera = new CategoryItemDescription(CameraListFragment.class, "摄像机", R.drawable.ic_camera, funDevices.size());
         //CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, blists.size());
@@ -72,7 +71,7 @@ public class DataManager {
         CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "房间", R.drawable.ic_room, 0);*/
         CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothEditFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, 0);
         CategoryItemDescription remote = new CategoryItemDescription(RemoteEditFragment.class, "远程控制", R.drawable.ic_remote_3, 0);
-        CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "场景", R.drawable.ic_room2, 0);
+        CategoryItemDescription room = new CategoryItemDescription(DoorEditFragment.class, "门禁位置", R.drawable.ic_room2, 0);
         list.add(camera);
         //list.add(remoteConfig);
         list.add(bluetooth);
@@ -126,8 +125,8 @@ public class DataManager {
         bleDescription.setList(bitems);
         list.add(bleDescription);
 
-        ArrayList<Remote> rlists = MyApplication.liteOrm.query(Remote.class);
-        for (Remote remote : rlists) {
+        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
+        for (WifiRemoter remote : rlists) {
             MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, remote.name, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
             remoteDescription.setDevice(remote);
             if (remote.doorList != null) {

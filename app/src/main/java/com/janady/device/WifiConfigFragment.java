@@ -1,12 +1,17 @@
 package com.janady.device;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.DhcpInfo;
+import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +33,13 @@ import com.lib.funsdk.support.utils.MyUtils;
 import com.lib.funsdk.support.utils.StringUtils;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
+import org.json.JSONArray;
+
 import io.fogcloud.sdk.easylink.api.EasyLink;
 import io.fogcloud.sdk.easylink.helper.EasyLinkCallBack;
 import io.fogcloud.sdk.easylink.helper.EasyLinkParams;
+import io.fogcloud.sdk.mdns.api.MDNS;
+import io.fogcloud.sdk.mdns.helper.SearchDeviceCallBack;
 
 public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFiConfigListener {
     private QMUITopBarLayout mTopBar;
@@ -45,6 +54,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
 
     private int mWifiDevice = 0;  //0-摄像头 1-控制板
     private EasyLink el;
+    private MDNS mdns = null;
 
     @Override
     protected View onCreateView() {
@@ -88,10 +98,15 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 startQuickSetting();
             }
         });
+
+        //实时更新ssid
+        listenwifichange();
+
         initTopBar();
         FunSupport.getInstance().registerOnFunDeviceWiFiConfigListener(this);
 
         el = new EasyLink(getContext());
+        mdns = new MDNS(getContext());
 
         return root;
     }
@@ -186,10 +201,10 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 FunWifiPassword.getInstance().saveWifiPassword(ssid, wifiPwd);
             }else {
                 EasyLinkParams elp = new EasyLinkParams();
-                elp.ssid = ssid;
-                elp.password = wifiPwd;
+                elp.ssid = ssid.trim();
+                elp.password = wifiPwd.trim();
+                elp.sleeptime = 50;
                 elp.runSecond = 60000;
-                elp.sleeptime = 20;
                 el.startEasyLink(elp, new EasyLinkCallBack() {
                     @Override
                     public void onSuccess(int code, String message) {
@@ -198,14 +213,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                                 getResources().getString(R.string.device_opt_set_wifi_success),
                                 "wifi remoter ok!"));
 
-                        Log.i("WifiConfigFragment", "code="+ code +"    message=" + message);
-                        /*Intent intent = new Intent();
-                        intent.putExtra("DeviceTypsSpinnerNo",2);
-                        intent.setClass(getContext(), DeviceAddByUser.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-
-                        popBackStack();*/
+                        Log.d("WifiConfigFragment", "code="+ code +"    message=" + message);
+                        send2handler(1, message);
                     }
 
                     @Override
@@ -213,6 +222,31 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                         Dialogs.alertMessage(getContext(), "WIFI配网失败",message);
                     }
                 });
+
+  /*              mdns.startSearchDevices("_easylink._tcp.local.", new SearchDeviceCallBack() {
+                    @Override
+                    public void onSuccess(int code, String message) {
+                        super.onSuccess(code, message);
+                        Log.d("---mdns---", "\ncode="+code+"\nmessage=\n"+message);
+                    }
+
+                    @Override
+                    public void onFailure(int code, String message) {
+                        super.onFailure(code, message);
+                        Log.d("---mdns---", "\ncode="+code+"\nmessage=\n"+message);
+                    }
+
+                    @Override
+                    public void onDevicesFind(int code, JSONArray deviceStatus) {
+                        super.onDevicesFind(code, deviceStatus);
+                        if (!deviceStatus.equals("")) {
+                            send2handler(3, deviceStatus.toString());
+                            Log.d("---mdns---","\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+                        }else{
+                            Log.d("---mdns---", "\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+                        }
+                    }
+                });*/
             }
             new CountDownTimer(60000, 1000) {
 
@@ -239,17 +273,34 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             FunSupport.getInstance().stopWiFiQuickConfig();
         }else{
             hideWaitDialog();
-            el.stopEasyLink(new EasyLinkCallBack() {
+/*            mdns.stopSearchDevices(new SearchDeviceCallBack() {
                 @Override
                 public void onSuccess(int code, String message) {
-                    //Dialogs.alertMessage(getContext(), "WIFI配网已停止",message);
+                    super.onSuccess(code, message);
+                    Log.i("WCF-stopSearchDevices", "code="+ code +"    message=" + message);
                 }
 
                 @Override
                 public void onFailure(int code, String message) {
+                    super.onFailure(code, message);
+                    Log.i("WCF-stopSearchDevices", "code="+ code +"    message=" + message);
+                }
+            });
+*/
+            el.stopEasyLink(new EasyLinkCallBack() {
+                @Override
+                public void onSuccess(int code, String message) {
+                    //Dialogs.alertMessage(getContext(), "WIFI配网已停止",message);
+                    Log.i("WCF-StopEasyLink", "code="+ code +"    message=" + message);
+                }
+
+                @Override
+                public void onFailure(int code, String message) {
+                    Log.i("WCF-StopEasyLink", "code="+ code +"    message=" + message);
                     //Dialogs.alertMessage(getContext(), "WIFI配网失败",message);
                 }
             });
+
         }
 
     }
@@ -270,4 +321,52 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             popBackStack();
         }
     }
+
+    private void send2handler(int code, String message) {
+        Message msg = new Message();
+        msg.what = code;
+        msg.obj = message;
+        LHandler.sendMessage(msg);
+    }
+
+    Handler LHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+                Log.d("WifiConfigFragment", msg.obj.toString().trim() + "\r\n");
+                Intent intent = new Intent();
+                intent.putExtra("DeviceTypsSpinnerNo", 2);
+                intent.setClass(getContext(), DeviceAddByUser.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+
+                popBackStack();
+            }
+            if (msg.what == 2) {
+                Log.d("WifiConfigFragment", "");
+            }
+            if (msg.what == 3) {
+
+            }
+        }
+    };
+
+    private void listenwifichange() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        getContext().registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+                NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                if (info.getDetailedState() == NetworkInfo.DetailedState.CONNECTED) {
+                    Log.d("WifiConfigFragment", "---heiheihei---");
+                    mEditWifiSSID.setText(el.getSSID());
+                }
+            }
+        }
+    };
 }

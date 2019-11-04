@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.janady.base.JBaseGroupedListFragment;
-import com.janady.database.model.Bluetooth;
-import com.janady.database.model.Remote;
-import com.janady.setup.JBaseFragment;
+import com.janady.database.model.WifiRemoter;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
 import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
@@ -28,8 +26,8 @@ public class RemoteListFragment extends JBaseGroupedListFragment {
         QMUIGroupListView.Section section = QMUIGroupListView.newSection(getContext())
                 .setTitle("已经添加的远程控制设备")
                 .setLeftIconSize(size, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ArrayList<Remote> blists = MyApplication.liteOrm.query(Remote.class);
-        for (final Remote remote : blists) {
+        ArrayList<WifiRemoter> blists = MyApplication.liteOrm.query(WifiRemoter.class);
+        for (final WifiRemoter remote : blists) {
             QMUICommonListItemView itemView = mGroupListView.createItemView(
                     ContextCompat.getDrawable(getContext(), R.drawable.ic_bluetooth),
                     remote.name,

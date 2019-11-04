@@ -21,7 +21,7 @@ public class Door {
     public ArrayList<Camera> cameraList;
 
     @Mapping(Relation.ManyToOne)
-    public Remote remote;
+    public WifiRemoter remote;
     @Mapping(Relation.OneToOne)
     public Bluetooth bluetooth;
 }

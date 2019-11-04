@@ -1,4 +1,4 @@
-package com.janady;
+package com.janady.lkd;
 
 import android.content.Context;
 import android.widget.Toast;

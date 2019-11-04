@@ -1,15 +1,13 @@
 package com.janady.device;
 
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -21,39 +19,30 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.TestFragment;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ActivityGuideUserLogin;
-import com.example.funsdkdemo.DeviceActivitys;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.google.zxing.activity.CaptureActivity;
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.AppConstants;
-import com.janady.AppManager;
-import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
-import com.janady.HomeActivity;
-import com.janady.MainActivity;
-import com.janady.Util;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
+import com.janady.database.model.WifiRemoter;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.ClientManager;
-import com.janady.setup.JBaseFragment;
+import com.janady.lkd.WifiRemoterBoard;
 import com.janady.view.PullRefreshListView;
 import com.janady.view.PullToRefreshFrameLayout;
 import com.lib.FunSDK;
@@ -70,13 +59,18 @@ import com.lib.funsdk.support.models.FunLoginType;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import io.fogcloud.sdk.mdns.api.MDNS;
+import io.fogcloud.sdk.mdns.helper.SearchDeviceCallBack;
+
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
-import static com.lib.funsdk.support.models.FunDevType.EE_DEV_NORMAL_MONITOR;
-import static com.lib.funsdk.support.models.FunDevType.getType;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_REMOTER;
 
 
 public class DeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnFunDeviceOptListener, OnItemSelectedListener, OnItemClickListener,  OnAddSubDeviceResultListener {
@@ -103,11 +97,14 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private FunDevType mCurrDevType = null;
 
     private List<SearchResult> mBleDevices;
+    private List<WifiRemoterBoard> mWifiRemoterBoards;
 
     private boolean isBleScanning = false;
 
     private Bluetooth mBluetooth;
     private Camera mCamera;
+	private WifiRemoterBoard mWifiRemoterBoard;
+    private WifiRemoter mWifiRemoter;
 
     private String bleOldPsw;
 	private String inputPwd = "";
@@ -117,10 +114,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
     DialogInputPasswd inputDialog = null;
 
+    private CountDownTimer countDownTimer = null;
+
     private int step = 0;  //0-没事，1-密码输入
 
 	//private final int MESSAGE_DELAY_FINISH = 0x100;
 	private final int MESSAGE_REFRESH_DEVICE_STATUS = 0x100;
+	private final int MESSAGE_EASYLINK_DEVICE_FOUND = 0x101;
 
 	// 定义当前支持通过序列号登录的设备类型 
 	// 如果是设备类型特定的话,固定一个就可以了
@@ -155,6 +155,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	};
 
 
+	private MDNS mdns = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -162,6 +164,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		setContentView(R.layout.jdevice_add_by_user);
 
 		setStatusBar();
+
+		mWifiRemoterBoards = new ArrayList<WifiRemoterBoard>();
 
 		mBleDevices = new ArrayList<SearchResult>();
 		mBluetooth = new Bluetooth();
@@ -300,6 +304,35 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						+"\nMac:"+funDevice.getDevMac()
 						+"\nDevType:"+funDevice.getDevType());
 			}
+
+			@Override
+			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
+				mWifiRemoterBoard = wifiRemoterBoard;
+				List<WifiRemoterBoard> wrbs = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoterBoard>(WifiRemoterBoard.class).whereEquals(Bluetooth.COL_MAC,
+						wifiRemoterBoard.getWifiRemoter().mac));
+				if (wrbs != null && wrbs.size() > 0) {
+					mTextTitle.setText("修改设备");
+					mBtnDevAdd.setText("修改");
+
+					mWifiRemoterBoard = wrbs.get(0);
+					mEditDevSN.setText(wrbs.get(0).getWifiRemoter().name);
+					mEditSceneName.setText(wrbs.get(0).getWifiRemoter().sceneName);
+				}else{
+					mTextTitle.setText("添加设备");
+					mBtnDevAdd.setText("添加");
+					mEditSceneName.setText("");
+				}
+
+				Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoterBoard.getWifiRemoter().name
+						+"\ndevName:"+wifiRemoterBoard.getWifiRemoter().devName
+						+"\nHost Url:"+wifiRemoterBoard.getWifiRemoter().hostUrl
+						+"\nPublic Topics:"+wifiRemoterBoard.getWifiRemoter().publictopic
+						+"\nSubscribe Topics:"+wifiRemoterBoard.getWifiRemoter().subscribetopic
+						+"\nClient Id:"+wifiRemoterBoard.getWifiRemoter().clientid
+						+"\nDevice Local IP:"+wifiRemoterBoard.getWifiRemoter().devIpAddr
+						+"\nDevice Local Port:"+ wifiRemoterBoard.getWifiRemoter().devPort
+						+"\nMac:"+wifiRemoterBoard.getWifiRemoter().mac);
+			}
 		});
 
 		mListViewDev.setAdapter(mAdapterDev);
@@ -312,6 +345,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			}
 
 		});
+
+		mdns = new MDNS(this);
 
 		searchDevice();
 
@@ -539,11 +574,74 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					finish();
 				}
 				break;*/
+
+				case MESSAGE_EASYLINK_DEVICE_FOUND:
+				{
+					JSONArray jsonArray = (JSONArray)msg.obj;
+					for (int i = 0; i < jsonArray.length(); i++) {
+						try {
+							JSONObject tmp = (JSONObject) jsonArray.get(i);
+							if (tmp.getString("Name").contains("LKD-OWSL")) {
+
+								WifiRemoter wr = new WifiRemoter();
+
+								String s=tmp.getString("Name").substring(tmp.getString("Name").lastIndexOf("#")+1);
+								if(tmp.getString("Name").contains("-19#")){
+									wr.name = "WIFI主控器（单向）@ "+ s ;
+								}else{
+									wr.name = "WIFI主控器（双向）@ "+s;
+								}
+
+								/*正式版应该从服务器获取设备MQTT设置*/
+								wr.hostUrl = "tcp://mqtt.xuanma.tech:1883";
+								wr.hostPort = "1883";
+								wr.clientid = "LKD_SMART_LOCKER_CLIENT";
+								wr.publictopic = "hardware/from/server/" + tmp.getString("MAC").replace(":","");
+								wr.subscribetopic = "hardware/from/client/" + tmp.getString("MAC").replace(":","");
+								wr.hostUsername = "kuki";
+								wr.hostPassword = "123123";
+
+								wr.devName = tmp.getString("Name");
+								wr.devIpAddr = tmp.getString("IP");
+								wr.devPort = tmp.getString("Port");
+								wr.mac = tmp.getString("MAC");
+
+								WifiRemoterBoard wrb = new WifiRemoterBoard(mcontext, wr,null);
+
+								if(matchWifiRemoterInList(wr.mac)){
+									Log.d("DeviceAddByUser", "Found Device in List");
+								}else{
+									mWifiRemoterBoards.add(wrb);
+								}
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+					mAdapterDev.updateWifiRemoterBoards(mWifiRemoterBoards);
+				}
+					break;
 			}
 		}
 		
 	};
-	
+
+	private boolean matchWifiRemoterInList(String Mac) {
+		if(mWifiRemoterBoards==null){return false;}
+		//如果为null，直接使用全部数据
+		if (!Mac.equals("") ||  mWifiRemoterBoards.size()>0) {
+			//否则，匹配相应的数据
+			for (int i = 0; i < mWifiRemoterBoards.size(); i++) {
+				if (mWifiRemoterBoards.get(i).getWifiRemoter().mac.contains(Mac)) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
+					return true;
+				}
+			}
+			return  false;
+		}else{
+			return false;
+		}
+	}
+
 	private int getSpinnerIndexByDeviceType(FunDevType type) {
 		for ( int i = 0; i < mSupportDevTypes.length; i ++ ) {
 			if ( type == mSupportDevTypes[i] ) {
@@ -989,11 +1087,19 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 			ClientManager.getClient().search(request, mSearchResponse);
 		}else{
-			//requestToGetLanDeviceList();
-			// 以局域网内搜索过的设备,显示在下方作为测试设备添加
-			if ( null != mAdapterDev &&  (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR || mCurrDevType == EE_DEV_BOUTIQUEROTOT)) {
-				//mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
-				requestToGetLanDeviceList();
+    		if(mCurrDevType == EE_DEV_BLUETOOTH) {
+				//requestToGetLanDeviceList();
+				// 以局域网内搜索过的设备,显示在下方作为测试设备添加
+				if (null != mAdapterDev && (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR || mCurrDevType == EE_DEV_BOUTIQUEROTOT)) {
+					//mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
+					requestToGetLanDeviceList();
+				}
+			}else{
+				if(mCurrDevType == EE_DEV_REMOTER) {
+					searchEasyLinkDevices();
+				}else{
+					return;
+				}
 			}
 		}
 
@@ -1197,4 +1303,81 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			}
 		}
 	};
+
+	private void searchEasyLinkDevices(){
+		mdns.startSearchDevices("_easylink._tcp.local.", new SearchDeviceCallBack() {
+			@Override
+			public void onSuccess(int code, String message) {
+				super.onSuccess(code, message);
+				Log.d("---mdns---", "\ncode="+code+"\nmessage=\n"+message);
+			}
+
+			@Override
+			public void onFailure(int code, String message) {
+				super.onFailure(code, message);
+				Log.d("---mdns---", "\ncode="+code+"\nmessage=\n"+message);
+			}
+
+			@Override
+			public void onDevicesFind(int code, JSONArray deviceStatus) {
+				super.onDevicesFind(code, deviceStatus);
+				if (!deviceStatus.equals("")) {
+					send2handlerObj(MESSAGE_EASYLINK_DEVICE_FOUND, deviceStatus);
+					Log.d("---mdns---","\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+				}else{
+					Log.d("---mdns---", "\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+				}
+			}
+		});
+
+      countDownTimer = new CountDownTimer(10000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                Log.i("SearchEasyLinkDevice", "seconds remaining: " + millisUntilFinished / 1000);
+            }
+
+            public void onFinish() {
+                hideWaitDialog();
+                mdns.stopSearchDevices(new SearchDeviceCallBack() {
+					@Override
+					public void onSuccess(int code, String message) {
+						super.onSuccess(code, message);
+						mListViewDev.onRefreshComplete(true);
+						mRefreshLayout.showState(AppConstants.LIST);
+						Log.i("SearchEasyLinkDevice","CountDownTimer-onFinish");
+
+						mTextTip.setText("扫描设备");
+						//toolbar.setTitle(R.string.devices);
+						Log.i("SearchEasyLinkDevice", "down");
+					}
+
+					@Override
+					public void onFailure(int code, String message) {
+						super.onFailure(code, message);
+					}
+
+					@Override
+					public void onDevicesFind(int code, JSONArray deviceStatus) {
+						super.onDevicesFind(code, deviceStatus);
+						if (!deviceStatus.equals("")) {
+							send2handlerObj(MESSAGE_EASYLINK_DEVICE_FOUND, deviceStatus);
+							Log.d("---mdns---","\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+						}else{
+							Log.d("---mdns---", "\ncode="+code+"\ndeviceInfo=\n"+deviceStatus.toString());
+						}
+					}
+				});
+            }
+        }.start();
+	}
+
+	private void send2handler(int code, String message) {
+		send2handlerObj(code, message);
+	}
+
+	private void send2handlerObj(int code, Object message) {
+		Message msg = new Message();
+		msg.what = code;
+		msg.obj = message;
+		mHandler.sendMessage(msg);
+	}
 }

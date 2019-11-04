@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.inuker.bluetooth.library.search.SearchResult;
+import com.janady.database.model.WifiRemoter;
+import com.janady.lkd.WifiRemoterBoard;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
@@ -24,6 +26,7 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 	private LayoutInflater mInflater;
 	private List<FunDevice> mListDevs = new ArrayList<FunDevice>();
 	private List<SearchResult> mListBleDevs = new ArrayList<SearchResult>();
+	private List<WifiRemoterBoard> mListWifiRemoterBoardDevs = new ArrayList<WifiRemoterBoard>();
 
 	public FunDevType getCurrentDevType() {
 		return currentDevType;
@@ -52,6 +55,12 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 	}
 
 
+	public void updateWifiRemoterBoards(List<WifiRemoterBoard> devWifiRemoterBoardList) {
+		mListWifiRemoterBoardDevs.clear();
+		mListWifiRemoterBoardDevs.addAll(devWifiRemoterBoardList);
+		this.notifyDataSetInvalidated();
+	}
+
 	public void updateBleDevice(List<SearchResult> devBleList) {
 		mListBleDevs.clear();
 		mListBleDevs.addAll(devBleList);
@@ -69,6 +78,10 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 	public FunDevice getFunDevice(int position) {
 		return (FunDevice)getItem(position);
 	}
+
+	public WifiRemoterBoard getWifiRemoterBoard(int position) {
+		return (WifiRemoterBoard) getItem(position);
+	}
 	
 	@Override
 	public Object getItem(int position) {
@@ -81,12 +94,22 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 				return mListBleDevs.get(position);
 			}
 		}else{
-			if (position >= 0 && position < mListDevs.size()) {
-				return mListDevs.get(position);
-			}
+			if(currentDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
+				if (position >= 0 && position < mListDevs.size()) {
+					return mListDevs.get(position);
+				}
 
-			if (position >= 0 && position < mListDevs.size()) {
-				return mListDevs.get(position);
+				if (position >= 0 && position < mListDevs.size()) {
+					return mListDevs.get(position);
+				}
+			}else{
+				if (position >= 0 && position < mListWifiRemoterBoardDevs.size()) {
+					return mListWifiRemoterBoardDevs.get(position);
+				}
+
+				if (position >= 0 && position < mListWifiRemoterBoardDevs.size()) {
+					return mListWifiRemoterBoardDevs.get(position);
+				}
 			}
 		}
 		return null;
@@ -97,7 +120,11 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 		if(currentDevType == FunDevType.EE_DEV_BLUETOOTH ) {
 			return mListBleDevs.size();
 		}else{
-			return mListDevs.size();
+			if(currentDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
+				return mListDevs.size();
+			}else{
+				return mListWifiRemoterBoardDevs.size();
+			}
 		}
 
 
@@ -138,7 +165,7 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 			holder.imgDevIcon.setImageResource(currentDevType.getDrawableResId());
 			holder.txtDevName.setText(result.getName());
 
-			holder.txtDevName.setTextColor(mContext.getResources().getColorStateList(R.drawable.common_title_color));
+			//holder.txtDevName.setTextColor(mContext.getResources().getColorStateList(R.drawable.common_title_color));
 
 			holder.txtDevStatus.setText(String.format("Rssi: %d", result.rssi));
 			//holder.txtDevStatus.setTextColor(0xff177fca);
@@ -151,27 +178,47 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 				}
 			});
 		} else {
-			final FunDevice funDevice = mListDevs.get(groupPosition);
+			if(currentDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
+				final FunDevice funDevice = mListDevs.get(groupPosition);
 
-			holder.imgDevIcon.setImageResource(funDevice.devType.getDrawableResId());
-			holder.txtDevName.setText(funDevice.getDevName());
+				holder.imgDevIcon.setImageResource(funDevice.devType.getDrawableResId());
+				holder.txtDevName.setText(funDevice.getDevName());
 
-			//holder.txtDevName.setTextColor(mContext.getResources().getColorStateList(R.drawable.common_title_color));
+				//holder.txtDevName.setTextColor(mContext.getResources().getColorStateList(R.drawable.common_title_color));
 
-			holder.txtDevStatus.setText(funDevice.devStatus.getStatusResId());
-			if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
-				holder.txtDevStatus.setTextColor(0xff177fca);
-			} else if (funDevice.devStatus == FunDevStatus.STATUS_OFFLINE) {
-				holder.txtDevStatus.setTextColor(0xffda202e);
-			} else {
-				holder.txtDevStatus.setTextColor(mContext.getResources().getColor(R.color.demo_desc));
-			}
-			convertView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (mOnClickListener != null) mOnClickListener.OnClickedFun(funDevice);
+				holder.txtDevStatus.setText(funDevice.devStatus.getStatusResId());
+				if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
+					holder.txtDevStatus.setTextColor(0xff177fca);
+				} else if (funDevice.devStatus == FunDevStatus.STATUS_OFFLINE) {
+					holder.txtDevStatus.setTextColor(0xffda202e);
+				} else {
+					holder.txtDevStatus.setTextColor(mContext.getResources().getColor(R.color.demo_desc));
 				}
-			});
+				convertView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (mOnClickListener != null) mOnClickListener.OnClickedFun(funDevice);
+					}
+				});
+			}else{
+				final WifiRemoterBoard result = (WifiRemoterBoard) getItem(groupPosition);
+				holder.imgDevIcon.setImageResource(currentDevType.getDrawableResId());
+				holder.txtDevName.setText(result.getWifiRemoter().name);
+
+				holder.txtDevName.setTextColor(mContext.getResources().getColor(R.color.title_text_bg_gray));
+
+				holder.txtDevStatus.setVisibility(View.GONE);
+				//holder.txtDevStatus.setText(String.format("Rssi: %d", result.rssi));
+				//holder.txtDevStatus.setTextColor(0xff177fca);
+				//holder.txtDevStatus.setTextColor(mContext.getResources().getColor(R.color.demo_desc));
+
+				convertView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (mOnClickListener != null) mOnClickListener.OnClickedWifiRmoter(result);
+					}
+				});
+			}
 		}
 		return convertView;
 	}
@@ -191,5 +238,6 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 	public interface OnClickListener {
 		public void OnClickedBle(SearchResult searchResult);
 		public void OnClickedFun(FunDevice funDevice);
+		public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard);
 	}
 }

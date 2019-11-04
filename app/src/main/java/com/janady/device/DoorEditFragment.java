@@ -13,11 +13,8 @@ import com.janady.base.JBaseEditFragment;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
-import com.janady.database.model.Remote;
+import com.janady.database.model.WifiRemoter;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
-import com.qmuiteam.qmui.util.QMUIResHelper;
-import com.qmuiteam.qmui.widget.QMUILoadingView;
-import com.qmuiteam.qmui.widget.QMUITabSegment;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -36,7 +33,7 @@ public class DoorEditFragment extends JBaseEditFragment {
 
     @Override
     protected String title() {
-        return "智能门";
+        return "门禁位置";
     }
 
     @Override
@@ -141,7 +138,7 @@ public class DoorEditFragment extends JBaseEditFragment {
 
         ArrayList<Camera> dlists = MyApplication.liteOrm.query(Camera.class);
         if (dlists == null || dlists.size() == 0) {
-            Toast.makeText(getActivity(), "请先添加智能门", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "请先添加门禁位置", Toast.LENGTH_SHORT).show();
             return;
         }
         final String[] items = new String[dlists.size()];
@@ -180,7 +177,7 @@ public class DoorEditFragment extends JBaseEditFragment {
 
         ArrayList<Bluetooth> dlists = MyApplication.liteOrm.query(Bluetooth.class);
         if (dlists == null || dlists.size() == 0) {
-            Toast.makeText(getActivity(), "请先添加智能门", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "请先添加门禁位置", Toast.LENGTH_SHORT).show();
             return;
         }
         final String[] items = new String[dlists.size()];
@@ -217,9 +214,9 @@ public class DoorEditFragment extends JBaseEditFragment {
     }
     private void showRemoteChoiceDialog() {
 
-        ArrayList<Remote> dlists = MyApplication.liteOrm.query(Remote.class);
+        ArrayList<WifiRemoter> dlists = MyApplication.liteOrm.query(WifiRemoter.class);
         if (dlists == null || dlists.size() == 0) {
-            Toast.makeText(getActivity(), "请先添加智能门", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "请先添加门禁位置", Toast.LENGTH_SHORT).show();
             return;
         }
         final String[] items = new String[dlists.size()];

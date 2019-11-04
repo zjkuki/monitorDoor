@@ -2,12 +2,8 @@ package com.janady.adapter;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,27 +14,16 @@ import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
-import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
-import com.inuker.bluetooth.library.Constants;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.janady.AppConstants;
-import com.janady.BleLockerCallBack;
 import com.janady.Dialogs;
-import com.janady.Util;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.common.JDialogModifyPasswd;
 import com.janady.database.model.Bluetooth;
-import com.janady.database.model.Camera;
-import com.janady.device.BluetoothLockFragment;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
-import com.janady.lkd.ClientManager;
-import com.lib.funsdk.support.FunPath;
-import com.lib.funsdk.support.models.FunDevice;
 
-import java.io.File;
 import java.util.List;
 
 public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {

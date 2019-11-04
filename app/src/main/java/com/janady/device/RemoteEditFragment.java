@@ -10,9 +10,8 @@ import android.widget.Toast;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.R;
 import com.janady.base.JBaseEditFragment;
-import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
-import com.janady.database.model.Remote;
+import com.janady.database.model.WifiRemoter;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
@@ -23,10 +22,10 @@ import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 import java.util.ArrayList;
 
 public class RemoteEditFragment extends JBaseEditFragment {
-    private Remote mRemote;
+    private WifiRemoter mRemote;
     private EditText mNameEv;
 
-    public void setRemote(Remote remote) {
+    public void setRemote(WifiRemoter remote) {
         this.mRemote = remote;
     }
 
@@ -37,7 +36,7 @@ public class RemoteEditFragment extends JBaseEditFragment {
 
     @Override
     protected void initGroupListView() {
-        if (mRemote == null) mRemote = new Remote();
+        if (mRemote == null) mRemote = new WifiRemoter();
         int size = QMUIDisplayHelper.dp2px(getContext(), 20);
         QMUIGroupListView.Section section = QMUIGroupListView.newSection(getContext())
                 .setTitle("编辑")
