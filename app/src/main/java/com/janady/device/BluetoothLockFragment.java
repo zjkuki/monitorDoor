@@ -402,7 +402,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                     }
                 });
             }else{
-                step=1;
+                step=0;
                 BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
             }
         }

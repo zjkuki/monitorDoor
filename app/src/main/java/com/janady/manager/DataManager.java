@@ -130,7 +130,7 @@ public class DataManager {
         ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
         List<Object> ritems = new ArrayList<>();
         for (WifiRemoter remote : rlists) {
-            remoteDescription.setDevice(remote);
+            //remoteDescription.setDevice(remote);
             ItemDescription itemDescription = new ItemDescription(WifiRemoterBoardFragment.class, remote.sceneName, R.drawable.icon_check);
             itemDescription.setEnable(true);
             itemDescription.setItem(remote);
