@@ -61,7 +61,7 @@ public class WifiRemoterBoardFragment extends JBaseFragment implements View.OnCl
     QMUITopBarLayout mTopBar;
     @Override
     protected View onCreateView() {
-        View root = LayoutInflater.from(getActivity()).inflate(R.layout.jbluetooth_lock_layout, null);
+        View root = LayoutInflater.from(getActivity()).inflate(R.layout.jwifiremoter_lock_layout, null);
         //mTopBar = root.findViewById(R.id.topbar);
         //initTopBar();
 //        bleLocker = new BleLocker(MAC, false, BleService,

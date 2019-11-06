@@ -16,6 +16,9 @@ import com.example.funsdkdemo.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
+import com.janady.database.model.WifiRemoter;
+import com.janady.device.WifiRemoterBoardActivity;
+import com.janady.device.WifiRemoterBoardFragment;
 import com.janady.lkd.BleLockerCallBack;
 import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.JTabSegmentFragment;
@@ -285,6 +288,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ((BluetoothLockFragment)fragment).isDebugViewOpen = true;
 
                 startFragment(fragment);
+            }
+
+            if (fragment instanceof WifiRemoterBoardFragment && itemDescription.getItem() instanceof WifiRemoter) {
+                WifiRemoter citem = (WifiRemoter) itemDescription.getItem();
+
+                Intent intent = new Intent();
+                intent.setClass(getContext(), WifiRemoterBoardActivity.class);
+                intent.putExtra("FUN_DEVICE_ID", "0");
+                intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
+                intent.putExtra("FUN_DEVICE_SN", citem.devName);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
