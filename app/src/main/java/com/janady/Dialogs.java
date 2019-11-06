@@ -104,12 +104,14 @@ public class Dialogs {
     }
 
     //单选Dialog
-    public static void alertDialogSingleSelect(Context context, String title, String[] list, String btnCustomerText, DialogInterface.OnClickListener selectedClick){
+    public static void alertDialogSingleSelect(Context context, String title, String[] list, int icon, DialogInterface.OnClickListener selectedClick, DialogInterface.OnClickListener positviteClick){
         alert = null;
         builder = new AlertDialog.Builder(context);
-        alert = builder.setIcon(R.drawable.xmjp_camera)
+        //alert = builder.setIcon(R.drawable.xmjp_camera)
+        alert = builder.setIcon(icon)
                 .setTitle(title)
                 .setSingleChoiceItems(list, 0, selectedClick)
+                .setPositiveButton("确定", positviteClick)
                 .create();
         alert.show();
     }
@@ -127,7 +129,5 @@ public class Dialogs {
 
         alert.show();
     }
-
-
 
 }

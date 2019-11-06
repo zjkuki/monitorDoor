@@ -26,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
@@ -51,6 +52,7 @@ import com.example.funsdkdemo.devices.monitor.ActivityGuideDevicePreview;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;
+import com.janady.Dialogs;
 import com.janady.database.model.Camera;
 import com.janady.view.CustomCircle;
 import com.janady.view.CycleSelector.SelectorView;
@@ -103,8 +105,13 @@ public class WifiRemoterBoardActivity
 	private FunDevice mFunDevice = null;
 
 	private RelativeLayout mLayoutVideoWnd = null;
+	private RelativeLayout mLayoutFunctionButtons = null;
 	private FunVideoView mFunVideoView = null;
+
 	private LinearLayout mVideoControlLayout = null;
+	private LinearLayout mLayoutCameraButtons = null;
+	private LinearLayout mLayoutLockerButtons = null;
+
 	private TextView mTextStreamType = null;
 
 	private Button mBtnPlay = null;
@@ -127,6 +134,7 @@ public class WifiRemoterBoardActivity
 	private LinearLayout mLayoutControls = null;
 	private LinearLayout mLayoutChannel = null;
 	private RelativeLayout mBtnVoiceTalk = null;
+	private RelativeLayout mBtnVoiceTalk_jcdp = null;
 	private Button mBtnVoice = null;
     private ImageButton mBtnQuitVoice = null;
 	private ImageButton mBtnDevCapture = null;
@@ -142,6 +150,18 @@ public class WifiRemoterBoardActivity
 	private ImageButton mPtz_down = null;
 	private ImageButton mPtz_left = null;
 	private ImageButton mPtz_right = null;
+
+	private ImageButton mBtnAddDoor = null;
+	private ImageButton mBtnRemoveDoor = null;
+	private ImageView mBtnSelectLeft = null;
+	private ImageView mBtnSelectRight = null;
+
+	private ImageButton mBtnLockOpen = null;
+	private ImageButton mBtnLockClose = null;
+	private ImageButton mBtnLockStop = null;
+	private ImageButton mBtnLockLocker = null;
+	private ImageButton mBtnOpenCamera = null;
+
 
 	private TextView mTextVideoStat = null;
 	private AlertDialog alert = null;
@@ -367,7 +387,6 @@ public class WifiRemoterBoardActivity
 		mBtnRecord = (Button) findViewById(R.id.btnRecord);
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
-		mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
         mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
         mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
 
@@ -384,10 +403,14 @@ public class WifiRemoterBoardActivity
 
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
+		mBtnVoiceTalk_jcdp = (RelativeLayout) findViewById(R.id.btnVoiceTalk_jcdp);
+		mBtnVoiceTalk_jcdp.setVisibility(View.VISIBLE);
+
 		mBtnVoiceTalk = (RelativeLayout) findViewById(R.id.btnVoiceTalk);
 		mBtnVoiceTalk.setVisibility(View.VISIBLE);
 
-		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
+		//mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
+		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch_jcdp);
 		mBtnVoice.setVisibility(View.GONE);
 
         mBtnQuitVoice = (ImageButton) findViewById(R.id.btn_quit_voice);
@@ -405,6 +428,9 @@ public class WifiRemoterBoardActivity
 		mCbDoubleTalk.setVisibility(View.GONE);
 
 
+		mLayoutFunctionButtons = (RelativeLayout) findViewById(R.id.layoutFunctionButtons);
+		mLayoutFunctionButtons.setVisibility(View.GONE);
+
 		mLayoutDirectionControl = (RelativeLayout) findViewById(R.id.layoutDirectionControl);
 		/*mPtz_up = (ImageButton) findViewById(R.id.ptz_up);
 		mPtz_down = (ImageButton) findViewById(R.id.ptz_down);
@@ -416,8 +442,32 @@ public class WifiRemoterBoardActivity
 		mPtz_left = (ImageButton) findViewById(R.id.btnCamLeft);
 		mPtz_right = (ImageButton) findViewById(R.id.btnCamRight);
 
-		mBtnVoiceTalk.setOnClickListener(this);
-		mBtnVoiceTalk.setOnTouchListener(mIntercomTouchLs);
+		mBtnAddDoor = (ImageButton) findViewById(R.id.btnAddDoor);
+		mBtnRemoveDoor = (ImageButton) findViewById(R.id.btnRemoveDoor);
+		mBtnSelectLeft = (ImageView) findViewById(R.id.select_left);
+		mBtnSelectRight = (ImageView) findViewById(R.id.select_right);
+
+		mBtnLockOpen = (ImageButton) findViewById(R.id.btnOpenDoor);
+		mBtnLockClose = (ImageButton) findViewById(R.id.btnCloseDoor);
+		mBtnLockStop = (ImageButton) findViewById(R.id.btnLockStop);
+		mBtnLockLocker = (ImageButton) findViewById(R.id.btnLockLocker);
+		mBtnOpenCamera = (ImageButton) findViewById(R.id.btnOpenCamear);
+
+		mBtnAddDoor.setOnClickListener(this);
+		mBtnRemoveDoor.setOnClickListener(this);
+
+		mBtnLockOpen.setOnClickListener(this);
+		mBtnLockClose.setOnClickListener(this);
+		mBtnLockStop.setOnClickListener(this);
+
+		mBtnLockLocker.setOnClickListener(this);
+		mBtnLockLocker.setOnTouchListener(null);
+
+		mBtnOpenCamera.setOnClickListener(this);
+		mBtnOpenCamera.setOnTouchListener(null);
+
+		mBtnVoiceTalk_jcdp.setOnClickListener(this);
+		mBtnVoiceTalk_jcdp.setOnTouchListener(mIntercomTouchLs);
 		mBtnVoice.setOnClickListener(this);
         mBtnQuitVoice.setOnClickListener(this);
 		mBtnDevCapture.setOnClickListener(this);
@@ -431,12 +481,14 @@ public class WifiRemoterBoardActivity
 		mPtz_left.setOnTouchListener(onPtz_left);
 		mPtz_right.setOnTouchListener(onPtz_right);*/
 
-		mBtnLocker.setImageResource(R.drawable.icon_button_empty);
 		//mBtnLocker.setOnClickListener(this);
 		//mBtnLocker.setOnTouchListener(mLockerTouchLs);
 
 		mLayoutControls = (LinearLayout) findViewById(R.id.layoutFunctionControl);
 		mLayoutChannel = (LinearLayout) findViewById(R.id.layoutChannelBtn);
+
+		mLayoutCameraButtons = (LinearLayout) findViewById(R.id.layoutCameraButtons);
+		mLayoutLockerButtons = (LinearLayout) findViewById(R.id.layoutLockerButtons);
 
 
 		mTextStreamType = (TextView) findViewById(R.id.textStreamStat);
@@ -449,14 +501,57 @@ public class WifiRemoterBoardActivity
 		String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
 		String sn = getIntent().getStringExtra("FUN_DEVICE_SN");
 
-		if(devId!=0) {
-			initCamera(devId, sn);
-		}
-
+		showCamera(devId,sn);
 		setStatusBar();
 	}
 
 
+	private void showCamera(int devId, String sn){
+		RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
+
+		if(devId!=0) {
+			mLayoutVideoWnd.setVisibility(View.VISIBLE);
+			//mLayoutFunctionButtons.setVisibility(View.VISIBLE);
+			mLayoutCameraButtons.setVisibility(View.VISIBLE);
+			lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
+			lp.topMargin=0;
+			mLayoutControls.setLayoutParams(lp);
+			initCamera(devId, sn);
+		}else{
+			mLayoutVideoWnd.setVisibility(View.GONE);
+			//mLayoutFunctionButtons.setVisibility(View.GONE);
+			mLayoutCameraButtons.setVisibility(View.GONE);
+			lp.addRule(RelativeLayout.BELOW, R.id.layoutTop);
+			lp.topMargin=0;
+			mLayoutControls.setLayoutParams(lp);
+		}
+
+	}
+
+	private void selectCamera(){
+		final int[] index = new int[1];
+		final List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
+		if(cams.size()>0) {
+			String[] s=new String[cams.size()];
+			for(int i=0;i<cams.size();i++){
+				s[i]=cams.get(i).sceneName;
+			}
+
+			Dialogs.alertDialogSingleSelect(mContext, "请选择摄像机", s, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					index[0] =which;
+				}
+			}, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					showCamera(cams.get(index[0]).devId, cams.get(index[0]).sn);
+				}
+			});
+		}else{
+			Dialogs.alertMessage(mContext,"失败", "您还没添加摄像机。");
+		}
+	}
 	@Override
 	protected void onDestroy() {
 
@@ -741,6 +836,27 @@ public class WifiRemoterBoardActivity
                 }
             }
             break;
+			case R.id.btnOpenCamear:
+			{
+				selectCamera();
+				/*RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
+
+				if(mLayoutVideoWnd.getVisibility()==View.GONE) {
+					mLayoutVideoWnd.setVisibility(View.VISIBLE);
+					mLayoutFunctionButtons.setVisibility(View.VISIBLE);
+					mLayoutCameraButtons.setVisibility(View.VISIBLE);
+					lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
+					mLayoutControls.setLayoutParams(lp);
+					//initCamera(devId, sn);
+				}else{
+					mLayoutVideoWnd.setVisibility(View.GONE);
+					mLayoutFunctionButtons.setVisibility(View.GONE);
+					mLayoutCameraButtons.setVisibility(View.GONE);
+					lp.addRule(RelativeLayout.BELOW, R.id.layoutTop);
+					mLayoutControls.setLayoutParams(lp);
+				}*/
+			}
+			break;
         default:
             break;
 		}
@@ -1160,7 +1276,9 @@ public class WifiRemoterBoardActivity
 				break;
             case MESSAGE_OPEN_VOICE:
                 {
-				mFunVideoView.setMediaSound(true);
+                	if(mFunVideoView!=null) {
+						mFunVideoView.setMediaSound(true);
+					}
 			}
             default:
                 break;

@@ -132,6 +132,8 @@ public class DeviceCameraActivity
 	private LinearLayout mLayoutControls = null;
 	private LinearLayout mLayoutChannel = null;
 	private RelativeLayout mBtnVoiceTalk = null;
+	private RelativeLayout mBtnVoiceTalk_jcdp = null;
+
 	private Button mBtnVoice = null;
     private ImageButton mBtnQuitVoice = null;
 	private ImageButton mBtnDevCapture = null;
@@ -323,7 +325,7 @@ public class DeviceCameraActivity
 		mBtnRecord = (Button) findViewById(R.id.btnRecord);
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
-		mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
+		//mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
         mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
         mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
 
@@ -340,8 +342,12 @@ public class DeviceCameraActivity
 
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
+		mBtnVoiceTalk_jcdp = (RelativeLayout) findViewById(R.id.btnVoiceTalk_jcdp);
+		mBtnVoiceTalk_jcdp.setVisibility(View.GONE);
+
 		mBtnVoiceTalk = (RelativeLayout) findViewById(R.id.btnVoiceTalk);
 		mBtnVoiceTalk.setVisibility(View.VISIBLE);
+
 
 		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
 		mBtnVoice.setVisibility(View.GONE);

@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_marginTop="48dp"
-        android:background="#ff000000" >
+        android:background="#ff000000"
+        android:visibility="visible">
 
         <com.lib.funsdk.support.widget.FunVideoView
             android:id="@+id/funVideoView"
@@ -131,7 +132,7 @@
 
     <include
         android:id="@+id/layoutTop"
-        layout="@layout/layout_top_navigate_theme" />
+        layout="@layout/layout_top_navigate_theme"/>
 
     <LinearLayout
         android:id="@+id/layoutFunctionControl"
@@ -153,13 +154,14 @@
         </HorizontalScrollView>
 
         <RelativeLayout
-            android:id="@+id/relativeLayout1"
+            android:id="@+id/layoutFunctionButtons"
             android:layout_width="fill_parent"
             android:layout_height="140dp"
             android:layout_below="@+id/layoutPlayWnd"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="3dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="visible">
 
             <CheckBox
                 android:id="@+id/cb_double_talk_switch"
@@ -265,18 +267,19 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/relativeLayout1"
+            android:layout_below="@+id/layoutFunctionButtons"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
             android:visibility="visible"
             >
             <LinearLayout
+                android:id="@+id/layoutDoorButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#ffffff"
                 android:orientation="vertical"
                 android:paddingBottom="5dp"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -285,24 +288,25 @@
                     android:orientation="horizontal">
                     <ImageButton
                         android:layout_marginRight="5dp"
-                        android:id="@+id/btnOpenDoor"
+                        android:id="@+id/btnAddDoor"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginLeft="10dp"
                         android:layout_centerVertical="true"
                         android:background="@color/transparent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/icon_btn_open_selector">
+                        android:src="@drawable/icon_btn_add_selector">
                     </ImageButton>
 
                     <ImageView
+                        android:id="@+id/select_left"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/icon_btn_skip_previous_selector"
+                        android:src="@drawable/icon_btn_back_selector"
                         android:onClick="left"
                         />
 
@@ -354,11 +358,11 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
-                        android:src="@drawable/icon_btn_skip_next_selector"
+                        android:src="@drawable/icon_btn_forward_selector"
                         android:onClick="right"/>
                     <ImageButton
                         android:layout_marginRight="5dp"
-                        android:id="@+id/btnDoorDelete"
+                        android:id="@+id/btnRemoveDoor"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginLeft="0dp"
@@ -366,7 +370,7 @@
                         android:layout_centerVertical="true"
                         android:background="@color/transparent"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/icon_btn_open_selector">
+                        android:src="@drawable/icon_btn_sub_selector">
                     </ImageButton>
                 </LinearLayout>
                 <TextView
@@ -374,18 +378,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="2dp"
                     android:textColor="#2987fb"
                     android:textSize="15sp"
                     tools:text="门号："/>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/ll_functions"
+                android:id="@+id/layoutDirectionButtons"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_below="@+id/layoutDoorButtons"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
                 <include
+                    android:id="@+id/layoutCameraButtons"
                     android:layout_height="match_parent"
                     android:layout_width="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -393,6 +399,7 @@
                     android:visibility="visible"
                     layout="@layout/jcamrea_direction_pad" />
                 <include
+                    android:id="@+id/layoutLockerButtons"
                     android:layout_height="match_parent"
                     android:layout_width="fill_parent"
                     android:layout_marginLeft="10dp"
