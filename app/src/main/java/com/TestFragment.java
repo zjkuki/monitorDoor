@@ -295,9 +295,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
                 Intent intent = new Intent();
                 intent.setClass(getContext(), WifiRemoterBoardActivity.class);
-                intent.putExtra("FUN_DEVICE_ID", "0");
-                intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
-                intent.putExtra("FUN_DEVICE_SN", citem.devName);
+                intent.putExtra("WIFI_DEVICE_MAC", citem.mac);
+                intent.putExtra("WIFI_DEVICE_SCENE", citem.sceneName);
+                intent.putExtra("WIFI_DEVICE_SN", citem.devName);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -334,7 +334,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onResume() {
-        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
+        //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
+        new Thread(searchDevices).start();
+
         super.onResume();
     }
 
@@ -347,7 +349,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if(isVisibleToUser){
-            mHandler.postDelayed(searchDevices, 0);
+            //mHandler.postDelayed(searchDevices, 0);
+            new Thread(searchDevices).start();
             refreshDataSet();
         }else{
 

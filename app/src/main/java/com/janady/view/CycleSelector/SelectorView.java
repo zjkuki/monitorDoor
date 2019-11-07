@@ -76,10 +76,10 @@ public class SelectorView extends ViewGroup {
         mValueAnimator.addUpdateListener(mAnimatorUpdateListener);
 
         cycleStruct = new CycleStruct<>();
-        cycleStruct.addData(0);
+        /*cycleStruct.addData(0);
         cycleStruct.addData(1);
         cycleStruct.addData(2);
-        cycleStruct.addData(3);
+        cycleStruct.addData(3);*/
 
     }
 

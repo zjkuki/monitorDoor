@@ -308,14 +308,32 @@
                         android:scaleType="fitCenter"
                         android:src="@drawable/icon_btn_back_selector"
                         android:onClick="left"
+                        android:visibility="gone"
                         />
 
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/tabDoors"
+                        android:layout_width="270dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="0dp"
+                        android:padding="0dp"
+                        android:gravity="center"
+                        app:tabSelectedTextColor="#2987fb"
+                        app:tabTextColor="#000000"
+                        app:tabIndicatorHeight="2dp"
+                        app:tabIndicatorColor="#30e407"
+                        app:tabBackground="@color/white_transparent"
+                        app:tabMode="scrollable"
+                        app:tabGravity="center"
+                        android:layout_gravity="center">
+                    </android.support.design.widget.TabLayout>
                     <com.janady.view.CycleSelector.SelectorView
                         android:id="@+id/selector"
                         android:layout_width="0dp"
                         android:layout_height="30dp"
                         android:layout_weight="1"
-                        app:space="10dp">
+                        app:space="10dp"
+                        android:visibility="gone">
 
                         <CheckedTextView
                             android:layout_width="wrap_content"
@@ -359,29 +377,54 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:src="@drawable/icon_btn_forward_selector"
-                        android:onClick="right"/>
+                        android:onClick="right"
+                        android:visibility="gone"/>
                     <ImageButton
                         android:layout_marginRight="5dp"
                         android:id="@+id/btnRemoveDoor"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginEnd="5dp"
+                        android:layout_marginLeft="10dp"
                         android:layout_centerVertical="true"
                         android:background="@color/transparent"
                         android:scaleType="fitCenter"
                         android:src="@drawable/icon_btn_sub_selector">
                     </ImageButton>
                 </LinearLayout>
-                <TextView
-                    android:id="@+id/select_door"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="2dp"
-                    android:textColor="#2987fb"
-                    android:textSize="15sp"
-                    tools:text="门号："/>
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:id="@+id/tv_selected_door"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="2dp"
+                        android:textColor="#2987fb"
+                        android:textSize="15sp"
+                        tools:text="门号：1号"/>
+                    <ImageView
+                        android:id="@+id/imgLockLockerStat"
+                        android:layout_marginLeft="30dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_locked">
+                    </ImageView>
+                    <TextView
+                        android:id="@+id/tv_selected_camera"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginLeft="20dp"
+                        android:textColor="@color/grey"
+                        android:textSize="15sp"
+                        tools:text="摄像机：1号"/>
+                </LinearLayout>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/layoutDirectionButtons"

@@ -54,7 +54,8 @@
                 android:layout_height="40dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="Open TalkChannel" />
+                android:text="Open TalkChannel"
+                android:visibility="gone"/>
 
             <RelativeLayout
                 android:id="@+id/btnVoiceTalk_jcdp"

@@ -41,11 +41,21 @@ public class WifiRemoter {// 指定一对多关系
     public String publictopic;
     public String subscribetopic;
     public String sceneName;
+    public int defaultDoorId = 0;
 
+    @Mapping(Relation.OneToOne)
+    public Camera camera;
 
     @Mapping(Relation.OneToMany)
     public ArrayList<WifiRemoteLocker> Lockers;
 
     @Mapping(Relation.OneToMany)
     public ArrayList<Door> doorList;
+
+    @Override public String toString() {
+        return "Classes{"
+                + super.toString() +
+                " Camera= " + camera +
+                "} ";
+    }
 }

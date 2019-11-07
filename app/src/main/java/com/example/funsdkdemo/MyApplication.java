@@ -13,6 +13,7 @@ import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager;
 public class MyApplication extends Application {
 
 	public static LiteOrm liteOrm;
+	//public static LiteOrm liteOrmCascade;
 	public static Context context;
 	@Override
 	public void onCreate() {

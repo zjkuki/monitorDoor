@@ -138,7 +138,7 @@ public class DeviceCameraActivity
     private ImageButton mBtnQuitVoice = null;
 	private ImageButton mBtnDevCapture = null;
 	private ImageButton mBtnDevRecord = null;
-	private ImageButton mBtnLocker = null;
+	private ImageButton mBtnVoic_jcdp= null;
 
 	private ImageButton mBtnSkipNext = null;
     private ImageButton mBtnSkipPrevious = null;
@@ -326,6 +326,7 @@ public class DeviceCameraActivity
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
 		//mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
+
         mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
         mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
 
@@ -393,7 +394,7 @@ public class DeviceCameraActivity
 		mPtz_left.setOnTouchListener(onPtz_left);
 		mPtz_right.setOnTouchListener(onPtz_right);*/
 
-		mBtnLocker.setImageResource(R.drawable.icon_button_empty);
+		//mBtnLocker.setImageResource(R.drawable.icon_button_empty);
 		//mBtnLocker.setOnClickListener(this);
 		//mBtnLocker.setOnTouchListener(mLockerTouchLs);
 
@@ -1657,24 +1658,5 @@ public class DeviceCameraActivity
 		// TODO Auto-generated method stub
 		
 	}
-
-	private OnTouchListener mLockerTouchLs = new OnTouchListener() {
-
-		@Override
-		public boolean onTouch(View arg0, MotionEvent arg1) {
-			try {
-						if (!mIsLocked) {
-							mBtnLocker.setBackgroundResource(R.drawable.icon_unlock_btn_normal);
-							mIsLocked = true;
-						}else {
-							//stopTalkByDoubleDirection();
-							mBtnLocker.setBackgroundResource(R.drawable.icon_lock_btn_normal);
-							mIsLocked = false;						}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return false;
-		}
-	};
 
 }
