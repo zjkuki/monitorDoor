@@ -9,7 +9,7 @@ import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 /**
  * Created by ccy on 2017-09-28.

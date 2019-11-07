@@ -16,6 +16,8 @@ public class Door {
     @Column("_id") // 指定列名
     private int id;
     @Unique
+    public int no; //最小0-最大255
+    @Unique
     public String name;
     @Mapping(Relation.ManyToMany)
     public ArrayList<Camera> cameraList;

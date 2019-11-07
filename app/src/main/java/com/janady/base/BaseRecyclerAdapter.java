@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.RoundRect;
 import com.janady.model.ItemDescription;
 

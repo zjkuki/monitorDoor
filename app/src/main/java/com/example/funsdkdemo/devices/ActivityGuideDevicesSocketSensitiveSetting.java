@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunDeviceOptListener;
 import com.lib.funsdk.support.config.PowerSocketSensitive;

@@ -42,7 +42,7 @@ import android.widget.Toast;
 import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;

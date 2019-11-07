@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.IFunSDKResult;
 
 public abstract class BaseDlg implements OnClickListener, IFunSDKResult {

@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import java.lang.reflect.Field;
 

@@ -26,7 +26,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.lkd.BleLocker;
 
 import java.lang.reflect.Constructor;
@@ -231,4 +231,60 @@ public class Util {
         return sdf.format(new Date());
     }
 
+    //获取ArrayList中的最大值
+    public static int ArrayListMax(ArrayList sampleList)
+    {
+        try
+        {
+            int maxDevation = 0;
+            int totalCount = sampleList.size();
+            if (totalCount >= 1)
+            {
+                int max =Integer.parseInt(sampleList.get(0).toString());
+                for (int i = 0; i < totalCount; i++)
+                {
+                    int temp = Integer.parseInt(sampleList.get(i).toString());
+                    if (temp > max)
+                    {
+                        max = temp;
+                    }
+                } maxDevation = max;
+            }
+            return maxDevation;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+
+    }
+
+
+
+    //获取ArrayList中的最小值
+    public static int ArrayListMin(ArrayList sampleList)
+    {
+        try
+        {
+            int mixDevation = 0;
+            int totalCount = sampleList.size();
+            if (totalCount >= 1)
+            {
+                int min = Integer.parseInt(sampleList.get(0).toString());
+                for (int i = 0; i < totalCount; i++)
+                {
+                    int temp = Integer.parseInt(sampleList.get(i).toString());
+                    if (min > temp)
+                    {
+                        min = temp;
+                    }
+                } mixDevation = min;
+            }
+            return mixDevation;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
+    }
  }

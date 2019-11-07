@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;

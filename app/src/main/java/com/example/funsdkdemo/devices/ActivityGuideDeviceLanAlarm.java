@@ -14,7 +14,7 @@ import com.basic.G;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ListAdapterDeviceComComands;
 import com.example.funsdkdemo.ListAdapterDeviceComComands.ComCommand;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.EDEV_ATTR;
 import com.lib.EUIMSG;
 import com.lib.FunSDK;

@@ -5,7 +5,7 @@ package com.example.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import android.app.Dialog;
 import android.content.Context;

@@ -20,7 +20,7 @@ android {
 //        release.setRoot('build-types/release')
 //    }
     defaultConfig {
-        applicationId "com.example.funsdkdemo"
+        applicationId "com.lkd.smartlocker"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
@@ -107,5 +107,6 @@ dependencies {
     //implementation 'ru.alexbykov:nopermission:1.1.2'
     implementation 'io.fogcloud.sdk:mdns:0.0.3'
     implementation 'io.fogcloud.sdk:mqtt:0.0.3'
+    implementation 'com.github.HanHuoBin:BaseDialog:1.2.0'
 }
 

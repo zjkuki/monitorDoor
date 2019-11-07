@@ -25,7 +25,7 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSONObject;
 import com.basic.G;
 import com.example.funsdkdemo.ActivityAPBase;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.WifiListAdapter;
 import com.example.funsdkdemo.utils.XUtils;
 import com.lib.EUIMSG;

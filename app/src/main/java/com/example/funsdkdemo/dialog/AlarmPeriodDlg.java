@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.basic.G;
 import com.example.common.DialogWaitting;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.TimePeriodsAdapter;
 import com.example.funsdkdemo.devices.settings.alarm.ActivityAlarmTimeSet;
 import com.example.funsdkdemo.entity.TimeItem;

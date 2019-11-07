@@ -10,7 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.ListAdapterSystemFunction;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;

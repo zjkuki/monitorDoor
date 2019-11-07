@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.google.zxing.activity.CaptureActivity;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;

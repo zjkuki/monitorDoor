@@ -9,7 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.utils.XUtils;
 
 import java.util.List;

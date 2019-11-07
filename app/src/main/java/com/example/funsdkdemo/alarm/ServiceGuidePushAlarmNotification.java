@@ -11,7 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunAlarmNotification;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunSupport;

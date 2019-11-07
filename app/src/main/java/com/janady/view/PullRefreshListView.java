@@ -10,7 +10,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 //import android.support.v4.view.MotionEventCompat;
 

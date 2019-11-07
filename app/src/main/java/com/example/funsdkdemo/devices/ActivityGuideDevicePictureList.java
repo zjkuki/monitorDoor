@@ -18,7 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.DeviceCameraPicAdapter;
 import com.lib.FunSDK;
 import com.lib.IFunSDKResult;

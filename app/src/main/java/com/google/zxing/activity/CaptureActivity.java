@@ -34,7 +34,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.google.zxing.Result;
 import com.lib.FunSDK;
 

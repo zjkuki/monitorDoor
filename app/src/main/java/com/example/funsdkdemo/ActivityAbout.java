@@ -10,6 +10,8 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.lkd.smartlocker.R;
+
 public class ActivityAbout extends Activity implements OnClickListener{
 
 	

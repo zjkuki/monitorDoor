@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.lib.funsdk.support.config.AlarmInfo;
+import com.lkd.smartlocker.R;
 
 public class ListAdapterDeviceComComands extends BaseAdapter {
 	

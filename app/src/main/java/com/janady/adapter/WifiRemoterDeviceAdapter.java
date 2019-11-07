@@ -14,7 +14,7 @@ import com.basic.G;
 import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.Dialogs;

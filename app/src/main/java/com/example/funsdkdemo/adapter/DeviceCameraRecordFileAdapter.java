@@ -17,7 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.EUIMSG;
 import com.lib.FunSDK;
 import com.lib.IFunSDKResult;

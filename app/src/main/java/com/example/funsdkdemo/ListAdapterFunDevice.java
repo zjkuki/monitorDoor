@@ -16,6 +16,7 @@ import com.example.funsdkdemo.manager.SysAbilityManager;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevice;
+import com.lkd.smartlocker.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

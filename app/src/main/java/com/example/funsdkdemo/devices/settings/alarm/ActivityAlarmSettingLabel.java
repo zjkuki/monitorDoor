@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.FunSDK;
 
 public class ActivityAlarmSettingLabel extends Activity {

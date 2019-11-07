@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunLoginType;
+import com.lkd.smartlocker.R;
 
 import android.os.Bundle;
 
@@ -45,7 +46,7 @@ public class ActivityGuideUser extends ActivityGuide {
 				ActivityGuideUserInfo.class));
 //		 1.6.设备密码本地保存
 		mGuideModules.add(new DemoModule(-1,
-				R.string.guide_module_title_user_debug, 
+				R.string.guide_module_title_user_debug,
 				-1, 
 				ActivityGuideUserDebug.class));
 		

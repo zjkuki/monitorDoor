@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.EUIMSG;
 import com.lib.FunSDK;
 import com.lib.IFunSDKResult;

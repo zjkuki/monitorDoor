@@ -11,7 +11,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.config.SystemFunction;
 
 public class ListAdapterSystemFunction extends BaseExpandableListAdapter {

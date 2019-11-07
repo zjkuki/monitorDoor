@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.basic.G;
 import com.example.common.DeviceConfigType;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.dialog.AlarmPeriodDlg;
 import com.example.funsdkdemo.entity.TimeItem;
 import com.lib.DevSDK;

@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.funsdkdemo.ActivityGuideMain;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.RecyclerViewHolder;

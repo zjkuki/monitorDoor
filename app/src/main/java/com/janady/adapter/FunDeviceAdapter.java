@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.lib.funsdk.support.FunPath;

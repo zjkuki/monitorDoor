@@ -1,6 +1,8 @@
 package com.example.funsdkdemo;
 
 import com.lib.funsdk.support.FunSupport;
+import com.lkd.smartlocker.R;
+
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;

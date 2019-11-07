@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.model.CategoryItemDescription;

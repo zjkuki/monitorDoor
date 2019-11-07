@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.AppManager;
 import com.janady.RoundRect;
 import com.janady.base.BaseRecyclerAdapter;

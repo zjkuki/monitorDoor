@@ -10,7 +10,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;

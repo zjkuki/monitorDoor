@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lkd.smartlocker.R;
+
 public abstract class ActivityGuide extends ActivityDemo implements OnItemClickListener, OnClickListener{
 
 	private ListView mListView = null;

@@ -21,7 +21,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.Dialogs;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;

@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.tour.listener.TourContract;
 import com.example.funsdkdemo.devices.tour.model.bean.PTZTourBean;
 import com.example.funsdkdemo.devices.tour.model.bean.TourBean;

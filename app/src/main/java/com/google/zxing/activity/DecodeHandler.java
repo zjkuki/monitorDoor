@@ -24,7 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;

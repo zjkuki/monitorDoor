@@ -30,6 +30,7 @@ allprojects {
             url 'https://maven.aliyun.com/repository/jcenter'
             name 'jcenter'
         }
+        maven { url 'https://jitpack.io' }
         flatDir {
             dirs 'libs'
         }

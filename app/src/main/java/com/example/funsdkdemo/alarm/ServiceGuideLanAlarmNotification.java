@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunDeviceAlarmListener;

@@ -2,7 +2,7 @@ package com.janady.base;
 
 import android.view.View;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 

@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.PasswordChecker;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunForgetPasswListener;

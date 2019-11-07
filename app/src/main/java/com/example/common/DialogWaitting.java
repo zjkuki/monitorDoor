@@ -3,7 +3,7 @@ package com.example.common;
 
 
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import android.app.Dialog;
 import android.content.Context;

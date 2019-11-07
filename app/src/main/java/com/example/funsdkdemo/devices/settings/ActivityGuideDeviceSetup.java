@@ -6,7 +6,7 @@ import android.widget.AdapterView;
 
 import com.example.funsdkdemo.ActivityGuide;
 import com.example.funsdkdemo.DemoModule;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.settings.alarm.ActivityGuideDeviceSetupAlarm;
 import com.example.funsdkdemo.devices.settings.alarm.ActivityGuideDeviceSetupAlarmCenter;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;

@@ -5,7 +5,7 @@ import com.example.funsdkdemo.ActivityGuideDeviceListAP;
 import com.example.funsdkdemo.ActivityGuideDeviceListLan;
 import com.example.funsdkdemo.ActivityGuideDeviceSNLogin;
 import com.example.funsdkdemo.DemoModule;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;

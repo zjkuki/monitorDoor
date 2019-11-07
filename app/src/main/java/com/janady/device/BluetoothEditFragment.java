@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.JBaseEditFragment;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;

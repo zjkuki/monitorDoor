@@ -3,7 +3,7 @@ package com.janady;
 import android.Manifest;
 import android.os.Bundle;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.dialog.PermissionDialog;
 import com.janady.setup.FragmentSetup;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;

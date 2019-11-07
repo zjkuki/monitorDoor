@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.FileDownloadListAdapter;
 import com.lib.SDKCONST;
 import com.lib.funsdk.support.FunSupport;

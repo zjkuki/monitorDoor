@@ -11,6 +11,7 @@ import android.widget.Button;
 import com.example.funsdkdemo.dialog.PermissionDialog;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
+import com.lkd.smartlocker.R;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -28,7 +29,7 @@ public class ActivityGuideMain extends ActivityGuide implements OnFunLoginListen
 	static {
 		
 		// 1.用户相关
-		mGuideModules.add(new DemoModule(R.drawable.icon_user, 
+		mGuideModules.add(new DemoModule(R.drawable.icon_user,
 				R.string.guide_module_title_user, 
 				R.string.guide_module_desc_user, 
 				ActivityGuideUser.class));

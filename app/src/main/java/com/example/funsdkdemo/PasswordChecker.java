@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunCheckPasswListener;
+import com.lkd.smartlocker.R;
 
 /**
  * Created by Jeff on 4/14/16.

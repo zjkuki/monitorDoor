@@ -1,5 +1,7 @@
 package com.example.funsdkdemo;
 
+import com.lkd.smartlocker.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +13,7 @@ public class ActivityGuideTranscode extends ActivityGuide {
 		
 		// 4.1 JPEG转MP4
 		mGuideModules.add(new DemoModule(-1, 
- 				R.string.guide_module_title_trancode_jpeg2mp4, 
+ 				R.string.guide_module_title_trancode_jpeg2mp4,
  				-1, 
  				null));
 		

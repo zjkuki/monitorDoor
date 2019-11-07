@@ -3,7 +3,7 @@ package com.lib.funsdk.support;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 public class FunError {
 

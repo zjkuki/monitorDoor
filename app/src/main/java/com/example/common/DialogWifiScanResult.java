@@ -20,7 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 
 public class DialogWifiScanResult implements OnItemClickListener {

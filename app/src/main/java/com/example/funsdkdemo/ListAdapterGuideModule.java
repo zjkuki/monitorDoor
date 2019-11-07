@@ -10,6 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.lkd.smartlocker.R;
+
 public class ListAdapterGuideModule extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private List<DemoModule> mListModules;

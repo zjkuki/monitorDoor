@@ -12,6 +12,7 @@ import com.example.funsdkdemo.alarm.ServiceGuideLanAlarmNotification;
 import com.example.funsdkdemo.alarm.ServiceGuidePushAlarmNotification;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
+import com.lkd.smartlocker.R;
 
 public class ActivityStartup extends FragmentActivity implements OnFunLoginListener {
 

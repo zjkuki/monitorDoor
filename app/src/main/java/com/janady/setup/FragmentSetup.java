@@ -1,5 +1,6 @@
 package com.janady.setup;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -9,7 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityGuideDeviceList;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.alarm.ServiceGuideLanAlarmNotification;
 import com.example.funsdkdemo.alarm.ServiceGuidePushAlarmNotification;
 import com.janady.HomeActivity;
@@ -91,8 +92,9 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
                     Intent intent = new Intent();
 
                     intent.setClass(getContext(), HomeActivity.class);
-                    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 
                     startActivity(intent);
 

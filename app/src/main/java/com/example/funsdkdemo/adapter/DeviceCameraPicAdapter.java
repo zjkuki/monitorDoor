@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.basic.G;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunPath;
 import com.lib.funsdk.support.FunSupport;

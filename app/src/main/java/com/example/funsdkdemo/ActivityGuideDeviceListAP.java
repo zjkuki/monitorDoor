@@ -26,6 +26,7 @@ import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.lib.funsdk.support.utils.APAutomaticSwitch;
 import com.lib.funsdk.support.utils.WifiStateListener;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;

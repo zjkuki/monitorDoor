@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;

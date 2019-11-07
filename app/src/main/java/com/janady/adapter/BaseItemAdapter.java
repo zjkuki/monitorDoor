@@ -2,7 +2,7 @@ package com.janady.adapter;
 
 import android.content.Context;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.qmuiteam.qmui.layout.QMUILinearLayout;

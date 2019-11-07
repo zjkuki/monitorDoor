@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.widget.FunVideoView;
 import com.janady.view.HandleTouchEvent;
 

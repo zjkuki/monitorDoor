@@ -24,6 +24,7 @@ import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.models.FunLoginType;
+import com.lkd.smartlocker.R;
 
 public class ActivityGuideDeviceSNLogin extends ActivityDemo
 		implements OnClickListener, OnFunDeviceListener, OnItemSelectedListener {

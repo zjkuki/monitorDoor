@@ -17,7 +17,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.SDKCONST.SDK_FileSystemDriverTypes;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;

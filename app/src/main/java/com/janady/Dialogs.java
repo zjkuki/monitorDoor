@@ -8,7 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.hb.dialog.myDialog.MyAlertInputDialog;
+import com.lkd.smartlocker.R;
 
 public class Dialogs {
 
@@ -116,6 +117,27 @@ public class Dialogs {
         alert.show();
     }
 
+    public static void alertInputDialog(Context context, String title, View.OnClickListener onOkClickListener, View.OnClickListener onCancleClickListener){
+        final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(context).builder()
+                .setTitle(title)
+                .setEditText("");
+        myAlertInputDialog.setPositiveButton("确认", onOkClickListener
+                /*new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMsg(myAlertInputDialog.getResult());
+                myAlertInputDialog.dismiss();
+            }
+        }*/).setNegativeButton("取消", onCancleClickListener
+                /*new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMsg("取消");
+                myAlertInputDialog.dismiss();
+            }
+        }*/);
+        myAlertInputDialog.show();
+    }
 
     //自定义Dialog
     public static void alertDialogCustomerView(Context context, View view){

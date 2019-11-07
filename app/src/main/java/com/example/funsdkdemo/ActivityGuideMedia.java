@@ -2,6 +2,7 @@ package com.example.funsdkdemo;
 
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.monitor.ActivityGuideMediaRealPlay;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class ActivityGuideMedia extends ActivityGuide {
  		
  		// 3.6 播放控制(暂停/继续等)
  		mGuideModules.add(new DemoModule(-1, 
- 				R.string.guide_module_title_media_play_control, 
+ 				R.string.guide_module_title_media_play_control,
  				-1, 
  				null));
  		

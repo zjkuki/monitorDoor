@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.base.JBaseGroupedListFragment;
 import com.janady.database.model.Bluetooth;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;

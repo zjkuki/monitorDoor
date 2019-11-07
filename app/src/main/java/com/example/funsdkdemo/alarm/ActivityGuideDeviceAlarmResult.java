@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.basic.G;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ListAdapterDeviceAlarmInfo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityGuideDeviceLanAlarm;
 import com.example.funsdkdemo.devices.settings.alarm.ActivityGuideDeviceSetupAlarm;
 import com.lib.EUIMSG;

@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.example.common.DialogWaitting;
 import com.example.common.UIFactory;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;

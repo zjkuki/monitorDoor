@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.GridAdapterDevicePicture;
 import com.example.funsdkdemo.adapter.GridAdapterDevicePicture.OnGridDevicePictureListener;
 import com.lib.SDKCONST;

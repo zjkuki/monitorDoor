@@ -1,5 +1,7 @@
 package com.example.funsdkdemo;
 
+import com.lkd.smartlocker.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +54,7 @@ public class ActivityGuideDevice extends ActivityGuide {
 		
 		// 2.8 浏览设备文件
 		mGuideModules.add(new DemoModule(-1, 
-				R.string.guide_module_title_device_browse, 
+				R.string.guide_module_title_device_browse,
 				-1, 
 				null));
 		

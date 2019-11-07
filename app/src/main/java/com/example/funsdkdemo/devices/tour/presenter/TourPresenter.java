@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.tour.listener.TourContract;
 import com.example.funsdkdemo.devices.tour.listener.TourDataSource;
 import com.example.funsdkdemo.devices.tour.model.TourRepository;

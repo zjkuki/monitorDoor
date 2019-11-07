@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.funsdkdemo"
+    package="com.lkd.smartlocker"
     android:versionCode="140"
     android:versionName="1.4.0" >
+    <!--package="com.example.funsdkdemo"-->
+
 
     <!-- <uses-permission android:name="com.example.permission.RECEIVE_MY_BROADCAST" /> -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -411,11 +413,11 @@
             android:name="com.example.funsdkdemo.devices.monitor.ActivityGuideMediaRealPlay">
             </activity>
 
-        <activity android:name=".ActivityGuideUserForgetPassw"/>
-        <activity android:name=".devices.ActivityGuideDeviceNormalPic"/>
-        <activity android:name=".devices.ActivityGuideDevicePicBrowser"/>
-        <activity android:name=".devices.ActivityGuideDeviceSportPicList"/>
-        <activity android:name=".devices.playback.ActivityGuideDeviceRecordList"
+        <activity android:name="com.example.funsdkdemo.ActivityGuideUserForgetPassw"/>
+        <activity android:name="com.example.funsdkdemo.devices.ActivityGuideDeviceNormalPic"/>
+        <activity android:name="com.example.funsdkdemo.devices.ActivityGuideDevicePicBrowser"/>
+        <activity android:name="com.example.funsdkdemo.devices.ActivityGuideDeviceSportPicList"/>
+        <activity android:name="com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList"
             android:screenOrientation="portrait">
         </activity>
 
@@ -439,20 +441,20 @@
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".devices.lowpower.LowPowerDevActivity"
+        <activity android:name="com.example.funsdkdemo.devices.lowpower.LowPowerDevActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".devices.settings.ActivityGuideDeviceSmart433" />
-        <activity android:name=".devices.settings.ActivityGuideDeviceDoorLock" />
-        <activity android:name=".devices.settings.ActivityGuideDeviceGetYUVData" />
-        <activity android:name=".devices.settings.ActivityGuideDeviceAPToWiFi" />
-        <activity android:name=".cloud.ActivityDevCloudPlayBack" />
-        <activity android:name=".cloud.ActivityDevCloudDate" />
-        <activity android:name=".devices.tour.view.TourActivity" />
-        <activity android:name=".devices.settings.alarm.ActivityAlarmTimeSet" />
-        <activity android:name=".devices.settings.alarm.ActivityAlarmSettingLabel" />
-        <activity android:name=".devices.settings.alarm.ActivityWeekSelect" />
-        <activity android:name=".devices.settings.ActivityHumanDetect" />
-        <activity android:name=".devices.settings.ActivityOneKeyMaskVideo" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSmart433" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityGuideDeviceDoorLock" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityGuideDeviceGetYUVData" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityGuideDeviceAPToWiFi" />
+        <activity android:name="com.example.funsdkdemo.cloud.ActivityDevCloudPlayBack" />
+        <activity android:name="com.example.funsdkdemo.cloud.ActivityDevCloudDate" />
+        <activity android:name="com.example.funsdkdemo.devices.tour.view.TourActivity" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.alarm.ActivityAlarmTimeSet" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.alarm.ActivityAlarmSettingLabel" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.alarm.ActivityWeekSelect" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityHumanDetect" />
+        <activity android:name="com.example.funsdkdemo.devices.settings.ActivityOneKeyMaskVideo" />
 
 
         <service android:name="com.example.funsdkdemo.alarm.ServiceGuidePushAlarmNotification">

@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.common.DialogInputPasswd;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.adapter.CategoryItemAdapter;
 import com.janady.base.JTabSegmentFragment;
 import com.janady.device.AddDeviceFragment;

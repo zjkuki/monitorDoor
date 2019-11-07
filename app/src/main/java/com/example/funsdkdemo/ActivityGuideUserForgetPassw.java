@@ -8,6 +8,7 @@ import android.widget.*;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunForgetPasswListener;
+import com.lkd.smartlocker.R;
 
 import java.util.regex.Pattern;
 

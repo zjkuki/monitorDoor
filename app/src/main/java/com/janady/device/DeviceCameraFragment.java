@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.setup.JBaseFragment;
 import com.janady.view.TestView;
 import com.lib.EPTZCMD;

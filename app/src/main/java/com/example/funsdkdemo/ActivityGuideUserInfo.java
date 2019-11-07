@@ -12,6 +12,7 @@ import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunGetUserInfoListener;
 import com.lib.funsdk.support.models.FunUserInfo;
+import com.lkd.smartlocker.R;
 
 /**
  * Created by Jeff on 16/4/11.

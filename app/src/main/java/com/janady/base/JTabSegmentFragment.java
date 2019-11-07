@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.DeviceAddByUser;

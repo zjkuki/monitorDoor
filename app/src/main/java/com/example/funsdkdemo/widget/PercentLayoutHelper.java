@@ -25,7 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

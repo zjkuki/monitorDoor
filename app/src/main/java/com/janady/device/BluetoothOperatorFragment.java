@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.Util;
 import com.janady.base.JBaseSegmentFragment;

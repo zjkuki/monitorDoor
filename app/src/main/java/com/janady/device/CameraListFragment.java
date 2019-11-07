@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.adapter.CameraDeviceAdapter;
 import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;

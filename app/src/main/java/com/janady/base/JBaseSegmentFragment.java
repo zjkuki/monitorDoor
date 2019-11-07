@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.DeviceAddByUser;
 import com.janady.manager.DataManager;

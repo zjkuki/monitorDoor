@@ -19,6 +19,7 @@ import com.janady.lkd.WifiRemoterBoard;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
+import com.lkd.smartlocker.R;
 
 public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparator<SearchResult> {
 	

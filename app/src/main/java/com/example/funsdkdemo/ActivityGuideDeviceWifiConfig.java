@@ -23,6 +23,7 @@ import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.utils.DeviceWifiManager;
 import com.lib.funsdk.support.utils.MyUtils;
 import com.lib.funsdk.support.utils.StringUtils;
+import com.lkd.smartlocker.R;
 
 
 public class ActivityGuideDeviceWifiConfig extends ActivityDemo implements OnClickListener, OnFunDeviceWiFiConfigListener {

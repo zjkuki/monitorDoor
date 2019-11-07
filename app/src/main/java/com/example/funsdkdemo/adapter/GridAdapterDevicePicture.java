@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.basic.G;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.SDKCONST;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunPath;

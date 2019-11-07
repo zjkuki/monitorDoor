@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import com.basic.G;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.DeviceCameraRecordFileAdapter;
 import com.example.funsdkdemo.adapter.DeviceCameraRecordTimeAdapter;
 import com.example.funsdkdemo.entity.DownloadInfo;

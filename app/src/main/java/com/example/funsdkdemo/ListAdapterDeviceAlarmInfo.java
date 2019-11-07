@@ -19,6 +19,7 @@ import com.example.download.PictureDownload;
 import com.example.download.PictureDownload.OnPictureDownloadListener;
 import com.lib.funsdk.support.config.AlarmInfo;
 import com.lib.funsdk.support.utils.StringUtils;
+import com.lkd.smartlocker.R;
 
 public class ListAdapterDeviceAlarmInfo extends BaseAdapter implements OnPictureDownloadListener {
 	

@@ -18,7 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.common.UIFactory;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 public abstract class JDialogModifyPasswd {
 	Context context;

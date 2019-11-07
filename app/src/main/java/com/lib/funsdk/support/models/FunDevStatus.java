@@ -1,6 +1,6 @@
 package com.lib.funsdk.support.models;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 public enum FunDevStatus {
 

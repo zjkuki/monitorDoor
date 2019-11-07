@@ -27,7 +27,7 @@ import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ActivityGuideUserLogin;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.google.zxing.activity.CaptureActivity;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;

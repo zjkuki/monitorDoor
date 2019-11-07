@@ -1,7 +1,7 @@
 package com.lib.funsdk.support.utils;
 
 import android.content.Context;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.SDKCONST.PicFileType;
 import com.lib.SDKCONST.StreamType;
 import com.lib.SDKCONST.VidoFileType;

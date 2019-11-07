@@ -2,10 +2,10 @@ package com.example.funsdkdemo.devices;
 
 import org.json.JSONObject;
 
-import com.example.funsdkdemo.R;
-import com.example.funsdkdemo.R.id;
-import com.example.funsdkdemo.R.layout;
-import com.example.funsdkdemo.R.string;
+import com.lkd.smartlocker.R;
+import com.lkd.smartlocker.R.id;
+import com.lkd.smartlocker.R.layout;
+import com.lkd.smartlocker.R.string;
 
 import android.app.Activity;
 import android.content.Context;

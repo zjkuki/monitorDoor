@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.common.DialogWaitting;
 import com.example.common.UIFactory;
 import com.lib.FunSDK;
+import com.lkd.smartlocker.R;
 import com.xm.ui.widget.SpinnerSelectItem;
 
 import java.util.Arrays;

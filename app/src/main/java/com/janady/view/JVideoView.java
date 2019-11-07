@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;

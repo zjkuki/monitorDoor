@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.google.zxing.Result;
 
 /**

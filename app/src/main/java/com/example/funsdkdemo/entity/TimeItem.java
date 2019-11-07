@@ -2,7 +2,7 @@ package com.example.funsdkdemo.entity;
 
 import android.content.Context;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.SDKCONST;
 
 import java.io.Serializable;

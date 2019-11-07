@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.basic.G;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.EUIMSG;
 import com.lib.FunSDK;
 import com.lib.IFunSDKResult;
@@ -21,13 +21,13 @@ import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.config.SPVMNCfgJson;
 import com.lib.funsdk.support.models.FunDevice;
 
-import static com.example.funsdkdemo.R.id.img_setup_motion_move_btn;
-import static com.example.funsdkdemo.R.id.img_setup_outalarm_open_btn;
-import static com.example.funsdkdemo.R.id.img_setup_screen_occlusion_btn;
-import static com.example.funsdkdemo.R.id.img_setup_server_open_btn;
-import static com.example.funsdkdemo.R.id.img_setup_system_abnormality_btn;
-import static com.example.funsdkdemo.R.id.img_setup_user_connect_btn;
-import static com.example.funsdkdemo.R.id.img_setup_video_dismiss_btn;
+import static com.lkd.smartlocker.R.id.img_setup_motion_move_btn;
+import static com.lkd.smartlocker.R.id.img_setup_outalarm_open_btn;
+import static com.lkd.smartlocker.R.id.img_setup_screen_occlusion_btn;
+import static com.lkd.smartlocker.R.id.img_setup_server_open_btn;
+import static com.lkd.smartlocker.R.id.img_setup_system_abnormality_btn;
+import static com.lkd.smartlocker.R.id.img_setup_user_connect_btn;
+import static com.lkd.smartlocker.R.id.img_setup_video_dismiss_btn;
 
 /**
  * Created by zzq on 2017-07-13.

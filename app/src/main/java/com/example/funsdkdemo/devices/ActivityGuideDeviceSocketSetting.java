@@ -8,7 +8,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.example.funsdkdemo.ActivityGuide;
 import com.example.funsdkdemo.DemoModule;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceChangePassw;
 import com.example.funsdkdemo.devices.settings.alarm.ActivityGuideDeviceSetupAlarm;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetupCamera;

@@ -14,7 +14,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.Checkable;
 import android.widget.Scroller;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 
 
 /**

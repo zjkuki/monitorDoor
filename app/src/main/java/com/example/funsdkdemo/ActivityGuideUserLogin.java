@@ -8,6 +8,7 @@ import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.lib.funsdk.support.models.FunLoginType;
+import com.lkd.smartlocker.R;
 
 import android.app.Activity;
 import android.content.Intent;

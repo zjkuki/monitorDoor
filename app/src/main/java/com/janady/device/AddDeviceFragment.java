@@ -9,12 +9,12 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.funsdkdemo.ActivityGuideMain;
-import com.example.funsdkdemo.R;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.FunWifiPassword;
 import com.lib.funsdk.support.OnFunDeviceWiFiConfigListener;
 import com.lib.funsdk.support.models.FunDevice;
+import com.lkd.smartlocker.R;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 
 public class AddDeviceFragment extends JBaseFragment {

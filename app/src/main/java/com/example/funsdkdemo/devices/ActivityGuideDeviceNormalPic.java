@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.basic.G;
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunPath;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunDeviceFileListener;

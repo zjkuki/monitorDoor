@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.ActivityDemo;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.entity.TimeItem;
 import com.lib.SDKCONST.Switch;

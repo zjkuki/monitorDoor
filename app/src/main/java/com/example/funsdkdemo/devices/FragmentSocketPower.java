@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.SocketTaskAdapter;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;

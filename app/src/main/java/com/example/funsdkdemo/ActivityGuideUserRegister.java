@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunRegisterListener;
+import com.lkd.smartlocker.R;
 
 
 public class ActivityGuideUserRegister extends ActivityDemo implements OnClickListener, OnCheckedChangeListener, OnFunRegisterListener{

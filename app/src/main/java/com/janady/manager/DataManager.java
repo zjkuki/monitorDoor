@@ -1,7 +1,7 @@
 package com.janady.manager;
 
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.janady.database.model.Bluetooth;
 import com.janady.database.model.Camera;

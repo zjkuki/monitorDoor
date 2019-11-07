@@ -7,7 +7,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunRegisterListener;

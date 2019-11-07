@@ -30,6 +30,7 @@ import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
+import com.lkd.smartlocker.R;
 
 
 public class ActivityGuideDeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnItemSelectedListener, OnItemClickListener, OnFunDeviceOptListener {

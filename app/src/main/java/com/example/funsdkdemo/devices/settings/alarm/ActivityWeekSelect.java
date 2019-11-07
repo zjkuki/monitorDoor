@@ -17,7 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.funsdkdemo.R;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.adapter.CommonAdapter;
 import com.example.funsdkdemo.adapter.ViewHolder;
 import com.lib.SDKCONST;

@@ -32,6 +32,7 @@ import com.lib.funsdk.support.config.JsonConfig;
 import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
+import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
 import java.util.List;

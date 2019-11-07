@@ -49,7 +49,11 @@ import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.MyApplication;
-import com.example.funsdkdemo.R;
+import com.hb.dialog.myDialog.MyAlertDialog;
+import com.hb.dialog.myDialog.MyAlertInputDialog;
+import com.janady.Util;
+import com.janady.database.model.Door;
+import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
 import com.example.funsdkdemo.devices.ActivityGuideDeviceSportPicList;
@@ -86,6 +90,8 @@ import com.litesuits.orm.db.assit.QueryBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
@@ -104,7 +110,7 @@ public class WifiRemoterBoardActivity
 							OnErrorListener,
 							OnInfoListener{
 
-
+	private final String TAG="----WRBActivity-------";
 	private RelativeLayout mLayoutTop = null;
 	private TextView mTextTitle = null;
 	private ImageButton mBtnBack = null;
@@ -209,7 +215,8 @@ public class WifiRemoterBoardActivity
 
     private WifiRemoterBoard wifiRemoterBoard = null;
     private WifiRemoter mWifiRemoter = null;
-    private int currWifiRemoterDoorId = 0;
+    private int currWifiRemoterDoorIndex = 0;
+    private int maxDoorNo = 0;
 
 
     private SelectorView selectorView;
@@ -373,30 +380,24 @@ public class WifiRemoterBoardActivity
 		imgLockLockerStat.setVisibility(View.GONE);
 
 		mTabDoors = (TabLayout) findViewById(R.id.tabDoors);
-
-		//mTabDoors.setTabGravity();
-		doorNo = new ArrayList<>();
-		for (int i = 0; i < 1; i++) {
-			doorNo.add(i+"号门");
-			mTabDoors.addTab(mTabDoors.newTab().setText(i+"号门"));
-		}
-
-		tvSelectedDoor.setText("门号："+doorNo.get(0));
-
-		selectorView = (SelectorView) findViewById(R.id.selector);
-
-		selectorView.setAdapter(doors_adapter);
-
-		selectorView.setOnItemCheckListener(new SelectorView.OnItemCheckListener() {
+		mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
+		mTabDoors.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 			@Override
-			public void onItemChecked(int position) {
-				Log.i("-----WRBA----", "onItemChecked: "+position);
-				tvSelectedDoor.setText(doorNo.get(position));
+			public void onTabSelected(TabLayout.Tab tab) {
+				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
-			public void onScrolled(int position) {
-				Log.i("-----WRBA-----", "onScrolled: "+position);
+			public void onTabUnselected(TabLayout.Tab tab) {
+
+				Toast.makeText(mContext, "未选中的"+tab.getText(), Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onTabReselected(TabLayout.Tab tab) {
+
+				Toast.makeText(mContext, "复选的"+tab.getText(), Toast.LENGTH_SHORT).show();
+
 			}
 		});
 
@@ -463,10 +464,6 @@ public class WifiRemoterBoardActivity
 		mLayoutFunctionButtons.setVisibility(View.GONE);
 
 		mLayoutDirectionControl = (RelativeLayout) findViewById(R.id.layoutDirectionControl);
-		/*mPtz_up = (ImageButton) findViewById(R.id.ptz_up);
-		mPtz_down = (ImageButton) findViewById(R.id.ptz_down);
-		mPtz_left = (ImageButton) findViewById(R.id.ptz_left);
-		mPtz_right = (ImageButton) findViewById(R.id.ptz_right);*/
 
 		mPtz_up = (ImageButton) findViewById(R.id.btnCamUp);
 		mPtz_down = (ImageButton) findViewById(R.id.btnCamDown);
@@ -555,6 +552,59 @@ public class WifiRemoterBoardActivity
 		}
 
 		mTextTitle.setText(sceneName);
+
+		if(mWifiRemoter.doorList!=null && mWifiRemoter.doorList.size()>0) {
+			//mTabDoors.setTabGravity();
+			/*doorNo = new ArrayList<>();
+			for (int i = 0; i < 1; i++) {
+				doorNo.add(i + "号门");
+				mTabDoors.addTab(mTabDoors.newTab().setText(i + "号门"));
+			}*/
+			if(mTabDoors.getTabCount()<5){
+				mTabDoors.setTabMode(TabLayout.MODE_FIXED);
+				mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
+			}else{
+				mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
+				mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
+			}
+
+			for (int i = 0; i < mWifiRemoter.doorList.size(); i++) {
+				mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(i).name));
+				currWifiRemoterDoorIndex = i;
+			}
+			tvSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
+		}else{
+			Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加门锁，马上添加门锁吗？", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					AddDoor();
+				}
+			}, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+
+				}
+			});
+		}
+
+
+		/*selectorView = (SelectorView) findViewById(R.id.selector);
+
+		selectorView.setAdapter(doors_adapter);
+
+		selectorView.setOnItemCheckListener(new SelectorView.OnItemCheckListener() {
+			@Override
+			public void onItemChecked(int position) {
+				Log.i("-----WRBA----", "onItemChecked: "+position);
+				tvSelectedDoor.setText(doorNo.get(position));
+			}
+
+			@Override
+			public void onScrolled(int position) {
+				Log.i("-----WRBA-----", "onScrolled: "+position);
+			}
+		});*/
+
 	}
 
 	private void showCamera(int devId, String sn){
@@ -627,6 +677,7 @@ public class WifiRemoterBoardActivity
 			Dialogs.alertMessage(mContext,"失败", "您还没添加摄像机。");
 		}
 	}
+
 	@Override
 	protected void onDestroy() {
 
@@ -935,27 +986,99 @@ public class WifiRemoterBoardActivity
 						});
 					}
 				}
-				/*RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
-
-				if(mLayoutVideoWnd.getVisibility()==View.GONE) {
-					mLayoutVideoWnd.setVisibility(View.VISIBLE);
-					mLayoutFunctionButtons.setVisibility(View.VISIBLE);
-					mLayoutCameraButtons.setVisibility(View.VISIBLE);
-					lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
-					mLayoutControls.setLayoutParams(lp);
-					//initCamera(devId, sn);
-				}else{
-					mLayoutVideoWnd.setVisibility(View.GONE);
-					mLayoutFunctionButtons.setVisibility(View.GONE);
-					mLayoutCameraButtons.setVisibility(View.GONE);
-					lp.addRule(RelativeLayout.BELOW, R.id.layoutTop);
-					mLayoutControls.setLayoutParams(lp);
-				}*/
+			}
+			break;
+			case R.id.btnAddDoor:
+			{
+				AddDoor();
+			}
+			break;
+			case R.id.btnRemoveDoor:
+			{
+				RemoveDoor();
 			}
 			break;
         default:
             break;
 		}
+	}
+
+	private void AddDoor(){
+		final String[] doorName = {""};
+
+		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
+				.setTitle("请输入门锁的名称")
+				.setEditText("");
+		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, myAlertInputDialog.getResult());
+        		doorName[0] = myAlertInputDialog.getResult();
+				if(mWifiRemoter!=null){
+					Door door = new Door();
+
+					if(mWifiRemoter.doorList==null){
+						mWifiRemoter.doorList = new ArrayList<>();
+					}
+
+					if(mWifiRemoter.doorList.size()>0){
+						maxDoorNo = MaxDoorNo(mWifiRemoter.doorList);
+						door.no = maxDoorNo+1;
+
+						currWifiRemoterDoorIndex++;
+					}else {
+						door.no = 0;
+						mWifiRemoter.defaultDoorId = 0;
+						currWifiRemoterDoorIndex = 0;
+					}
+					door.name = doorName[0];
+					door.remote=mWifiRemoter;
+					mWifiRemoter.doorList.add(door);
+					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+
+					if(mTabDoors.getTabCount()<5){
+						mTabDoors.setTabMode(TabLayout.MODE_FIXED);
+						mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
+					}else{
+						mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
+						mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
+					}
+
+					mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name));
+				}
+                myAlertInputDialog.dismiss();
+            }
+        }).setNegativeButton("取消", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "取消");
+                myAlertInputDialog.dismiss();
+            }
+        });
+		myAlertInputDialog.show();
+	}
+
+	private void RemoveDoor(){
+		final Door door = mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition());
+
+		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
+				.setTitle("删除门锁")
+				.setMsg("确定删除【"+door.name+"】吗？");
+		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				currWifiRemoterDoorIndex --;
+				mWifiRemoter.doorList.remove(mTabDoors.getSelectedTabPosition());
+				mTabDoors.removeTabAt(mTabDoors.getSelectedTabPosition());
+				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+			}
+		}).setNegativeButton("取消", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "取消");
+			}
+		});
+		myAlertDialog.show();
 	}
 
 	private void tryToRecord() {
@@ -1964,4 +2087,31 @@ public class WifiRemoterBoardActivity
 		}
 	};
 
+	//获取doorId最大值
+	private int MaxDoorNo(ArrayList<Door> sampleList)
+	{
+		try
+		{
+			int maxDevation = 0;
+			int totalCount = sampleList.size();
+			if (totalCount >= 1)
+			{
+				int max =sampleList.get(0).no;
+				for (int i = 0; i < totalCount; i++)
+				{
+					int temp = sampleList.get(i).no;
+					if (temp > max)
+					{
+						max = temp;
+					}
+				} maxDevation = max;
+			}
+			return maxDevation;
+		}
+		catch (Exception ex)
+		{
+			throw ex;
+		}
+
+	}
 }
