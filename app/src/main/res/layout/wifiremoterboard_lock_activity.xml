@@ -285,6 +285,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
                     <ImageButton
                         android:layout_marginRight="5dp"
@@ -293,6 +294,7 @@
                         android:layout_height="30dp"
                         android:layout_marginLeft="10dp"
                         android:layout_centerVertical="true"
+                        android:layout_weight="1"
                         android:background="@color/transparent"
                         android:scaleType="fitCenter"
                         android:src="@drawable/icon_btn_add_selector">
@@ -325,6 +327,7 @@
                         app:tabBackground="@color/white_transparent"
                         app:tabMode="scrollable"
                         app:tabGravity="center"
+                        android:layout_weight="1"
                         android:layout_gravity="center">
                     </android.support.design.widget.TabLayout>
                     <com.janady.view.CycleSelector.SelectorView
@@ -388,6 +391,7 @@
                         android:layout_centerVertical="true"
                         android:background="@color/transparent"
                         android:scaleType="fitCenter"
+                        android:layout_weight="1"
                         android:src="@drawable/icon_btn_sub_selector">
                     </ImageButton>
                 </LinearLayout>
@@ -396,16 +400,28 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:orientation="horizontal"
-                    android:gravity="center_horizontal">
+                    android:gravity="left">
                     <TextView
-                        android:id="@+id/tv_selected_door"
+                        android:id="@+id/tv_selected_camera"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="2dp"
-                        android:textColor="#2987fb"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="50dp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/black"
                         android:textSize="15sp"
-                        tools:text="门号：1号"/>
+                        tools:text="摄像机：1号"/>
+                    <CheckBox
+                        android:id="@+id/cb_selected_door"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:layout_margin="0dp"
+                        android:layout_marginTop="0dp"
+                        android:textColor="#2987fb"
+                        android:textSize="14sp"
+                        tools:text="默认"/>
                     <ImageView
                         android:id="@+id/imgLockLockerStat"
                         android:layout_marginLeft="30dp"
@@ -414,16 +430,7 @@
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_locked">
                     </ImageView>
-                    <TextView
-                        android:id="@+id/tv_selected_camera"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginLeft="20dp"
-                        android:textColor="@color/grey"
-                        android:textSize="15sp"
-                        tools:text="摄像机：1号"/>
+
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout

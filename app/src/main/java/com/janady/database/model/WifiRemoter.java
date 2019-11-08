@@ -31,6 +31,7 @@ public class WifiRemoter {// 指定一对多关系
     @Column(COL_MAC) // 指定列名
     @Unique
     public String mac;
+    public String loginPsw;
     public String hostUrl;
     public String hostPort;
     public String hostUsername;

@@ -12,7 +12,7 @@ import com.qmuiteam.qmui.arch.annotation.DefaultFirstFragment;
 public class HomeActivity extends QMUIFragmentActivity {
     @Override
     protected int getContextViewId() {
-        AppManager.getAppManager().addActivity(this);
+        //AppManager.getAppManager().addActivity(this);
         return R.id.home_page;
     }
 

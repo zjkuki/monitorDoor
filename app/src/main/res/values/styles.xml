@@ -14,8 +14,8 @@
 <!-- 复选框 -->
     <style name="xmfamily_checkbox" parent="@android:style/Widget.CompoundButton.CheckBox">
         <item name="android:textColor">@color/demo_title</item>
-        <item name="android:paddingTop">5dip</item>
-        <item name="android:paddingBottom">5dip</item>
+        <item name="android:paddingTop">0dip</item>
+        <item name="android:paddingBottom">0dip</item>
     </style>
     <style name="dialog_animation" mce_bogus="1" parent="android:Animation">
         <item name="android:windowEnterAnimation">@anim/dialog_center_in</item>

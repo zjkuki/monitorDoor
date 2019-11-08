@@ -36,6 +36,7 @@ import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -222,7 +223,7 @@ public class WifiRemoterBoardActivity
     private SelectorView selectorView;
 
     private TextView tvSelectedCamera;
-    private TextView tvSelectedDoor;
+    private CheckBox cbSelectedDoor;
 	private ImageView imgLockLockerStat;
 	private List<String> doorNo;
 	private Context mContext;
@@ -374,7 +375,19 @@ public class WifiRemoterBoardActivity
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.wifiremoterboard_lock_activity);
-		tvSelectedDoor = (TextView) findViewById(R.id.tv_selected_door);
+		cbSelectedDoor = (CheckBox) findViewById(R.id.cb_selected_door);
+		cbSelectedDoor.setText("默认");
+		cbSelectedDoor.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(cbSelectedDoor.isChecked()){
+					mWifiRemoter.defaultDoorId = mTabDoors.getSelectedTabPosition();
+					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+				}else{
+
+				}
+			}
+		});
 		tvSelectedCamera = (TextView) findViewById(R.id.tv_selected_camera);
 		imgLockLockerStat = (ImageView) findViewById(R.id.imgLockLockerStat);
 		imgLockLockerStat.setVisibility(View.GONE);
@@ -384,7 +397,13 @@ public class WifiRemoterBoardActivity
 		mTabDoors.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 			@Override
 			public void onTabSelected(TabLayout.Tab tab) {
-				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
+				if(tab.getPosition()==mWifiRemoter.defaultDoorId){
+					cbSelectedDoor.setChecked(true);
+				}else{
+					cbSelectedDoor.setChecked(false);
+				}
+
+				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(tab.getPosition()).no+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
@@ -569,10 +588,15 @@ public class WifiRemoterBoardActivity
 			}
 
 			for (int i = 0; i < mWifiRemoter.doorList.size(); i++) {
-				mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(i).name));
+				TabLayout.Tab tab = mTabDoors.newTab();
+				tab.setText(mWifiRemoter.doorList.get(i).name);
+				mTabDoors.addTab(tab);
 				currWifiRemoterDoorIndex = i;
 			}
-			tvSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
+			if(mTabDoors.getTabCount()>0) {
+				mTabDoors.getTabAt(mWifiRemoter.defaultDoorId).select();
+			}
+			//cbSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
 		}else{
 			Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加门锁，马上添加门锁吗？", new DialogInterface.OnClickListener() {
 				@Override
@@ -1043,7 +1067,7 @@ public class WifiRemoterBoardActivity
 						mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
 						mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
 					}
-
+					//cbSelectedDoor.setText(mWifiRemoter.doorList.get(mWifiRemoter.defaultDoorId).name);
 					mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name));
 				}
                 myAlertInputDialog.dismiss();

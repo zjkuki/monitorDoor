@@ -86,10 +86,15 @@ public class FunSupport implements IFunSDKResult {
     private static final String TAG = "FunSupport";
 
     // 应用证书,请在开放平台注册应用之后替换以下4个字段
-    private static final String APP_UUID = "e0534f3240274897821a126be19b6d46";
+    private static final String APP_UUID = "c019d33895444eb1be507afffc613ef3";
+    private static final String APP_KEY = "ee0b7acd809443578d4bfda434804e8b";
+    private static final String APP_SECRET = "7f007affb74641f091a65e4dbb3e87a9";
+    private static final int APP_MOVECARD = 7;
+
+    /*private static final String APP_UUID = "e0534f3240274897821a126be19b6d46";
     private static final String APP_KEY = "0621ef206a1d4cafbe0c5545c3882ea8";
     private static final String APP_SECRET = "90f8bc17be2a425db6068c749dee4f5d";
-    private static final int APP_MOVECARD = 2;
+    private static final int APP_MOVECARD = 2;*/
 
 
 //    private static final String APP_UUID = "90b4eb2b73c44be28baf8d61cfc4f59e";

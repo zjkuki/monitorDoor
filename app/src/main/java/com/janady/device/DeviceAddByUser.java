@@ -70,6 +70,7 @@ import io.fogcloud.sdk.mdns.helper.SearchDeviceCallBack;
 
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_NORMAL_MONITOR;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_REMOTER;
 
 
@@ -215,6 +216,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		mEditSceneName = (EditText)findViewById(R.id.editSceneName);
 		mEditPassword = (EditText)findViewById(R.id.editDeviceLoginPassword);
+		mEditPassword.setVisibility(View.VISIBLE);
+
 		mBtnDevAdd = (Button)findViewById(R.id.devAddBtn);
 		mBtnDevAdd.setOnClickListener(this);
 		
@@ -283,16 +286,35 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			public void OnClickedFun(FunDevice funDevice) {
 				mFunDevice = funDevice;
 				mEditDevSN.setText(funDevice.devSn);
+
 				//mEditSceneName.setText();
 				List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
 				if (cams != null && cams.size() > 0) {
-				  mEditSceneName.setText(cams.get(0).sceneName);
+					mCamera = cams.get(0);
+				  	mEditSceneName.setText(cams.get(0).sceneName);
+					mEditPassword.setText(cams.get(0).loginPsw);
+					mFunDevice.loginPsw = cams.get(0).loginPsw;
 					mTextTitle.setText("修改设备");
 					mBtnDevAdd.setText("修改");
+
+					if(!cams.get(0).loginPsw.equals("") || !mFunDevice.loginPsw.equals("")){
+						showInputPasswordDialog(EE_DEV_NORMAL_MONITOR);
+					}
 				}else{
 					mTextTitle.setText("添加设备");
 					mBtnDevAdd.setText("添加");
 					mEditSceneName.setText("");
+					mFunDevice.loginPsw ="";
+
+					mCamera.devId = mFunDevice.getId();
+					mCamera.devIp = mFunDevice.getDevIP();
+					mCamera.mac = mFunDevice.getDevMac();
+					mCamera.name = mFunDevice.getDevName();
+					mCamera.sn = mFunDevice.getDevSn();
+					mCamera.serialNo = mFunDevice.getSerialNo();
+					mCamera.type = mCurrDevType.getDevIndex();
+					mCamera.loginName = "admin";
+					mCamera.loginPsw = mFunDevice.loginPsw;
 				}
 				Log.d("DeviceAddByUser", "OnClickedFun: \ndevLoginName:"+funDevice.loginName
 						+"\ndevLoginPsw:"+funDevice.loginPsw
@@ -356,11 +378,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		mTextTitle.setText(R.string.guide_module_title_device_add);
 
 
-		if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
+		/*if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
 			mEditPassword.setVisibility(View.VISIBLE);
 		}else{
 			mEditPassword.setVisibility(View.GONE);
-		}
+		}*/
 
 
 		//if(mCurrDevType!=EE_DEV_BOUTIQUEROTOT) {
@@ -453,12 +475,33 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					});
 				}else {
-
-					//requestDeviceLogin();
+					if(mEditPassword.getText().toString().equals("")) {
+						Dialogs.alertMessage(mcontext, "错误", "密码不能为空，请输入正确密码", new DialogInterface.OnCancelListener() {
+							@Override
+							public void onCancel(DialogInterface dialog) {
+								return;
+							}
+						});
+					}
 
 					if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
-						if(mEditPassword.getText().toString().equals("")) {
-							alertDialog("蓝牙设备密码不能为空！", new DialogInterface.OnClickListener() {
+						//Bluetooth bluetooth = null;
+						mBluetooth.name = mEditDevSN.getText().toString();
+						mBluetooth.sceneName = mEditSceneName.getText().toString();
+						mBluetooth.password = mEditPassword.getText().toString();
+						mBluetooth.isFirst=false;
+						/*List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals("mac", mBluetooth.mac));
+						if (bles != null && bles.size() > 0) {
+							bluetooth = bles.get(0);
+							bluetooth.name = mBluetooth.name;
+							bluetooth.password = mBluetooth.password;
+							bluetooth.isFirst = mBluetooth.isFirst;
+						} else {
+							bluetooth = mBluetooth;
+						}*/
+
+						if(bleLocker.getIsReday()) {bleLocker.changePassword(mBluetooth.password);}else{
+							alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									return;
@@ -469,57 +512,21 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 									return;
 								}
 							});
-						}else{
-							//Bluetooth bluetooth = null;
-							mBluetooth.name = mEditDevSN.getText().toString();
-							mBluetooth.sceneName = mEditSceneName.getText().toString();
-							mBluetooth.password = mEditPassword.getText().toString();
-							mBluetooth.isFirst=false;
-							/*List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals("mac", mBluetooth.mac));
-							if (bles != null && bles.size() > 0) {
-								bluetooth = bles.get(0);
-								bluetooth.name = mBluetooth.name;
-								bluetooth.password = mBluetooth.password;
-								bluetooth.isFirst = mBluetooth.isFirst;
-							} else {
-								bluetooth = mBluetooth;
-							}*/
-
-							if(bleLocker.getIsReday()) {bleLocker.changePassword(mBluetooth.password);}else{
-								alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										return;
-									}
-								}, new DialogInterface.OnCancelListener() {
-									@Override
-									public void onCancel(DialogInterface dialog) {
-										return;
-									}
-								});
-							}
-
-							MyApplication.liteOrm.save(mBluetooth);
-
-							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
-							intent.putExtra("data","ble_list_refresh");
-							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-							sendBroadcast(intent);
 						}
+
+						MyApplication.liteOrm.save(mBluetooth);
+
+						Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+						intent.putExtra("data","ble_list_refresh");
+						LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+						sendBroadcast(intent);
 					} else {
 						if (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
 							List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
 							if (cams != null && cams.size() > 0) {
 								mCamera = cams.get(0);
-								mCamera.devId = mFunDevice.getId();
-								mCamera.devIp = mFunDevice.getDevIP();
-								mCamera.mac = mFunDevice.getDevMac();
-								mCamera.name = mFunDevice.getDevName();
-								mCamera.serialNo = mFunDevice.getSerialNo();
-								mCamera.type = mCurrDevType.getDevIndex();
 								mCamera.sceneName = mEditSceneName.getText().toString();
-								mCamera.loginName = "admin";
-								mCamera.loginPsw = "";
+								mCamera.loginPsw = mEditPassword.getText().toString();
 							} else {
 								mCamera.devId = mFunDevice.getId();
 								mCamera.devIp = mFunDevice.getDevIP();
@@ -530,9 +537,19 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								mCamera.type = mCurrDevType.getDevIndex();
 								mCamera.sceneName = mEditSceneName.getText().toString();
 								mCamera.loginName = "admin";
-								mCamera.loginPsw = "";
+								mCamera.loginPsw = mEditPassword.getText().toString();
 							}
+
 							MyApplication.liteOrm.save(mCamera);
+
+							//保存密码
+							FunDevicePassword.getInstance().saveDevicePassword(mFunDevice.getDevSn(),
+								mCamera.loginPsw);
+							// 库函数方式本地保存密码
+							FunSDK.DevSetLocalPwd(mFunDevice.getDevSn(), "admin", mCamera.loginPsw);
+							// 如果设置了使用本地保存密码，则将密码保存到本地文件
+							// 重新以新的密码登录
+							//requestReloginByPasswd();
 
 							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "cam_list_refresh");
@@ -542,9 +559,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_NAME, mEditDevSN.getText().toString()));
 							if (wr != null && wr.size() > 0) {
 								mWifiRemoter = wr.get(0);
+								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
 								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
 							} else {
 								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
+								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
 							}
 							MyApplication.liteOrm.save(mWifiRemoter);
 
@@ -554,7 +573,6 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							sendBroadcast(intent);
 						}
 					}
-
 
 					finish();
 				}
@@ -686,39 +704,16 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	// 设备登录
 	private void requestDeviceLogin() {
 		String devSN = mEditDevSN.getText().toString().trim();
-		
+
 		if ( devSN.length() == 0 ) {
 			showToast(R.string.device_login_error_sn);
 			return;
 		}
 		
-		mFunDevice = null;
-		
 		showWaitDialog();
-		//mRefreshLayout.showState(AppConstants.LOADING);
-		
-		if ( null == mFunDevice ) {
-			// 虚拟一个设备, 只需要序列号和设备类型即可添加
-			mFunDevice = new FunDevice();
-			mFunDevice.devSn = devSN;
-			mFunDevice.devName = devSN;
-			mFunDevice.devType = EE_DEV_BOUTIQUEROTOT;
-			mFunDevice.loginName = "admin";
-			mFunDevice.loginPsw = "";
-		}
-		
+
 		// 添加设备之前都必须先登录一下,以防设备密码错误,也是校验其合法性
 		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
-//		for (int i = 10; i < 60; i++) {
-//				// 虚拟一个设备, 只需要序列号和设备类型即可添加
-//				mFunDevice = new FunDevice();
-//				mFunDevice.devSn = "123456789123as" + i;
-//				mFunDevice.devName = "12345678912345" + i;
-//				mFunDevice.devType = FunDevType.EE_DEV_NORMAL_MONITOR;
-//				mFunDevice.loginName = "admin";
-//				mFunDevice.loginPsw = "";
-//			FunSupport.getInstance().requestDeviceAdd(mFunDevice);
-//		}
 	}
 	
 	private void requestReloginByPasswd() {
@@ -768,62 +763,51 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 					@Override
 					public boolean confirm(String editText) {
-						if(devType==FunDevType.EE_DEV_BLUETOOTH) {
+						if (devType == FunDevType.EE_DEV_BLUETOOTH) {
 							step = 1;
 							needCheckSTA = false;
-							if(mBluetooth!=null){
+							if (mBluetooth != null) {
 								inputPwd = editText;
 								//bleOldPsw = mBluetooth.password;
 								//if(editText.equals(bleOldPsw)) {
-									bleOldPsw = editText;
-									mBluetooth.password = editText;
-									mEditDevSN.setText(mBluetooth.name);
-									mEditPassword.setText(mBluetooth.password);
-									mEditSceneName.setText(mBluetooth.sceneName);
-									mBluetooth.isFirst = false;
+								bleOldPsw = editText;
+								mBluetooth.password = editText;
+								mEditDevSN.setText(mBluetooth.name);
+								mEditPassword.setText(mBluetooth.password);
+								mEditSceneName.setText(mBluetooth.sceneName);
+								mBluetooth.isFirst = false;
 
-									bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
-									bleLocker.setmNoRssi(true);
-									bleLocker.connect();
-									/*if(bleLocker!=null){
-										bleLocker.disconnect();
-										bleLocker.setmPassword(bleOldPsw);
-										bleLocker.connect();
-									}*/
+								bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
+								bleLocker.setmNoRssi(true);
+								bleLocker.connect();
 
-									showWaitDialog();
-								/*}else{
-									alertDialog("密码错误！蓝牙设备连接失败！", new DialogInterface.OnClickListener() {
+								showWaitDialog();
+
+								super.hide();
+							}
+						} else {
+							if(devType == EE_DEV_NORMAL_MONITOR) {
+								if (editText.equals(mFunDevice.loginPsw)) {
+									super.hide();
+								}else{
+									Dialogs.alertDialogBtn(mcontext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog, int which) {
 											mEditDevSN.setText("");
 											mEditPassword.setText("");
 											mEditSceneName.setText("");
-											return;
 										}
 									}, new DialogInterface.OnCancelListener() {
 										@Override
 										public void onCancel(DialogInterface dialog) {
-											mEditDevSN.setText("");
-											mEditPassword.setText("");
-											mEditSceneName.setText("");
-											return;
 										}
 									});
 
-								}*/
-								super.hide();
+								}
+
 							}
-						}else {
-							//保存密码
-							FunDevicePassword.getInstance().saveDevicePassword(mFunDevice.getDevSn(),
-									editText);
-							// 库函数方式本地保存密码
-							FunSDK.DevSetLocalPwd(mFunDevice.getDevSn(), "admin", editText);
-							// 如果设置了使用本地保存密码，则将密码保存到本地文件
-							// 重新以新的密码登录
-							requestReloginByPasswd();
 						}
+
 
 						inputDialog = null;
 						return super.confirm(editText);
@@ -920,11 +904,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_LOCAL);
 			//}
 
-			if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
+			/*if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
 				mEditPassword.setVisibility(View.VISIBLE);
 			}else{
 				mEditPassword.setVisibility(View.GONE);
-			}
+			}*/
 
 			searchDevice();
 		}

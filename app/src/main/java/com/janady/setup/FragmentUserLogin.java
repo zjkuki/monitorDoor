@@ -12,6 +12,7 @@ import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityGuideDeviceList;
 import com.example.funsdkdemo.ActivityGuideUserForgetPassw;
 import com.example.funsdkdemo.ActivityGuideUserRegister;
+import com.janady.Dialogs;
 import com.lkd.smartlocker.R;
 import com.janady.HomeActivity;
 import com.lib.funsdk.support.FunError;
@@ -226,6 +227,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
     @Override
     public void onLoginFailed(Integer errCode) {
         hideWaitDialog();
+        Dialogs.alertMessage(getContext(), "登录失败", FunError.getErrorStr(errCode));
         showToast(FunError.getErrorStr(errCode));
     }
 
