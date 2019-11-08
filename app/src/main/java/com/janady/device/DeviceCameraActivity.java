@@ -46,6 +46,7 @@ import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.AppManager;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
@@ -157,6 +158,8 @@ public class DeviceCameraActivity
 	private String preset = null;
 	private int mChannelCount;
 	private boolean isGetSysFirst = true;
+
+	private String newPsd = "";
 
 	private boolean mIsLocked = false;
 
@@ -293,7 +296,7 @@ public class DeviceCameraActivity
 
 		// 如果设备未登录,先登录设备
 		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
-			loginDevice();
+			loginDevice(camera.loginName, camera.loginPsw);
 		} else {
 			requestSystemInfo();
 		}
@@ -304,6 +307,8 @@ public class DeviceCameraActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		AppManager.getAppManager().addActivity(this);
 
 		setContentView(R.layout.device_camera_activity);
 
@@ -960,10 +965,10 @@ public class DeviceCameraActivity
 
 	}
 
-	private void loginDevice() {
+	private void loginDevice(String loginName, String pwd) {
 		showWaitDialog();
 
-		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+		FunSupport.getInstance().requestDeviceLogin1(mFunDevice,loginName,pwd);
 	}
 
 	private void requestSystemInfo() {
@@ -1250,12 +1255,13 @@ public class DeviceCameraActivity
 			public boolean confirm(String editText) {
 				// 重新以新的密码登录
 				if (null != mFunDevice) {
-					NativeLoginPsw = editText;
+					newPsd = editText;
+					//NativeLoginPsw = editText;
 
-					onDeviceSaveNativePws();
+					//onDeviceSaveNativePws();
 
 					// 重新登录
-					loginDevice();
+					loginDevice(camera.loginName, newPsd);
 				}
 				return super.confirm(editText);
 			}
@@ -1265,7 +1271,8 @@ public class DeviceCameraActivity
 				super.cancel();
 
 				// 取消输入密码,直接退出
-				finish();
+				//finish();
+				onBackPressed();
 			}
 
 		};
@@ -1301,7 +1308,10 @@ public class DeviceCameraActivity
 		
 		if (null != mFunDevice && null != funDevice) {
 			if (mFunDevice.getId() == funDevice.getId()) {
-				
+
+				camera.loginPsw = newPsd;
+				MyApplication.liteOrm.save(camera);
+
 				// 登录成功后立刻获取SystemInfo
 				// 如果不需要获取SystemInfo,在这里播放视频也可以:playRealMedia();
 				requestSystemInfo();

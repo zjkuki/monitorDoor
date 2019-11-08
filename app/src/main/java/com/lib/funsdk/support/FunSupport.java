@@ -12,6 +12,7 @@ import com.basic.G;
 import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.entity.DownloadInfo;
 import com.example.funsdkdemo.utils.XUtils;
+import com.janady.database.model.Camera;
 import com.lib.ECONFIG;
 import com.lib.EDEV_ATTR;
 import com.lib.EDEV_JSON_ID;
@@ -1315,7 +1316,7 @@ public class FunSupport implements IFunSDKResult {
                 funDevice.getDevSn());
 
         if (devicePasswd != null) {
-            loginPsd = devicePasswd;
+            //loginPsd = devicePasswd;
         }
 
 //			switch (mVerificationPassword) {
@@ -1341,6 +1342,42 @@ public class FunSupport implements IFunSDKResult {
 //				loginPsd = devicePasswd;
 ////				funDevice.loginPsw = loginPsd;
 //			}
+
+        NativeLoginPsw = loginPsd;
+
+        if (null == findDeviceById(funDevice.getId())) {
+            // 如果登录的设备不存在,添加一个临时设备在列表里面,方便后续回调处理
+            mTmpSNLoginDeviceList.add(funDevice);
+        }
+        System.out.println("TTTTT----->>>password = " + loginPsd);
+        FunSDK.DevSetLocalPwd(funDevice.getDevSn(),loginName,loginPsd);
+        int result = FunSDK.DevLogin(getHandler(),
+                funDevice.getDevSn(),
+                loginName, loginPsd,
+                funDevice.getId());
+
+        return (result == 0);
+    }
+    /**
+     * 设备登录(请求)
+     *
+     * @param funDevice
+     * @return
+     */
+    public boolean requestDeviceLogin1(FunDevice funDevice, String loginName, String loginPsd) {
+        if (null == funDevice) {
+            return false;
+        }
+
+        //String loginName = (null == funDevice.loginName) ? "admin" : funDevice.loginName;
+        //String loginPsd = (null == funDevice.loginPsw) ? "" : funDevice.loginPsw;
+        // 使用之前保存的密码,非默认密码了,密码保存的位置,可以根据需求设计,DEMO里面是保存在一个文件中,参考FunDevicePassword.java
+        String devicePasswd = FunDevicePassword.getInstance().getDevicePassword(
+                funDevice.getDevSn());
+
+        if (devicePasswd != null && devicePasswd.equals(loginPsd)) {
+            loginPsd = devicePasswd;
+        }
 
         NativeLoginPsw = loginPsd;
 

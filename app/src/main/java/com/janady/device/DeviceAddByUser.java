@@ -4,10 +4,13 @@ package com.janady.device;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -22,11 +25,16 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.TestFragment;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ActivityGuideUserLogin;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.AppManager;
+import com.janady.HomeActivity;
+import com.janady.setup.JBaseFragment;
+import com.lib.funsdk.support.config.ModifyPassword;
 import com.lkd.smartlocker.R;
 import com.google.zxing.activity.CaptureActivity;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -107,6 +115,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	private WifiRemoterBoard mWifiRemoterBoard;
     private WifiRemoter mWifiRemoter;
 
+    private String camOldPsw;
     private String bleOldPsw;
 	private String inputPwd = "";
 
@@ -161,7 +170,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
+		AppManager.getAppManager().addActivity(this);
+
 		setContentView(R.layout.jdevice_add_by_user);
 
 		setStatusBar();
@@ -292,12 +303,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				if (cams != null && cams.size() > 0) {
 					mCamera = cams.get(0);
 				  	mEditSceneName.setText(cams.get(0).sceneName);
-					mEditPassword.setText(cams.get(0).loginPsw);
-					mFunDevice.loginPsw = cams.get(0).loginPsw;
+					mEditPassword.setText("");
+					//密码留空，调用FUNSDK进行密码校验
+					//mFunDevice.loginPsw = cams.get(0).loginPsw;
 					mTextTitle.setText("修改设备");
 					mBtnDevAdd.setText("修改");
 
-					if(!cams.get(0).loginPsw.equals("") || !mFunDevice.loginPsw.equals("")){
+					if(!cams.get(0).loginPsw.equals("")){
 						showInputPasswordDialog(EE_DEV_NORMAL_MONITOR);
 					}
 				}else{
@@ -305,7 +317,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mBtnDevAdd.setText("添加");
 					mEditSceneName.setText("");
 					mFunDevice.loginPsw ="";
-
+					camOldPsw = "";
 					mCamera.devId = mFunDevice.getId();
 					mCamera.devIp = mFunDevice.getDevIP();
 					mCamera.mac = mFunDevice.getDevMac();
@@ -316,6 +328,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mCamera.loginName = "admin";
 					mCamera.loginPsw = mFunDevice.loginPsw;
 				}
+
 				Log.d("DeviceAddByUser", "OnClickedFun: \ndevLoginName:"+funDevice.loginName
 						+"\ndevLoginPsw:"+funDevice.loginPsw
 						+"\nID:"+funDevice.getId()
@@ -457,7 +470,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		case R.id.backBtnInTopLayout:
 			{
 				// 返回/退出
-				finish();
+				//finish();
+				onBackPressed();
 			}
 			break;
 		case R.id.devAddBtn:
@@ -477,6 +491,15 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				}else {
 					if(mEditPassword.getText().toString().equals("")) {
 						Dialogs.alertMessage(mcontext, "错误", "密码不能为空，请输入正确密码", new DialogInterface.OnCancelListener() {
+							@Override
+							public void onCancel(DialogInterface dialog) {
+								return;
+							}
+						});
+					}
+
+					if(mEditPassword.getText().length() > 6 || mEditPassword.getText().length()< 6) {
+						Dialogs.alertMessage(mcontext, "错误", "请输入六位密码", new DialogInterface.OnCancelListener() {
 							@Override
 							public void onCancel(DialogInterface dialog) {
 								return;
@@ -542,14 +565,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 							MyApplication.liteOrm.save(mCamera);
 
-							//保存密码
-							FunDevicePassword.getInstance().saveDevicePassword(mFunDevice.getDevSn(),
-								mCamera.loginPsw);
-							// 库函数方式本地保存密码
-							FunSDK.DevSetLocalPwd(mFunDevice.getDevSn(), "admin", mCamera.loginPsw);
-							// 如果设置了使用本地保存密码，则将密码保存到本地文件
-							// 重新以新的密码登录
-							//requestReloginByPasswd();
+							// 修改密码,设置ModifyPassword参数
+							// 注意,如果是直接调用FunSDK.DevSetConfigByJson()接口,需要对密码做MD5加密,参考ModifyPassword.java的处理
+							ModifyPassword modifyPasswd = new ModifyPassword();
+							modifyPasswd.PassWord = camOldPsw;
+							modifyPasswd.NewPassWord = mEditPassword.getText().toString();
+
+							FunSupport.getInstance().requestDeviceSetConfig(mFunDevice, modifyPasswd);
 
 							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "cam_list_refresh");
@@ -574,7 +596,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					}
 
-					finish();
+					//finish();
 				}
 			}
 			break;
@@ -702,7 +724,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	}
 	
 	// 设备登录
-	private void requestDeviceLogin() {
+	private void requestDeviceLogin(String loginName, String pwd) {
 		String devSN = mEditDevSN.getText().toString().trim();
 
 		if ( devSN.length() == 0 ) {
@@ -713,7 +735,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		showWaitDialog();
 
 		// 添加设备之前都必须先登录一下,以防设备密码错误,也是校验其合法性
-		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+		FunSupport.getInstance().requestDeviceLogin1(mFunDevice,loginName, pwd);
 	}
 	
 	private void requestReloginByPasswd() {
@@ -723,7 +745,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			
 			showWaitDialog();
 			
-			FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+			FunSupport.getInstance().requestDeviceLogin1(mFunDevice,"admin","");
 		}
 	}
 
@@ -786,10 +808,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								super.hide();
 							}
 						} else {
-							if(devType == EE_DEV_NORMAL_MONITOR) {
-								if (editText.equals(mFunDevice.loginPsw)) {
+							if(devType == EE_DEV_NORMAL_MONITOR || devType ==EE_DEV_BOUTIQUEROTOT) {
+									camOldPsw = editText;
+									requestDeviceLogin("admin", editText);
 									super.hide();
-								}else{
+								/*}else{
 									Dialogs.alertDialogBtn(mcontext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
 										@Override
 										public void onClick(DialogInterface dialog, int which) {
@@ -803,7 +826,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 										}
 									});
 
-								}
+								}*/
 
 							}
 						}
@@ -860,7 +883,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		hideWaitDialog();
 		mListViewDev.onRefreshComplete(true);
 		mRefreshLayout.showState(AppConstants.LIST);
-		showToast(FunError.getErrorStr(errCode));
+		//showToast(FunError.getErrorStr(errCode));
 	}
 
 
@@ -941,6 +964,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	@Override
 	public void onDeviceLoginSuccess(FunDevice funDevice) {
+		mEditPassword.setText(camOldPsw);
 		if ( null != mFunDevice
 				&& null != funDevice
 				&& mFunDevice.getId() == funDevice.getId() ) {
@@ -979,15 +1003,42 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	@Override
 	public void onDeviceSetConfigSuccess(FunDevice funDevice, String configName) {
-		// TODO Auto-generated method stub
+		if ( ModifyPassword.CONFIG_NAME.equals(configName) ) {
+			// 修改密码成功,保存新密码,下次登录使用
+			if ( null != mFunDevice && null != mEditPassword.getText() ) {
+				FunDevicePassword.getInstance().saveDevicePassword(
+						mFunDevice.getDevSn(),
+						mEditPassword.getText().toString());
+			}
+			// 库函数方式本地保存密码
+			if (FunSupport.getInstance().getSaveNativePassword()) {
+				FunSDK.DevSetLocalPwd(mFunDevice.getDevSn(), "admin", mEditPassword.getText().toString());
+				// 如果设置了使用本地保存密码，则将密码保存到本地文件
+			}
+			// 隐藏等待框
+			hideWaitDialog();
+			showToast(R.string.user_forget_pwd_reset_passw_success);
+
+			onBackPressed();
+		}
 		
 	}
 
+	@Override
+	public void onBackPressed() {
+		//AppManager.getAppManager().getActivity(HomeActivity.class);
+		Intent intent = new Intent();
+		intent.setClass(mcontext, HomeActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		startActivity(intent);
+		finish();
+	}
 
 	@Override
 	public void onDeviceSetConfigFailed(FunDevice funDevice, String configName,
 			Integer errCode) {
-		// TODO Auto-generated method stub
+			hideWaitDialog();
+			showToast(FunError.getErrorStr(errCode));
 		
 	}
 

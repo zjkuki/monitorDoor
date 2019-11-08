@@ -334,8 +334,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onResume() {
-        //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
-        new Thread(searchDevices).start();
+        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
+        //new Thread(searchDevices).start();
 
         super.onResume();
     }
@@ -349,8 +349,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if(isVisibleToUser){
-            //mHandler.postDelayed(searchDevices, 0);
-            new Thread(searchDevices).start();
+            mHandler.postDelayed(searchDevices, 0);
+            //new Thread(searchDevices).start();
             refreshDataSet();
         }else{
 
@@ -383,7 +383,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             mHandler.removeCallbacksAndMessages(null);
         }
     }
-    private void  refreshDataSet() {
+    private synchronized void  refreshDataSet() {
         /*if(FunSupport.getInstance().getDeviceList().size()>0){
             hideWaitDialog();
             DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();

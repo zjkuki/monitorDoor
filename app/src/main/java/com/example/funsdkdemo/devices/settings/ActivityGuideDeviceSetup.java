@@ -55,8 +55,8 @@ public class ActivityGuideDeviceSetup extends ActivityGuide {
 				R.string.device_setup_hint_harddisk_config_alarm, ActivityGuideDeviceSetupStorage.class));
 
 		// 密码修改
-		/*mGuideModules.add(new DemoModule(R.drawable.ic_dialpad_120dp, R.string.device_setup_change_password,
-				R.string.device_setup_hint_pwd_modify_alarm, ActivityGuideDeviceChangePassw.class));*/
+		mGuideModules.add(new DemoModule(R.drawable.ic_dialpad_120dp, R.string.device_setup_change_password,
+				R.string.device_setup_hint_pwd_modify_alarm, ActivityGuideDeviceChangePassw.class));
 
 		// 系统功能列表
 		/*mGuideModules.add(

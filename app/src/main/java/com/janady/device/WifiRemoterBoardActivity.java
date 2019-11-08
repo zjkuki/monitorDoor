@@ -181,11 +181,14 @@ public class WifiRemoterBoardActivity
 	private ImageButton mBtnOpenCamera = null;
 
 
+
 	private TextView mTextVideoStat = null;
 	private AlertDialog alert = null;
 	private AlertDialog.Builder builder = null;
 
 	private String preset = null;
+	private String newPsd = "";
+
 	private int mChannelCount;
 	private boolean isGetSysFirst = true;
 
@@ -339,7 +342,7 @@ public class WifiRemoterBoardActivity
 
 		// 如果设备未登录,先登录设备
 		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
-			loginDevice();
+			loginDevice(camera.loginName, camera.loginPsw);
 		} else {
 			requestSystemInfo();
 		}
@@ -1389,11 +1392,12 @@ public class WifiRemoterBoardActivity
 
 	}
 
-	private void loginDevice() {
+	private void loginDevice(String loginName, String pwd) {
 		showWaitDialog();
 
-		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+		FunSupport.getInstance().requestDeviceLogin1(mFunDevice,loginName,pwd);
 	}
+
 
 	private void requestSystemInfo() {
 		showWaitDialog();
@@ -1681,12 +1685,13 @@ public class WifiRemoterBoardActivity
 			public boolean confirm(String editText) {
 				// 重新以新的密码登录
 				if (null != mFunDevice) {
-					NativeLoginPsw = editText;
+					newPsd = editText;
+					//NativeLoginPsw = editText;
 
-					onDeviceSaveNativePws();
+					//onDeviceSaveNativePws();
 
 					// 重新登录
-					loginDevice();
+					loginDevice(camera.loginName, newPsd);
 				}
 				return super.confirm(editText);
 			}

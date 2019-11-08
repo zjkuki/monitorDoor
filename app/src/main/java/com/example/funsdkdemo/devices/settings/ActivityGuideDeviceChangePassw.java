@@ -8,6 +8,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.funsdkdemo.ActivityDemo;
+import com.example.funsdkdemo.MyApplication;
+import com.janady.database.model.Camera;
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.lkd.smartlocker.R;
 import com.lib.FunSDK;
 import com.lib.funsdk.support.FunDevicePassword;
@@ -17,6 +20,8 @@ import com.lib.funsdk.support.OnFunDeviceOptListener;
 import com.lib.funsdk.support.config.ModifyPassword;
 import com.lib.funsdk.support.models.FunDevice;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
+
+import java.util.ArrayList;
 
 /**
  * Demo: 修改设备密码
@@ -149,9 +154,17 @@ public class ActivityGuideDeviceChangePassw extends ActivityDemo implements View
 				FunSDK.DevSetLocalPwd(mFunDevice.getDevSn(), "admin", mEditNewPassw.getText().toString());
 				// 如果设置了使用本地保存密码，则将密码保存到本地文件
 			}
+
+			ArrayList<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mFunDevice.getDevSn()));
+			if(cams.size()>0) {
+				cams.get(0).loginPsw = mEditNewPassw.getText().toString();
+				MyApplication.liteOrm.save(cams.get(0));
+			}
+
 			// 隐藏等待框
 			hideWaitDialog();
 			showToast(R.string.user_forget_pwd_reset_passw_success);
+			finish();
 		}
 	}
 
