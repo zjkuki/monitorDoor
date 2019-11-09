@@ -17,7 +17,9 @@
 
 <com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,10 +27,16 @@
         android:layout_marginTop="?attr/qmui_topbar_height"
         android:background="?attr/qmui_config_color_background"
         android:fitsSystemWindows="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
         <com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout
             android:id="@+id/pull_to_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="fill_parent"
+            android:layout_weight="1">
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/listview"
                 android:layout_width="match_parent"
@@ -37,8 +45,35 @@
                 android:dividerHeight="1px"
                 android:background="@color/qmui_config_color_white"/>
         </com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout>
-    </FrameLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            >
+            <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+                android:id="@+id/bnve"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/gray_e9_dddddd"
+                app:itemIconTint="@color/item_selected"
+                app:itemTextColor="@color/default_selected_text_color"
+                app:menu="@menu/menu_main_bottom_navigation" />
 
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabScanQRCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/scan_qrcode_64dp"
+                app:backgroundTint="@android:color/white"
+                app:borderWidth="0dp"
+                app:elevation="9dp"/>
+        </RelativeLayout>
+    </FrameLayout>
     <com.qmuiteam.qmui.widget.QMUITopBarLayout
         android:id="@+id/topbar"
         android:layout_width="match_parent"

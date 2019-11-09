@@ -7,9 +7,9 @@ import com.janady.database.model.WifiRemoter;
 
 import java.util.ArrayList;
 
-import io.fogcloud.sdk.mqtt.api.MQTT;
-import io.fogcloud.sdk.mqtt.helper.ListenDeviceCallBack;
-import io.fogcloud.sdk.mqtt.helper.ListenDeviceParams;
+import io.fogcloud.fog_mqtt.api.MQTT;
+import io.fogcloud.fog_mqtt.helper.ListenDeviceCallBack;
+import io.fogcloud.fog_mqtt.helper.ListenDeviceParams;
 
 public class WifiRemoterBoard {
     private String TAG = "WifiRemoterBoard";

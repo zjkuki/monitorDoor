@@ -1,5 +1,6 @@
 package com.janady.database.model;
 
+import com.google.gson.Gson;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -33,4 +34,24 @@ public class Bluetooth {
 
     @Mapping(Relation.OneToOne)
     public Door door;
+
+    @Override public String toString() {
+        return "Bluetooth{"+
+                "mac = " + mac +
+                ", uuid = " + uuid +
+                ", serviceUuid = " + serviceUuid +
+                ", writeUuid = " + writeUuid +
+                ", notifyUuid = " + notifyUuid +
+                ", password = " + password +
+                ", isFirst = " + isFirst +
+                ", name = " + name +
+                ", sceneName = " + sceneName +
+                ", isOnline = " + isOnline
+                + "} ";
+    }
+
+    public String toJson() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
 }

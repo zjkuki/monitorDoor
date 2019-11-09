@@ -2,7 +2,7 @@ package com.janady.lkd;
 
 import android.util.Log;
 
-import io.fogcloud.sdk.mqtt.helper.ListenDeviceCallBack;
+import io.fogcloud.fog_mqtt.helper.ListenDeviceCallBack;
 
 public class WiFiRemoterCallBack extends ListenDeviceCallBack {
     private String TAG = "WiFiRemoterCallBack";

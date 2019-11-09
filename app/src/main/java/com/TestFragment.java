@@ -1,17 +1,30 @@
 package com;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.common.UIFactory;
 import com.example.funsdkdemo.MyApplication;
+import com.google.zxing.activity.CaptureActivity;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.janady.Dialogs;
+import com.janady.GZIP;
+import com.janady.MqttUtil;
+import com.janady.common.JQrcodePopDialog;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -44,6 +57,7 @@ import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +75,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private boolean isScanning = false;
 
     private CountDownTimer countDownTimer = null;
+    private BottomNavigationViewEx bnve;
+    private FloatingActionButton fabScanQrCode;
+    private Bitmap mQrCodeBmp = null;
+
+    private MqttUtil mqttUtil = null;
 
     @Override
     protected View onCreateView() {
@@ -68,6 +87,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
 
         mTopBar = rootView.findViewById(R.id.topbar);
+        bnve = rootView.findViewById(R.id.bnve);
+        fabScanQrCode = rootView.findViewById(R.id.fabScanQRCode);
         mRecyclerView = rootView.findViewById(R.id.listview);
         mPullRefreshLayout = rootView.findViewById(R.id.pull_to_refresh);
         mPullRefreshLayout.setRefreshOffsetCalculator(new QMUICenterGravityRefreshOffsetCalculator());
@@ -95,6 +116,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });
 
+        initEvent();
 
         // 监听设备列表类事件
         FunSupport.getInstance().registerOnFunDeviceListener(this);
@@ -121,8 +143,22 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         initTopBar();
         initRecyclerView();
+        mqttUtil = MqttUtil.getInstance(getContext());
         return rootView;
     }
+
+    @Override
+    protected void onFragmentResult(int requestCode, int resultCode, Intent data) {
+        super.onFragmentResult(requestCode, resultCode, data);
+        if ( requestCode == 1
+                && resultCode == RESULT_OK ) {
+            // Demo, 扫描二维码的结果
+            if ( null != data ) {
+                Dialogs.alertMessage(getContext(),"扫描结果",data.toString());
+            }
+        }
+    }
+
     private void initTopBar() {
         mTopBar.setTitle("我的所有设备");
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
@@ -158,7 +194,67 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });
     }
+    private void initEvent() {
+        bnve.enableAnimation(false);
+        bnve.enableShiftingMode(false);
+        bnve.enableItemShiftingMode(false);
 
+        bnve.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            private int previousPosition = -1;
+
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int position = 0;
+                switch (item.getItemId()) {
+                    case R.id.menu_main:
+                        String content=DataManager.getInstance().getAllDevicesJson();
+                        //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
+                        JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
+                        mQrCodeBmp=makeQRCode(content);
+                        dialogBuild.setImage(mQrCodeBmp);
+                        JQrcodePopDialog dialog = dialogBuild.create();
+                        dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
+                        dialog.show();
+                        break;
+                    case R.id.menu_me:
+                        try{
+                            String str= DataManager.getInstance().getAllDevicesJson();
+                            //String str="看甲方时点击翻身肯\n";  //内容大小控制在240byte， >240 进行压缩·否则不压··
+                            Log.d("TF","原文大小："+str.getBytes().length+" \n压缩前："+str);
+
+                            String compress = GZIP.compress(str);
+                            Log.d("TF","解压大小："+compress.getBytes().length+" \n压缩后："+compress);
+
+                            String uncompress = GZIP.unCompress(compress);
+                            Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);
+
+                            mqttUtil.publish(str);
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                        break;
+                    case R.id.menu_empty: {
+
+                        position = 1;
+                        //此处return false且在FloatingActionButton没有自定义点击事件时 会屏蔽点击事件
+                        //return false;
+                    }
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+
+        fabScanQrCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(getContext(), CaptureActivity.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+    }
     /*public List<MainItemDescription> createData() {
         ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
         List<MainItemDescription> res = new ArrayList<>();
@@ -357,6 +453,19 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if ( requestCode == 1
+                && resultCode == RESULT_OK ) {
+            // Demo, 扫描二维码的结果
+            if ( null != data ) {
+                Dialogs.alertMessage(getContext(),"扫描结果",data.getStringExtra("result"));
+            }
+        }
+    }
+
 /*    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -389,12 +498,16 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
             //countDownTimer.cancel();
         }*/
+        mHandler.post(new Runnable(){
+            public void run(){
+                DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
+                DataManager.getInstance().mBleDevices = mBleDevices;
+                mainItems = DataManager.getInstance().getDescriptions();
+                mItemAdapter.setData(mainItems);
+                mItemAdapter.notifyDataSetChanged();
+            }
+        });
 
-        DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
-        DataManager.getInstance().mBleDevices = mBleDevices;
-        mainItems = DataManager.getInstance().getDescriptions();
-        mItemAdapter.setData(mainItems);
-        mItemAdapter.notifyDataSetChanged();
     }
 
 
@@ -582,5 +695,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         refreshDataSet();
     }
 
-
+    private Bitmap makeQRCode(String content){
+        // 生成二维码
+        Bitmap qrCodeBmp = UIFactory.createCode(
+                content, 600, 0xff202020);
+        if ( null != qrCodeBmp ) {
+            if ( null !=  mQrCodeBmp ) {
+                mQrCodeBmp.recycle();
+            }
+            mQrCodeBmp = qrCodeBmp;
+            return qrCodeBmp;
+        }else{
+            return  null;
+        }
+    }
 }

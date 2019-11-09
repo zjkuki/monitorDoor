@@ -20,3 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -keep public class * extends android.support.v4.**
+-keep class ccom.janady.database.model.** { *; }

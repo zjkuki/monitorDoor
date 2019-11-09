@@ -498,21 +498,21 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						});
 					}
 
-					if(mEditPassword.getText().length() > 6 || mEditPassword.getText().length()< 6) {
-						Dialogs.alertMessage(mcontext, "错误", "请输入六位密码", new DialogInterface.OnCancelListener() {
-							@Override
-							public void onCancel(DialogInterface dialog) {
-								return;
-							}
-						});
-					}
-
 					if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
-						//Bluetooth bluetooth = null;
-						mBluetooth.name = mEditDevSN.getText().toString();
-						mBluetooth.sceneName = mEditSceneName.getText().toString();
-						mBluetooth.password = mEditPassword.getText().toString();
-						mBluetooth.isFirst=false;
+						if(mEditPassword.getText().length() > 6 || mEditPassword.getText().length()< 6) {
+							Dialogs.alertMessage(mcontext, "错误", "请输入六位密码", new DialogInterface.OnCancelListener() {
+								@Override
+								public void onCancel(DialogInterface dialog) {
+									return;
+								}
+							});
+						}else {
+
+							//Bluetooth bluetooth = null;
+							mBluetooth.name = mEditDevSN.getText().toString();
+							mBluetooth.sceneName = mEditSceneName.getText().toString();
+							mBluetooth.password = mEditPassword.getText().toString();
+							mBluetooth.isFirst = false;
 						/*List<Bluetooth> bles = MyApplication.liteOrm.query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals("mac", mBluetooth.mac));
 						if (bles != null && bles.size() > 0) {
 							bluetooth = bles.get(0);
@@ -523,26 +523,29 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							bluetooth = mBluetooth;
 						}*/
 
-						if(bleLocker.getIsReday()) {bleLocker.changePassword(mBluetooth.password);}else{
-							alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									return;
-								}
-							}, new DialogInterface.OnCancelListener() {
-								@Override
-								public void onCancel(DialogInterface dialog) {
-									return;
-								}
-							});
+							if (bleLocker.getIsReday()) {
+								bleLocker.changePassword(mBluetooth.password);
+							} else {
+								alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										return;
+									}
+								}, new DialogInterface.OnCancelListener() {
+									@Override
+									public void onCancel(DialogInterface dialog) {
+										return;
+									}
+								});
+							}
+
+							MyApplication.liteOrm.save(mBluetooth);
+
+							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							intent.putExtra("data", "ble_list_refresh");
+							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
+							sendBroadcast(intent);
 						}
-
-						MyApplication.liteOrm.save(mBluetooth);
-
-						Intent intent = new Intent("android.intent.action.CART_BROADCAST");
-						intent.putExtra("data","ble_list_refresh");
-						LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-						sendBroadcast(intent);
 					} else {
 						if (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
 							List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
