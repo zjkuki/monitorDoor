@@ -9,6 +9,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.MyApplication;
 import com.google.zxing.activity.CaptureActivity;
@@ -24,6 +27,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
 import com.janady.GZIP;
 import com.janady.MqttUtil;
+import com.janady.SimpleCrypto;
 import com.janady.common.JQrcodePopDialog;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
@@ -57,8 +61,14 @@ import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
+import org.eclipse.jetty.util.IO;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener, OnFunDeviceListener  {
@@ -79,7 +89,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private FloatingActionButton fabScanQrCode;
     private Bitmap mQrCodeBmp = null;
 
+
     private MqttUtil mqttUtil = null;
+
+    private String mMsgId = "";
+    private String mMsgIdFromQR = "";
 
     @Override
     protected View onCreateView() {
@@ -144,6 +158,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         initTopBar();
         initRecyclerView();
         mqttUtil = MqttUtil.getInstance(getContext());
+        mqttUtil.setMqttCallBack(mqttCallback);
         return rootView;
     }
 
@@ -207,31 +222,48 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 int position = 0;
                 switch (item.getItemId()) {
                     case R.id.menu_main:
-                        String content=DataManager.getInstance().getAllDevicesJson();
-                        //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
-                        JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
-                        mQrCodeBmp=makeQRCode(content);
-                        dialogBuild.setImage(mQrCodeBmp);
-                        JQrcodePopDialog dialog = dialogBuild.create();
-                        dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
-                        dialog.show();
-                        break;
-                    case R.id.menu_me:
                         try{
-                            String str= DataManager.getInstance().getAllDevicesJson();
+                            //JSONObject data = DataManager.getInstance().getAllDevices2FastJson();
+
+                            JSONObject json = new com.alibaba.fastjson.JSONObject();
+
+                            long ctime = new Date().getTime();
+                            String msgid="from:"+FunSupport.getInstance().getUserName()+"@"+ctime;
+
+                            json.put("msgid", msgid);
+                            json.put("action","sharealldevices");
+
+                            mMsgId = msgid;
+
+                            Log.d("--TF--",json.toJSONString());
+
                             //String str="看甲方时点击翻身肯\n";  //内容大小控制在240byte， >240 进行压缩·否则不压··
-                            Log.d("TF","原文大小："+str.getBytes().length+" \n压缩前："+str);
+                            /*Log.d("TF","原文大小："+str.getBytes().length+" \n压缩前："+str);
 
                             String compress = GZIP.compress(str);
                             Log.d("TF","解压大小："+compress.getBytes().length+" \n压缩后："+compress);
 
                             String uncompress = GZIP.unCompress(compress);
-                            Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);
+                            Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);*/
 
-                            mqttUtil.publish(str);
-                        }catch (IOException e){
+                            //mqttUtil.publish(json.toJSONString());
+                            mqttUtil.publish(MqttUtil.PUBLISH_TOPIC, 2, json.toJSONString());
+
+                            String content = Base64.encodeToString(msgid.getBytes(), Base64.DEFAULT);
+
+                            //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
+                            JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
+                            mQrCodeBmp=makeQRCode(content);
+                            dialogBuild.setImage(mQrCodeBmp);
+                            JQrcodePopDialog dialog = dialogBuild.create();
+                            dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
+                            dialog.show();
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        break;
+                    case R.id.menu_me:
+
                         break;
                     case R.id.menu_empty: {
 
@@ -461,7 +493,15 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 && resultCode == RESULT_OK ) {
             // Demo, 扫描二维码的结果
             if ( null != data ) {
-                Dialogs.alertMessage(getContext(),"扫描结果",data.getStringExtra("result"));
+                try {
+                    String result=data.getStringExtra("result");
+                    String uncompress = new String(Base64.decode(result.getBytes(),Base64.DEFAULT));
+                    Dialogs.alertMessage(getContext(), "扫描结果", uncompress);
+                    mMsgIdFromQR = uncompress;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -709,4 +749,39 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             return  null;
         }
     }
+
+    //订阅主题的回调
+    private MqttCallback mqttCallback = new MqttCallback() {
+
+        @Override
+        public void messageArrived(String topic, MqttMessage message) throws Exception {
+            Log.i("TF", "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
+            try{
+                JSONObject json = JSONObject.parseObject(message.toString());
+                String msgid= json.getString("msgid");
+                String action = json.getString("action");
+                if(msgid == mMsgIdFromQR && action == "sharealldevices"){
+                    Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            //收到其他客户端的消息后，响应给对方告知消息已到达或者消息有问题等
+            //response("message arrived:"+message);
+        }
+
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken arg0) {
+            Log.i("TF", "deliveryComplete");
+        }
+
+        @Override
+        public void connectionLost(Throwable arg0) {
+            Log.i("TF", "连接断开");
+            mqttUtil.disconnect();//连接断开，重连
+            mqttUtil = MqttUtil.getInstance(getContext());
+        }
+    };
 }

@@ -1,5 +1,9 @@
 package com.janady;
 
+import android.util.Base64;
+
+import com.example.funsdkdemo.MyApplication;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -8,6 +12,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Random;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 
 /**
  * Created by dingjikerbo on 2016/9/1.
@@ -26,6 +35,7 @@ public class StringUtils {
             return "error";
         }
     }
+
 
     public static String asciiToString(byte[] bytes) {
         char[] buf = new char[bytes.length];

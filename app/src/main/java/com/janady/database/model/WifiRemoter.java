@@ -1,5 +1,6 @@
 package com.janady.database.model;
 
+import com.lib.funsdk.support.models.FunDevType;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -42,6 +43,8 @@ public class WifiRemoter {// 指定一对多关系
     public String publictopic;
     public String subscribetopic;
     public String sceneName;
+    public int devType = FunDevType.EE_DEV_REMOTER.getDevIndex();
+
     public int defaultDoorId = 0;
 
     @Mapping(Relation.OneToOne)

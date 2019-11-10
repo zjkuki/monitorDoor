@@ -33,13 +33,13 @@ public class MqttUtil {
     private boolean isConnectSuccess = false, isConnectionLost = true;
     //MQTT相关配置
     private final long cid = System.currentTimeMillis();
-    private final String CLIENTID = "LKD_SMART_LOCKER_APP@"+cid;
+    private final String CLIENTID = "LKD_APP_"+FunSupport.getInstance().getUserName()+"@"+cid;
 
     public String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
     public String USERNAME = "admin";//用户名
     public String PASSWORD = "public";//密码
-    public static String PUBLISH_TOPIC = "lkd_smart_locker_app/sharedata";//发布主题
-    public static String RESPONSE_TOPIC = "lkd_smart_locker_app/sharedata";//订阅主题
+    public static String PUBLISH_TOPIC = "lkd_smart_locker_app/message";//发布主题
+    public static String RESPONSE_TOPIC = "lkd_smart_locker_app/message";//订阅主题
 
     public void setMqttCallBack(MqttCallback callBack){
         mqttCallback = callBack;
@@ -181,6 +181,28 @@ public class MqttUtil {
                 BluetoothLog.d("doClientConnection:" + e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * 发布消息(自定义主题)
+     *
+     * @param message 消息
+     */
+    public void publish(String topic, Integer qos, String message) {
+        //String topic = PUBLISH_TOPIC;
+        //Integer qos = QUALITY_OF_SERVICE;
+        Boolean retained = false;
+        try {
+            if (mqttAndroidClient != null && mqttAndroidClient.isConnected()) {
+                //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
+                mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
+            } else {
+                BluetoothLog.d("mqttAndroidClient is Null");
+            }
+        } catch (MqttException e) {
+            BluetoothLog.d("publish MqttException:" + e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -2,8 +2,8 @@ package com.janady.manager;
 
 import android.util.Log;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.funsdkdemo.MyApplication;
-import com.google.gson.Gson;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.janady.database.model.Bluetooth;
@@ -114,7 +114,6 @@ public class DataManager {
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
         List<Object> bitems = new ArrayList<>();
         for (Bluetooth bluetooth : blists) {
-            Log.d("DataManager",bluetooth.toJson());
             //ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
             ItemDescription itemDescription = new ItemDescription(BluetoothLockFragment.class, bluetooth.sceneName, R.drawable.icon_check);
 
@@ -198,22 +197,22 @@ public class DataManager {
         }
     }
 
-    public String getAllDevicesJson(){
-        StringBuilder jsonStr= new StringBuilder();
-        Gson gson = new Gson();
-        ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
-        jsonStr.append(gson.toJson(camlists));
-        Log.d("DataManager", "Cameras Json:\n"+jsonStr);
 
-        ArrayList<Bluetooth> bluetooths = MyApplication.liteOrm.query(Bluetooth.class);
-        jsonStr.append(gson.toJson(bluetooths));
-        Log.d("DataManager", "Bluetooths Json:\n"+jsonStr);
+    public JSONObject getAllDevices2FastJson(){
+        JSONObject json = new JSONObject();
+        ArrayList<Camera> camlists = MyApplication.liteOrm.cascade().query(Camera.class);
+        json.put("cameras", camlists);
+        Log.d("DataManager", "Cameras Json:\n"+json.toString());
 
-        ArrayList<WifiRemoter> wifiRemoters = MyApplication.liteOrm.query(WifiRemoter.class);
-        jsonStr.append(gson.toJson(wifiRemoters));
-        Log.d("DataManager", "WifiRemoters Json:\n"+jsonStr);
+        ArrayList<Bluetooth> bluetooths = MyApplication.liteOrm.cascade().query(Bluetooth.class);
+        json.put("bluetooths", bluetooths);
+        Log.d("DataManager", "Bluetooths Json:\n"+json.toString());
 
-        return jsonStr.toString();
+        ArrayList<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
+        json.put("wifiremoters", wifiRemoters);
+        Log.d("DataManager", "WifiRemoters Json:\n"+json.toString());
+
+        return json;
     }
 
 }

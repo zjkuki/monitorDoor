@@ -1,6 +1,6 @@
 package com.janady.database.model;
 
-import com.google.gson.Gson;
+import com.lib.funsdk.support.models.FunDevType;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -22,6 +22,7 @@ public class Bluetooth {
     @Column(COL_MAC) // 指定列名
     @Unique
     public String mac;
+    public int devType = FunDevType.EE_DEV_BLUETOOTH.getDevIndex();
     public String uuid;
     public String serviceUuid;
     public String writeUuid;
@@ -50,8 +51,4 @@ public class Bluetooth {
                 + "} ";
     }
 
-    public String toJson() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
 }

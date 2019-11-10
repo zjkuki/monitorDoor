@@ -36,6 +36,13 @@ android {
             abiFilters "armeabi",'x86'
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
     buildTypes {
         debug {
             debuggable = true
@@ -112,6 +119,6 @@ dependencies {
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
     implementation 'com.github.HanHuoBin:BaseDialog:1.2.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.github.huangxiaoguo1:hxgsecurity:1.0.0'
 }
 

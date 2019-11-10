@@ -1,5 +1,6 @@
 package com.janady.database.model;
 
+import com.lib.funsdk.support.models.FunDevType;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
@@ -19,6 +20,7 @@ public class Door {
     public int no; //最小0-最大255
     @Unique
     public String name;
+
     @Mapping(Relation.ManyToMany)
     public ArrayList<Camera> cameraList;
 

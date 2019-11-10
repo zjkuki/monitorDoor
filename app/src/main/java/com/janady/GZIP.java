@@ -63,7 +63,7 @@ public class GZIP {
 
 
     public static void main(String[] args) throws IOException {
-        String str= DataManager.getInstance().getAllDevicesJson();
+        String str= DataManager.getInstance().getAllDevices2FastJson().toJSONString();
         //String str="看甲方时点击翻身肯\n";  //内容大小控制在240byte， >240 进行压缩·否则不压··
         System.out.println("原文大小："+str.getBytes().length+" \n压缩前："+str);
 
