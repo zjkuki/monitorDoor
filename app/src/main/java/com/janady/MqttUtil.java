@@ -131,6 +131,10 @@ public class MqttUtil {
         return mqttUtil;
     }
 
+    private MqttUtil(Context context, MqttCallback mqttCallback){
+        this.context = context;
+
+    }
     private MqttUtil(Context context) {
         this.context = context;
         initMqtt();
