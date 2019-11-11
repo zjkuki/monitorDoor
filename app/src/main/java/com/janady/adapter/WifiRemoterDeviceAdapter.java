@@ -4,16 +4,21 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
 import com.basic.G;
 import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.common.JQrcodePopDialog;
+import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -27,6 +32,7 @@ import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.WifiRemoterBoard;
 
+import java.util.Date;
 import java.util.List;
 
 public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
@@ -43,6 +49,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
     private JDialogModifyPasswd inputDialog = null;
     private AlertDialog.Builder builder = null;
     private int step = 0; //0-正常   1-输入密码
+    private String mqttclientid = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 
     public WifiRemoterDeviceAdapter(Context ctx, List<WifiRemoter> data) {
         super(ctx, data);
@@ -52,7 +59,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
 
     @Override
     public int getItemLayoutId(int viewType) {
-        return R.layout.jbluetooth_device_item;
+        return R.layout.jwifiremoter_device_item;
     }
 
 
@@ -60,14 +67,14 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
     public void bindData(RecyclerViewHolder holder, final int position, WifiRemoter item) {
         mCurrWifiRemoter = item;
 
-        holder.getTextView(R.id.item_ble_name).setText("场景："+mCurrWifiRemoter.sceneName);
-        holder.getTextView(R.id.item_ble_sn).setText("SN："+mCurrWifiRemoter.name);
-        holder.getTextView(R.id.item_ble_mac).setText("MAC："+mCurrWifiRemoter.mac);
+        holder.getTextView(R.id.item_wr_name).setText("场景："+mCurrWifiRemoter.sceneName);
+        holder.getTextView(R.id.item_wr_sn).setText("SN："+mCurrWifiRemoter.name);
+        holder.getTextView(R.id.item_wr_mac).setText("MAC："+mCurrWifiRemoter.mac);
 
-        ImageView iv = holder.getImageView(R.id.bleCover);
-        iv.setImageResource(R.drawable.ic_bluetooth_black_24dp);
+        ImageView iv = holder.getImageView(R.id.wrCover);
+        iv.setImageResource(R.drawable.ic_remote_3);
 
-        holder.getImageButton(R.id.ibBleDelete).setOnClickListener(new View.OnClickListener() {
+        holder.getImageButton(R.id.ibwrDelete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);//内部类
@@ -94,10 +101,40 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
             }
         });
 
+        holder.getImageButton(R.id.ibwrshare).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    JSONObject json = new com.alibaba.fastjson.JSONObject();
+
+                    String shareDevicePublishTopic = "lkd_app/" + mqttclientid + "/message";
+                    String shareDeviceResponseTopic = "lkd_app/" + mqttclientid+ "/response";
+                    json.put("from", mqttclientid);
+                    json.put("action", "shareRemoterDevice");
+                    json.put("mac", mCurrWifiRemoter.mac);
+
+                    json.put("SDPT", shareDevicePublishTopic);
+                    json.put("SDRT", shareDevicePublishTopic);
+                    String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
+                    //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
+                    JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
+                    Bitmap mQrCodeBmp=makeQRCode(content);
+                    dialogBuild.setImage(mQrCodeBmp);
+                    JQrcodePopDialog dialog = dialogBuild.create();
+                    dialog.setTitle("您正在分享远程控制器-"+mCurrWifiRemoter.name);
+                    dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
+                    dialog.show();
+                    Dialogs.alertMessage(context, "json", json.toJSONString());
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
         mWaitDialog = new DialogWaitting(context);
 
+        ibChaPasswd=holder.getImageButton(R.id.ibwrChangePassword);
         ibChaPasswd.setVisibility(View.GONE);
-        ibChaPasswd=holder.getImageButton(R.id.ibBleChangePassword);
         ibChaPasswd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

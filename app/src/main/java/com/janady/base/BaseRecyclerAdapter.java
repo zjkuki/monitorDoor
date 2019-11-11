@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.common.UIFactory;
 import com.lkd.smartlocker.R;
 import com.janady.RoundRect;
 import com.janady.model.ItemDescription;
@@ -31,6 +32,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
     private LayoutInflater mInflater;
     private OnItemClickListener mClickListener;
     private OnItemLongClickListener mLongClickListener;
+    private Bitmap mQrCodeBmp;
 
     public BaseRecyclerAdapter(Context ctx, List<T> list) {
         mData = (list != null) ? list : new ArrayList<T>();
@@ -42,7 +44,20 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
         mData = (list != null) ? list : new ArrayList<T>();
         notifyDataSetChanged();
     }
-
+    protected Bitmap makeQRCode(String content){
+        // 生成二维码
+        Bitmap qrCodeBmp = UIFactory.createCode(
+                content, 600, 0xff202020);
+        if ( null != qrCodeBmp ) {
+            if ( null !=  mQrCodeBmp ) {
+                mQrCodeBmp.recycle();
+            }
+            mQrCodeBmp = qrCodeBmp;
+            return qrCodeBmp;
+        }else{
+            return  null;
+        }
+    }
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final RecyclerViewHolder holder = new RecyclerViewHolder(mContext,

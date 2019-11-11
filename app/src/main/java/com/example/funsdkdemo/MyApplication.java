@@ -9,12 +9,17 @@ import com.lib.funsdk.support.FunSupport;
 import com.litesuits.orm.LiteOrm;
 import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager;
 
+import java.util.Date;
+
 
 public class MyApplication extends Application {
 
 	public static LiteOrm liteOrm;
 	//public static LiteOrm liteOrmCascade;
 	public static Context context;
+
+	public static String mqttClientId;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -39,6 +44,8 @@ public class MyApplication extends Application {
 				cachePath, 				// 缓存目录
 				20 * 1024 * 1024		// 20M的本地缓存空间
 				);
+
+		mqttClientId = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 	}
 
 	public void exit() {

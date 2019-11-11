@@ -1,5 +1,6 @@
 package com;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.CountDownTimer;
@@ -19,7 +20,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.MyApplication;
 import com.google.zxing.activity.CaptureActivity;
@@ -29,6 +32,7 @@ import com.janady.GZIP;
 import com.janady.MqttUtil;
 import com.janady.SimpleCrypto;
 import com.janady.common.JQrcodePopDialog;
+import com.janady.setup.FragmentUserLogin;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -95,17 +99,21 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private MqttUtil mqttUtil = null;
 
-    private String mCurrMsgId = "";
-    private String mMsgIdFromQR = "";
+    private String fromMsgClientId = "";
+    private String toMsgClientId = "";
 
-    private int mqttstep = 0;
-    private String shareDevicePublishTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/message";
-    private String shareDeviceResponseTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/response";
+    private String mqttaction = "";
+    private String shareDevicePublishTopic = "lkd_app_sharedata/message";
+    private String shareDeviceResponseTopic = "lkd_app_sharedata/response";
 
     private String clientShareDevicePublishTopic = "";
     private String clientShareDeviceResponseTopic = "";
 
     private String mqttclientid = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
+
+    private String shareCamMac ="";
+    private String shareBleMac ="";
+    private String shareRemoterMac ="";
 
     @Override
     protected View onCreateView() {
@@ -134,7 +142,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mPullRefreshLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mHandler.postDelayed(searchDevices, 0);
+                        //mHandler.postDelayed(searchDevices, 0);
                         //refreshDataSet();
                         mPullRefreshLayout.finishRefresh();
                     }
@@ -235,15 +243,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         try{
                             JSONObject json = new com.alibaba.fastjson.JSONObject();
 
-                            long ctime = new Date().getTime();
-                            //shareDevicePublishTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/message";
-                            //shareDeviceResponseTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/response";
+                            shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
+                            shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
                             //String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
-                            String msgid=mqttclientid;
-                            json.put("msgid", msgid);
+                            fromMsgClientId = mqttclientid;
+                            json.put("from", fromMsgClientId);
                             json.put("action","sharealldevices");
-
-                            //mCurrMsgId = msgid;
 
 
                             Log.d("--TF--",json.toJSONString());
@@ -257,13 +262,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             String uncompress = GZIP.unCompress(compress);
                             Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);*/
 
-                            mqttUtil =  new MqttUtil(getContext(), mqttclientid,2, shareDevicePublishTopic, shareDevicePublishTopic, iMqttActionListener,mqttCallback);
-                            //mqttUtil.publish(json.toJSONString());
+                            mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
 
-                            //mqttUtil.publish(MqttUtil.PUBLISH_TOPIC, 2, json.toJSONString());
-
-                            //json.clear();
-                            //json.put("msgid",msgid);
                             json.put("SDPT", shareDevicePublishTopic);
                             json.put("SDRT", shareDevicePublishTopic);
                             String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
@@ -279,6 +279,19 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         }
                         break;
                     case R.id.menu_me:
+                        Dialogs.alertDialog2Btn(getContext(), "注销", "您确定要注销本次登录吗？", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (FunSupport.getInstance().logout()) {
+                                    startFragmentAndDestroyCurrent(new FragmentUserLogin());
+                                }
+                            }
+                        }, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        });
 
                         break;
                     case R.id.menu_empty: {
@@ -303,51 +316,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });
     }
-    /*public List<MainItemDescription> createData() {
-        ArrayList<Camera> camlists = MyApplication.liteOrm.query(Camera.class);
-        List<MainItemDescription> res = new ArrayList<>();
-        if(camlists.size()>0) {
-            for (int i = 0; i < camlists.size(); i++) {
-                MainItemDescription items = new MainItemDescription(CameraListFragment.class, "camera-" + i, R.drawable.ic_camera, MainItemDescription.DeviceType.CAM);
-                res.add(items);
-            }
-        }
-
-        ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
-        List<Object> items = new ArrayList<>();
-        if(blists.size()>0) {
-            MainItemDescription bleDescription = new MainItemDescription(BluetoothListFragment.class, "蓝牙设备", R.drawable.ic_bluetooth_black_24dp, MainItemDescription.DeviceType.BLE);
-            for (int i = 0; i < 5; i++) {
-                ItemDescription itemDescription = new ItemDescription(BluetoothEditFragment.class, "ble-" + i, R.drawable.ic_bluetooth_black_24dp);
-                items.add(itemDescription);
-            }
-            bleDescription.setList(items);
-            res.add(bleDescription);
-        }
-
-        for (int i = 0; i < 2; i++) {
-            MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment_old.class, "remote-"+i, R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
-            List<Object> remote_items = new ArrayList<>();
-            for (int j =0; j < 3; j++) {
-                ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, "remote-"+i, R.drawable.ic_remote_3);
-                remote_items.add(itemDescription);
-            }
-            remoteDescription.setList(remote_items);
-            res.add(remoteDescription);
-        }
-
-        for (int i = 0; i < 2; i++) {
-            MainItemDescription remoteDescription = new MainItemDescription(DoorListFragment.class, "door-"+i, R.drawable.ic_room2, MainItemDescription.DeviceType.REMOTE);
-            List<Object> remote_items = new ArrayList<>();
-            for (int j =0; j < 3; j++) {
-                ItemDescription itemDescription = new ItemDescription(RemoteEditFragment.class, "door-"+i, R.drawable.ic_room2);
-                remote_items.add(itemDescription);
-            }
-            remoteDescription.setList(remote_items);
-            res.add(remoteDescription);
-        }
-        return res;
-    }*/
 
     private void startBluetooth(){
         if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
@@ -478,8 +446,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onResume() {
-        mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
-        //new Thread(searchDevices).start();
+        //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
+        new Thread(searchDevices).start();
 
         super.onResume();
     }
@@ -493,7 +461,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if(isVisibleToUser){
-            mHandler.postDelayed(searchDevices, 0);
+            //mHandler.postDelayed(searchDevices, 0);
             //new Thread(searchDevices).start();
             refreshDataSet();
         }else{
@@ -513,19 +481,23 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     String result=data.getStringExtra("result");
                     String uncompress = new String(Base64.decode(result.getBytes(),Base64.DEFAULT));
                     Dialogs.alertMessage(getContext(), "扫描结果", uncompress);
-                    //mMsgIdFromQR = uncompress;
 
                     JSONObject json = JSONObject.parseObject(uncompress);
                     long ctime = new Date().getTime();
                     String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
-                    //mCurrMsgId = json.getString("msgid");
+
+                    fromMsgClientId = json.getString("from");
+                    toMsgClientId = mqttclientid;
+                    mqttaction = json.getString("action");
+                    if(mqttaction.equals("shareRemoterDevice")){
+                        shareRemoterMac = json.getString("mac");
+                    }
+
+
                     shareDevicePublishTopic = json.getString("SDPT");
                     shareDeviceResponseTopic = json.getString("SDRT");
-                    mqttUtil =  new MqttUtil(getContext(), mqttclientid, 2, shareDevicePublishTopic, shareDevicePublishTopic,iMqttActionListener,mqttCallback);
 
-                    mqttstep=1;
-
-                    mMsgIdFromQR = mCurrMsgId;
+                    mqttUtil =  new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic,iMqttActionListener,mqttCallback);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -783,21 +755,63 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             Log.i("TF", "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
-            Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
+            //Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
             try{
                 JSONObject json = JSONObject.parseObject(message.toString());
-                String msgid= json.getString("msgid");
-                String action = json.getString("action");
-                if(msgid.equals(mCurrMsgId) && action == "sharealldevices"){
-                    Dialogs.alertMessage(getContext(), "mqtt reciver", json.getString("data"));
-                }else{
-                    if(msgid.equals(mCurrMsgId) && action.equals("requestDatas")){
-                        JSONObject data = DataManager.getInstance().getAllDevices2FastJson();
-                        json.put("action","responDatas");
-                        json.put("data", data);
+                JSONObject data = new JSONObject();
 
-                        mqttstep=0;
-                        mqttUtil.publish(json.toJSONString());
+                fromMsgClientId = json.getString("from");
+                toMsgClientId = json.getString("to");
+                mqttaction = json.getString("action");
+                if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestDatas")){
+                    data = DataManager.getInstance().getAllDevices2FastJson();
+                    json.put("action","responsedDevicesDatas");
+                    json.put("data", data);
+                    mqttUtil.publish(json.toJSONString());
+                    mqttaction="";
+                }else{
+                    if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestRemoterData")){
+                        String mac = json.getString("mac");
+                        List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac ));
+                        if(wifiRemoters.size()>0) {
+                            data = JSON.parseObject(wifiRemoters.get(0).toJson());
+                            json.put("action","responsedRemoterDeviceData");
+                            json.put("data", data);
+                            mqttUtil.publish(json.toJSONString());
+                            mqttaction="";
+                        }
+                    }else {
+                        if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedDevicesDatas")) {
+                            data = json.getJSONObject("data");
+                            Dialogs.alertMessage(getContext(), "Shared devices data:\n", data.toJSONString());
+                            if (data.toJSONString().contains("cameras")) {
+                                JSONArray cameras = data.getJSONArray("cameras");
+                                List<Camera> cams = JSON.parseArray(cameras.toJSONString(), Camera.class);
+                                MyApplication.liteOrm.cascade().save(cams);
+                            }
+
+                            if (data.toJSONString().contains("bluetooths")) {
+                                JSONArray bluetooths = data.getJSONArray("bluetooths");
+                                List<Bluetooth> bles = JSON.parseArray(bluetooths.toJSONString(), Bluetooth.class);
+                                MyApplication.liteOrm.cascade().save(bles);
+                            }
+
+                            if (data.toJSONString().contains("wifiremoters")) {
+                                JSONArray wifiremoters = data.getJSONArray("wifiremoters");
+                                List<WifiRemoter> wifiRemoters = JSON.parseArray(wifiremoters.toJSONString(), WifiRemoter.class);
+                                MyApplication.liteOrm.cascade().save(wifiRemoters);
+                            }
+
+                            //refreshDataSet();
+
+                            mqttaction = "";
+                        }else{
+                            if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedRemoterDeviceData")) {
+                                data = json.getJSONObject("data");
+                                WifiRemoter wr = (WifiRemoter) JSON.parseArray(data.toJSONString(), WifiRemoter.class);
+                                MyApplication.liteOrm.cascade().save(wr);
+                            }
+                        }
                     }
                 }
             }catch (Exception e) {
@@ -830,13 +844,22 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             Log.i("TF-MQTT----", "连接成功 ");
             mqttUtil.isConnectSuccess = true;
             try {
-                mqttUtil.getMqttAndroidClient().subscribe(shareDevicePublishTopic, 2);//订阅主题，参数：主题、服务质量
-                if (mqttstep==1){
-                    JSONObject json = new JSONObject();
-                    json.put("msgid",mCurrMsgId);
+                mqttUtil.getMqttAndroidClient().subscribe(mqttUtil.getPUBLISH_TOPIC(), 0);//订阅主题，参数：主题、服务质量
+                JSONObject json = new JSONObject();
+                if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("sharealldevices")){
+                    json.put("from", fromMsgClientId);
+                    json.put("to", toMsgClientId);
                     json.put("action","requestDatas");
-                    mqttUtil.publish(shareDeviceResponseTopic, 2, json.toJSONString());
+                }else{
+                    if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("shareRemoterDevice")) {
+                        json.put("from", fromMsgClientId);
+                        json.put("to", toMsgClientId);
+                        json.put("mac", shareRemoterMac);
+                        json.put("action", "requestRemoterData");
+                    }
                 }
+                mqttUtil.publish(mqttUtil.getPUBLISH_TOPIC(), 0, json.toJSONString());
+                mqttaction = "";
             } catch (MqttException e) {
                 e.printStackTrace();
             }

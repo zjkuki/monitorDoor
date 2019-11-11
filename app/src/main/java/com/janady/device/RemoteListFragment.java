@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.adapter.WifiRemoterDeviceAdapter;
+import com.janady.database.model.WifiRemoter;
 import com.lkd.smartlocker.R;
 import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
@@ -32,8 +34,8 @@ public class RemoteListFragment extends JBaseFragment {
     QMUIPullRefreshLayout mPullRefreshLayout;
     //    private BaseRecyclerAdapter<FunDevice> mItemAdapter;
 //    private List<FunDevice> mFunDevices;
-    private BaseRecyclerAdapter<Bluetooth> mItemAdapter;
-    private List<Bluetooth> mBluetooths;
+    private BaseRecyclerAdapter<WifiRemoter> mItemAdapter;
+    private List<WifiRemoter> mWifiRemoters;
     @Override
     protected View onCreateView() {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
@@ -69,7 +71,7 @@ public class RemoteListFragment extends JBaseFragment {
         return rootView;
     }
     private void initTopBar() {
-        mTopBar.setTitle("我的蓝牙设备");
+        mTopBar.setTitle("我的远程控制设备");
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,19 +90,18 @@ public class RemoteListFragment extends JBaseFragment {
     }
 
     private void initRecyclerView() {
-        mBluetooths = MyApplication.liteOrm.query(Bluetooth.class);
-        mItemAdapter = new BluetoothDeviceAdapter(getContext(), mBluetooths);
+        mWifiRemoters= MyApplication.liteOrm.cascade().query(WifiRemoter.class);
+        mItemAdapter = new WifiRemoterDeviceAdapter(getContext(), mWifiRemoters);
         mItemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View itemView, int pos) {
-                /*BluetoothOperatorFragment bluetoothOperatorFragment = new BluetoothOperatorFragment();
-                bluetoothOperatorFragment.setBluetoothDevice(mBluetooths.get(pos));
-                startFragment(bluetoothOperatorFragment);*/
-                BluetoothLockFragment bluetoothLockFragment = new BluetoothLockFragment();
-                bluetoothLockFragment.bleLocker = new BleLocker(mBluetooths.get(pos),false,800,null);
-                bluetoothLockFragment.bleLocker.setmNoRssi(true);
-                bluetoothLockFragment.isDebugViewOpen = true;
-                startFragment(bluetoothLockFragment);
+                Intent intent = new Intent();
+                intent.setClass(getContext(), WifiRemoterBoardActivity.class);
+                intent.putExtra("WIFI_DEVICE_MAC", mWifiRemoters.get(pos).mac);
+                intent.putExtra("WIFI_DEVICE_SCENE", mWifiRemoters.get(pos).sceneName);
+                intent.putExtra("WIFI_DEVICE_SN", mWifiRemoters.get(pos).devName);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 //popBackStack();
             }
         });
@@ -119,7 +120,7 @@ public class RemoteListFragment extends JBaseFragment {
             @Override
             public void onReceive(Context context, Intent intent){
                 String msg = intent.getStringExtra("data");
-                if("ble_list_refresh".equals(msg)){
+                if("wifiremoter_list_refresh".equals(msg)){
                     initRecyclerView();
                 }
             }
