@@ -120,5 +120,8 @@ dependencies {
     implementation 'com.github.HanHuoBin:BaseDialog:1.2.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:2.0.4'
     implementation 'com.github.huangxiaoguo1:hxgsecurity:1.0.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
 

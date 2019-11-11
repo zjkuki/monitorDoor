@@ -62,8 +62,11 @@ import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffset
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
 import org.eclipse.jetty.util.IO;
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.IOException;
@@ -92,8 +95,17 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private MqttUtil mqttUtil = null;
 
-    private String mMsgId = "";
+    private String mCurrMsgId = "";
     private String mMsgIdFromQR = "";
+
+    private int mqttstep = 0;
+    private String shareDevicePublishTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/message";
+    private String shareDeviceResponseTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/response";
+
+    private String clientShareDevicePublishTopic = "";
+    private String clientShareDeviceResponseTopic = "";
+
+    private String mqttclientid = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 
     @Override
     protected View onCreateView() {
@@ -157,8 +169,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         initTopBar();
         initRecyclerView();
-        mqttUtil = MqttUtil.getInstance(getContext());
-        mqttUtil.setMqttCallBack(mqttCallback);
         return rootView;
     }
 
@@ -223,17 +233,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 switch (item.getItemId()) {
                     case R.id.menu_main:
                         try{
-                            //JSONObject data = DataManager.getInstance().getAllDevices2FastJson();
-
                             JSONObject json = new com.alibaba.fastjson.JSONObject();
 
                             long ctime = new Date().getTime();
-                            String msgid="from:"+FunSupport.getInstance().getUserName()+"@"+ctime;
-
+                            //shareDevicePublishTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/message";
+                            //shareDeviceResponseTopic = "lkd_app/"+FunSupport.getInstance().getUserName()+"/response";
+                            //String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
+                            String msgid=mqttclientid;
                             json.put("msgid", msgid);
                             json.put("action","sharealldevices");
 
-                            mMsgId = msgid;
+                            //mCurrMsgId = msgid;
+
 
                             Log.d("--TF--",json.toJSONString());
 
@@ -246,11 +257,16 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             String uncompress = GZIP.unCompress(compress);
                             Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);*/
 
+                            mqttUtil =  new MqttUtil(getContext(), mqttclientid,2, shareDevicePublishTopic, shareDevicePublishTopic, iMqttActionListener,mqttCallback);
                             //mqttUtil.publish(json.toJSONString());
-                            mqttUtil.publish(MqttUtil.PUBLISH_TOPIC, 2, json.toJSONString());
 
-                            String content = Base64.encodeToString(msgid.getBytes(), Base64.DEFAULT);
+                            //mqttUtil.publish(MqttUtil.PUBLISH_TOPIC, 2, json.toJSONString());
 
+                            //json.clear();
+                            //json.put("msgid",msgid);
+                            json.put("SDPT", shareDevicePublishTopic);
+                            json.put("SDRT", shareDevicePublishTopic);
+                            String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
                             //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
                             JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
                             mQrCodeBmp=makeQRCode(content);
@@ -497,8 +513,19 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     String result=data.getStringExtra("result");
                     String uncompress = new String(Base64.decode(result.getBytes(),Base64.DEFAULT));
                     Dialogs.alertMessage(getContext(), "扫描结果", uncompress);
-                    mMsgIdFromQR = uncompress;
+                    //mMsgIdFromQR = uncompress;
 
+                    JSONObject json = JSONObject.parseObject(uncompress);
+                    long ctime = new Date().getTime();
+                    String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
+                    //mCurrMsgId = json.getString("msgid");
+                    shareDevicePublishTopic = json.getString("SDPT");
+                    shareDeviceResponseTopic = json.getString("SDRT");
+                    mqttUtil =  new MqttUtil(getContext(), mqttclientid, 2, shareDevicePublishTopic, shareDevicePublishTopic,iMqttActionListener,mqttCallback);
+
+                    mqttstep=1;
+
+                    mMsgIdFromQR = mCurrMsgId;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -657,7 +684,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             refreshDataSet();
             //}
-            mHandler.postDelayed(searchDevices, 3000);//每n秒执行一次runnable.
+            mHandler.postDelayed(searchDevices, 5000);//每n秒执行一次runnable.
         }
     };
 
@@ -756,12 +783,22 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             Log.i("TF", "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
+            Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
             try{
                 JSONObject json = JSONObject.parseObject(message.toString());
                 String msgid= json.getString("msgid");
                 String action = json.getString("action");
-                if(msgid == mMsgIdFromQR && action == "sharealldevices"){
-                    Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
+                if(msgid.equals(mCurrMsgId) && action == "sharealldevices"){
+                    Dialogs.alertMessage(getContext(), "mqtt reciver", json.getString("data"));
+                }else{
+                    if(msgid.equals(mCurrMsgId) && action.equals("requestDatas")){
+                        JSONObject data = DataManager.getInstance().getAllDevices2FastJson();
+                        json.put("action","responDatas");
+                        json.put("data", data);
+
+                        mqttstep=0;
+                        mqttUtil.publish(json.toJSONString());
+                    }
                 }
             }catch (Exception e) {
                 e.printStackTrace();
@@ -782,6 +819,35 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             Log.i("TF", "连接断开");
             mqttUtil.disconnect();//连接断开，重连
             mqttUtil = MqttUtil.getInstance(getContext());
+        }
+    };
+
+    //MQTT是否连接成功的监听
+    private IMqttActionListener iMqttActionListener = new IMqttActionListener() {
+
+        @Override
+        public void onSuccess(IMqttToken arg0) {
+            Log.i("TF-MQTT----", "连接成功 ");
+            mqttUtil.isConnectSuccess = true;
+            try {
+                mqttUtil.getMqttAndroidClient().subscribe(shareDevicePublishTopic, 2);//订阅主题，参数：主题、服务质量
+                if (mqttstep==1){
+                    JSONObject json = new JSONObject();
+                    json.put("msgid",mCurrMsgId);
+                    json.put("action","requestDatas");
+                    mqttUtil.publish(shareDeviceResponseTopic, 2, json.toJSONString());
+                }
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onFailure(IMqttToken arg0, Throwable arg1) {
+            arg1.printStackTrace();
+            Log.i("TF-MQTT----", "onFailure 连接失败:" + arg1.getMessage());
+            mqttUtil.isConnectSuccess = false;
+            mqttUtil.getHandler().sendEmptyMessageDelayed(mqttUtil.getHAND_RECONNECT(), mqttUtil.getRECONNECT_TIME_CONFIG());
         }
     };
 }
