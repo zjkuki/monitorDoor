@@ -70,8 +70,8 @@ public final class CameraConfigurationManager {
 
 		/** 因为换成了竖屏显示，所以不替换屏幕宽高得出的预览图是变形的 */
 		Point screenResolutionForCamera = new Point();
-		screenResolutionForCamera.x = screenResolution.x;
-		screenResolutionForCamera.y = screenResolution.y;
+		screenResolutionForCamera.x = screenResolution.x*8/10;
+		screenResolutionForCamera.y = screenResolution.y*7/10;
 
 		if (screenResolution.x < screenResolution.y) {
 			screenResolutionForCamera.x = screenResolution.y;

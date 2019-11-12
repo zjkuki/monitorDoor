@@ -1,5 +1,8 @@
 package com.janady.database.model;
 
+import android.util.Log;
+
+import com.alibaba.fastjson.JSON;
 import com.lib.funsdk.support.models.FunDevType;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
@@ -49,6 +52,12 @@ public class Bluetooth {
                 ", sceneName = " + sceneName +
                 ", isOnline = " + isOnline
                 + "} ";
+    }
+
+    public String toJson() {
+        String json = JSON.toJSONString(this);
+        Log.d("Bluetooth Model", "Bluetooth Json:\n"+json);
+        return json;
     }
 
 }

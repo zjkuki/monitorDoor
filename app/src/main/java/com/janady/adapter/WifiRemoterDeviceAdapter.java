@@ -17,6 +17,7 @@ import com.basic.G;
 import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
 import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
@@ -49,7 +50,6 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
     private JDialogModifyPasswd inputDialog = null;
     private AlertDialog.Builder builder = null;
     private int step = 0; //0-正常   1-输入密码
-    private String mqttclientid = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 
     public WifiRemoterDeviceAdapter(Context ctx, List<WifiRemoter> data) {
         super(ctx, data);
@@ -107,24 +107,22 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
                 try {
                     JSONObject json = new com.alibaba.fastjson.JSONObject();
 
-                    String shareDevicePublishTopic = "lkd_app/" + mqttclientid + "/message";
-                    String shareDeviceResponseTopic = "lkd_app/" + mqttclientid+ "/response";
-                    json.put("from", mqttclientid);
+                    json.put("from", MqttUtil.getCLIENTID());
                     json.put("action", "shareRemoterDevice");
                     json.put("mac", mCurrWifiRemoter.mac);
 
-                    json.put("SDPT", shareDevicePublishTopic);
-                    json.put("SDRT", shareDevicePublishTopic);
+                    //json.put("SDPT", shareDevicePublishTopic);
+                    //json.put("SDRT", shareDevicePublishTopic);
                     String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
                     //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
                     JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
                     Bitmap mQrCodeBmp=makeQRCode(content);
                     dialogBuild.setImage(mQrCodeBmp);
+                    dialogBuild.setDialog_msg("您正在分享WIFI控制器-"+mCurrWifiRemoter.sceneName);
                     JQrcodePopDialog dialog = dialogBuild.create();
-                    dialog.setTitle("您正在分享远程控制器-"+mCurrWifiRemoter.name);
                     dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
                     dialog.show();
-                    Dialogs.alertMessage(context, "json", json.toJSONString());
+                    //Dialogs.alertMessage(context, "json", json.toJSONString());
 
                 }catch (Exception e){
                     e.printStackTrace();

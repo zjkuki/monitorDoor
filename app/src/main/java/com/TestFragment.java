@@ -1,5 +1,6 @@
 package com;
 
+import android.app.Notification;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -96,6 +97,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private FloatingActionButton fabScanQrCode;
     private Bitmap mQrCodeBmp = null;
 
+    private Thread thSearchDevice;
 
     private MqttUtil mqttUtil = null;
 
@@ -109,7 +111,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private String clientShareDevicePublishTopic = "";
     private String clientShareDeviceResponseTopic = "";
 
-    private String mqttclientid = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
+    private String mqttclientid =MqttUtil.getCLIENTID();
 
     private String shareCamMac ="";
     private String shareBleMac ="";
@@ -119,6 +121,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     protected View onCreateView() {
         startBluetooth();
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
+
+        thSearchDevice = new Thread(searchDevices);
 
         mTopBar = rootView.findViewById(R.id.topbar);
         bnve = rootView.findViewById(R.id.bnve);
@@ -174,6 +178,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 Log.i("TestFragment", "done!");
             }
         }.start();*/
+
+        shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
+        shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
+        mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
 
         initTopBar();
         initRecyclerView();
@@ -241,39 +249,47 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 switch (item.getItemId()) {
                     case R.id.menu_main:
                         try{
-                            JSONObject json = new com.alibaba.fastjson.JSONObject();
+                            Dialogs.alertDialog2Btn(getContext(), "分享提示", "本操作将分享您全部已添加的设备，您确定要继续吗？", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    JSONObject json = new com.alibaba.fastjson.JSONObject();
 
-                            shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
-                            shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
-                            //String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
-                            fromMsgClientId = mqttclientid;
-                            json.put("from", fromMsgClientId);
-                            json.put("action","sharealldevices");
+                                    //String msgid=FunSupport.getInstance().getUserName()+"@"+ctime;
+                                    fromMsgClientId = mqttclientid;
+
+                                    json.put("from", fromMsgClientId);
+                                    json.put("action", "sharealldevices");
 
 
-                            Log.d("--TF--",json.toJSONString());
+                                    Log.d("--TF--", json.toJSONString());
 
-                            //String str="看甲方时点击翻身肯\n";  //内容大小控制在240byte， >240 进行压缩·否则不压··
-                            /*Log.d("TF","原文大小："+str.getBytes().length+" \n压缩前："+str);
+                                    //String str="看甲方时点击翻身肯\n";  //内容大小控制在240byte， >240 进行压缩·否则不压··
+                                    /*Log.d("TF","原文大小："+str.getBytes().length+" \n压缩前："+str);
 
-                            String compress = GZIP.compress(str);
-                            Log.d("TF","解压大小："+compress.getBytes().length+" \n压缩后："+compress);
+                                    String compress = GZIP.compress(str);
+                                    Log.d("TF","解压大小："+compress.getBytes().length+" \n压缩后："+compress);
 
-                            String uncompress = GZIP.unCompress(compress);
-                            Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);*/
+                                    String uncompress = GZIP.unCompress(compress);
+                                    Log.d("TF","解压大小："+uncompress.getBytes().length+" \n解压缩："+uncompress);*/
 
-                            mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
+                                    //json.put("SDPT", shareDevicePublishTopic);
+                                    //json.put("SDRT", shareDevicePublishTopic);
+                                    String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
+                                    //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
+                                    JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
+                                    mQrCodeBmp = makeQRCode(content);
+                                    dialogBuild.setImage(mQrCodeBmp);
+                                    JQrcodePopDialog jqdialog = dialogBuild.create();
+                                    jqdialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
+                                    jqdialog.show();
+                                }
+                            }, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    return;
+                                }
+                            });
 
-                            json.put("SDPT", shareDevicePublishTopic);
-                            json.put("SDRT", shareDevicePublishTopic);
-                            String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
-                            //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
-                            JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
-                            mQrCodeBmp=makeQRCode(content);
-                            dialogBuild.setImage(mQrCodeBmp);
-                            JQrcodePopDialog dialog = dialogBuild.create();
-                            dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
-                            dialog.show();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -310,6 +326,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         fabScanQrCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ClientManager.getClient().stopSearch();
+                thSearchDevice.interrupt();
+                mHandler.removeCallbacksAndMessages(null);
+
                 Intent intent = new Intent();
                 intent.setClass(getContext(), CaptureActivity.class);
                 startActivityForResult(intent, 1);
@@ -348,6 +368,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onItemClick(ItemDescription itemDescription) {
         ClientManager.getClient().stopSearch();
+        thSearchDevice.interrupt();
         mHandler.removeCallbacksAndMessages(null);
         if(!itemDescription.getEnable()){
             return;
@@ -383,6 +404,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
                 intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
                 intent.putExtra("FUN_DEVICE_SN", citem.sn);
+                intent.putExtra("FUN_DEVICE_MAC", citem.mac);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
@@ -423,6 +445,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {
         ClientManager.getClient().stopSearch();
+        thSearchDevice.interrupt();
         mHandler.removeCallbacksAndMessages(null);
         JBaseFragment fragment = null;
         Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
@@ -447,7 +470,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     public void onResume() {
         //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
-        new Thread(searchDevices).start();
+        //new Thread(searchDevices).start();
+        thSearchDevice = new Thread(searchDevices);
+        thSearchDevice.start();
 
         super.onResume();
     }
@@ -480,7 +505,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 try {
                     String result=data.getStringExtra("result");
                     String uncompress = new String(Base64.decode(result.getBytes(),Base64.DEFAULT));
-                    Dialogs.alertMessage(getContext(), "扫描结果", uncompress);
+                    //Dialogs.alertMessage(getContext(), "扫描结果", uncompress);
 
                     JSONObject json = JSONObject.parseObject(uncompress);
                     long ctime = new Date().getTime();
@@ -489,13 +514,14 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     fromMsgClientId = json.getString("from");
                     toMsgClientId = mqttclientid;
                     mqttaction = json.getString("action");
-                    if(mqttaction.equals("shareRemoterDevice")){
+                    if(mqttaction.equals("shareRemoterDevice") || mqttaction.equals("shareCameraDevice") || mqttaction.equals("shareBluetoothDevice")){
                         shareRemoterMac = json.getString("mac");
                     }
 
-
-                    shareDevicePublishTopic = json.getString("SDPT");
-                    shareDeviceResponseTopic = json.getString("SDRT");
+                    shareDevicePublishTopic = "lkd_app/"+fromMsgClientId+"/message";
+                    shareDeviceResponseTopic = "lkd_app/"+fromMsgClientId+"/response";
+                    //shareDevicePublishTopic = json.getString("SDPT");
+                    //shareDeviceResponseTopic = json.getString("SDRT");
 
                     mqttUtil =  new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic,iMqttActionListener,mqttCallback);
                 } catch (Exception e) {
@@ -529,6 +555,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         if(hidden) {
             ClientManager.getClient().stopSearch();
             mHandler.removeCallbacksAndMessages(null);
+            thSearchDevice.interrupt();
         }
     }
     private synchronized void  refreshDataSet() {
@@ -737,7 +764,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private Bitmap makeQRCode(String content){
         // 生成二维码
         Bitmap qrCodeBmp = UIFactory.createCode(
-                content, 600, 0xff202020);
+                content, 800, 0xff202020);
         if ( null != qrCodeBmp ) {
             if ( null !=  mQrCodeBmp ) {
                 mQrCodeBmp.recycle();
@@ -781,39 +808,80 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             mqttaction="";
                         }
                     }else {
-                        if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedDevicesDatas")) {
-                            data = json.getJSONObject("data");
-                            Dialogs.alertMessage(getContext(), "Shared devices data:\n", data.toJSONString());
-                            if (data.toJSONString().contains("cameras")) {
-                                JSONArray cameras = data.getJSONArray("cameras");
-                                List<Camera> cams = JSON.parseArray(cameras.toJSONString(), Camera.class);
-                                MyApplication.liteOrm.cascade().save(cams);
+                        if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestCameraData")){
+                            String mac = json.getString("mac");
+                            List<Camera> cameras = MyApplication.liteOrm.cascade().query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_MAC, mac ));
+                            if(cameras.size()>0) {
+                                data = JSON.parseObject(cameras.get(0).toJson());
+                                json.put("action","responsedCameraDeviceData");
+                                json.put("data", data);
+                                mqttUtil.publish(json.toJSONString());
+                                mqttaction="";
                             }
+                        }else {
+                            if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestBluetoothData")){
+                                String mac = json.getString("mac");
+                                List<Bluetooth> bles = MyApplication.liteOrm.cascade().query(new QueryBuilder<Bluetooth>(Bluetooth.class).whereEquals(Bluetooth.COL_MAC, mac ));
+                                if(bles.size()>0) {
+                                    data = JSON.parseObject(bles.get(0).toJson());
+                                    json.put("action","responsedBluetoothDeviceData");
+                                    json.put("data", data);
+                                    mqttUtil.publish(json.toJSONString());
+                                    mqttaction="";
+                                }
+                            }else {
+                                if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedDevicesDatas")) {
+                                    data = json.getJSONObject("data");
+                                    //Dialogs.alertMessage(getContext(), "Shared devices data:\n", data.toJSONString());
+                                    if (data.toJSONString().contains("cameras")) {
+                                        JSONArray cameras = data.getJSONArray("cameras");
+                                        List<Camera> cams = JSON.parseArray(cameras.toJSONString(), Camera.class);
+                                        MyApplication.liteOrm.cascade().save(cams);
+                                    }
 
-                            if (data.toJSONString().contains("bluetooths")) {
-                                JSONArray bluetooths = data.getJSONArray("bluetooths");
-                                List<Bluetooth> bles = JSON.parseArray(bluetooths.toJSONString(), Bluetooth.class);
-                                MyApplication.liteOrm.cascade().save(bles);
-                            }
+                                    if (data.toJSONString().contains("bluetooths")) {
+                                        JSONArray bluetooths = data.getJSONArray("bluetooths");
+                                        List<Bluetooth> bles = JSON.parseArray(bluetooths.toJSONString(), Bluetooth.class);
+                                        MyApplication.liteOrm.cascade().save(bles);
+                                    }
 
-                            if (data.toJSONString().contains("wifiremoters")) {
-                                JSONArray wifiremoters = data.getJSONArray("wifiremoters");
-                                List<WifiRemoter> wifiRemoters = JSON.parseArray(wifiremoters.toJSONString(), WifiRemoter.class);
-                                MyApplication.liteOrm.cascade().save(wifiRemoters);
-                            }
+                                    if (data.toJSONString().contains("wifiremoters")) {
+                                        JSONArray wifiremoters = data.getJSONArray("wifiremoters");
+                                        List<WifiRemoter> wifiRemoters = JSON.parseArray(wifiremoters.toJSONString(), WifiRemoter.class);
+                                        MyApplication.liteOrm.cascade().save(wifiRemoters);
+                                    }
 
-                            //refreshDataSet();
+                                    //refreshDataSet();
 
-                            mqttaction = "";
-                        }else{
-                            if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedRemoterDeviceData")) {
-                                data = json.getJSONObject("data");
-                                WifiRemoter wr = (WifiRemoter) JSON.parseArray(data.toJSONString(), WifiRemoter.class);
-                                MyApplication.liteOrm.cascade().save(wr);
+                                } else {
+                                    if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedRemoterDeviceData")) {
+                                        data = json.getJSONObject("data");
+                                        List<WifiRemoter> wr =  JSON.parseArray("["+data.toJSONString()+"]", WifiRemoter.class);
+                                        if(wr.size()>0) {
+                                            MyApplication.liteOrm.cascade().save(wr.get(0));
+                                        }else{
+                                            return;
+                                        }
+                                    } else {
+                                        if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedCameraDeviceData")) {
+                                            data = json.getJSONObject("data");
+                                            Camera cam = (Camera) JSON.parseObject(data.toJSONString(), Camera.class);
+                                            MyApplication.liteOrm.cascade().save(cam);
+                                        } else {
+                                            if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedBluetoothDeviceData")) {
+                                                data = json.getJSONObject("data");
+                                                Bluetooth ble = (Bluetooth) JSON.parseObject(data.toJSONString(), Bluetooth.class);
+                                                MyApplication.liteOrm.cascade().save(ble);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+                mqttaction = "";
             }catch (Exception e) {
                 e.printStackTrace();
             }
@@ -832,7 +900,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         public void connectionLost(Throwable arg0) {
             Log.i("TF", "连接断开");
             mqttUtil.disconnect();//连接断开，重连
-            mqttUtil = MqttUtil.getInstance(getContext());
+            mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
         }
     };
 
@@ -851,11 +919,25 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     json.put("to", toMsgClientId);
                     json.put("action","requestDatas");
                 }else{
-                    if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("shareRemoterDevice")) {
+                    if (toMsgClientId.equals(mqttclientid) && (mqttaction.equals("shareRemoterDevice")  || mqttaction.equals("shareCameraDevice") || mqttaction.equals("shareBluetoothDevice"))) {
                         json.put("from", fromMsgClientId);
                         json.put("to", toMsgClientId);
                         json.put("mac", shareRemoterMac);
-                        json.put("action", "requestRemoterData");
+                        if(mqttaction.equals("shareRemoterDevice")){
+                            mqttaction = "requestRemoterData";
+                        }else{
+                            if(mqttaction.equals("shareCameraDevice")){
+                                mqttaction = "requestCameraData";
+                            }else{
+                                if(mqttaction.equals("shareBluetoothDevice")){
+                                    mqttaction = "requestBluetoothData";
+                                }else{
+                                    mqttaction = "";
+                                    return;
+                                }
+                            }
+                        }
+                        json.put("action", mqttaction);
                     }
                 }
                 mqttUtil.publish(mqttUtil.getPUBLISH_TOPIC(), 0, json.toJSONString());

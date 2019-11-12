@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.lkd.smartlocker.R;
 
@@ -23,8 +24,13 @@ public class JQrcodePopDialog extends Dialog {
     public static class Builder {
         private Context context;
         private Bitmap image;
+        private String dialog_msg = "请使用本APP扫描设备分享二维码" ;
 
         public Builder(Context context) {
+            this.context = context;
+        }
+        public Builder(Context context, String Dialog_msg) {
+            this.dialog_msg = Dialog_msg;
             this.context = context;
         }
 
@@ -35,6 +41,9 @@ public class JQrcodePopDialog extends Dialog {
         public void setImage(Bitmap image) {
             this.image = image;
         }
+
+        public String getDialog_msg(){return dialog_msg;}
+        public void setDialog_msg(String msg){this.dialog_msg = msg; }
 
         public JQrcodePopDialog create() {
             LayoutInflater inflater = (LayoutInflater) context
@@ -47,6 +56,8 @@ public class JQrcodePopDialog extends Dialog {
             dialog.setContentView(layout);
             ImageView img = (ImageView)layout.findViewById(R.id.img_qrcode);
             img.setImageBitmap(getImage());
+            TextView tv_dialog_msg = (TextView)layout.findViewById(R.id.tv_qrdialog_msg);
+            tv_dialog_msg.setText(getDialog_msg());
             return dialog;
         }
     }

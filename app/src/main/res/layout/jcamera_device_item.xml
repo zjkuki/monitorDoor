@@ -59,9 +59,16 @@
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="80dp"
+        android:layout_width="100dp"
         android:layout_height="fill_parent">
-
+        <ImageButton
+            android:id="@+id/ibcamshare"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginRight="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_share_blue_24dp" />
         <ImageButton
             android:id="@+id/ibCamLocalFile"
             android:layout_width="wrap_content"

@@ -1,8 +1,12 @@
 package com.janady;
 
+import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import com.inuker.bluetooth.library.utils.BluetoothLog;
@@ -17,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import io.fogcloud.fog_mqtt.api.MQTT;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,12 +45,12 @@ public class MqttUtil {
     @Getter @Setter public boolean isConnectionLost = true;
 
     //MQTT相关配置
-    private final long cid = System.currentTimeMillis();
-    @Getter @Setter String CLIENTID = "LKD_APP_"+FunSupport.getInstance().getUserName()+"@"+cid;
+    private final static long cid = System.currentTimeMillis();
+    @Getter @Setter public static String CLIENTID = "LKD_APP_"+FunSupport.getInstance().getUserName()+"@"+cid;
 
-    @Getter @Setter public String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
-    @Getter @Setter public String USERNAME = "admin";//用户名
-    @Getter @Setter public String PASSWORD = "public";//密码
+    @Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
+    @Getter @Setter public static String USERNAME = "admin";//用户名
+    @Getter @Setter public static String PASSWORD = "public";//密码
     @Getter @Setter public static String PUBLISH_TOPIC = "lkd_smart_locker_app/message";//发布主题
     @Getter @Setter public static String RESPONSE_TOPIC = "lkd_smart_locker_app/message";//订阅主题
     @Getter @Setter public static String[] PUBLISH_TOPICS = {""};//发布主题
@@ -75,6 +80,7 @@ public class MqttUtil {
             }
         }
     };
+
 
     //MQTT是否连接成功的监听
     private IMqttActionListener iMqttActionListener = new IMqttActionListener() {
@@ -303,5 +309,6 @@ public class MqttUtil {
             e.printStackTrace();
         }
     }
+
 
 }

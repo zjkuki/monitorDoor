@@ -70,7 +70,7 @@ public class WifiRemoter {// 指定一对多关系
 
     public String toJson() {
         String json = JSON.toJSONString(this);
-        Log.d("Camera Model", "Camera Json:\n"+json);
+        Log.d("WifiRemoter Model", "WifiRemoter Json:\n"+json);
         return json;
     }
 }

@@ -123,6 +123,8 @@ public class CameraListFragment extends JBaseFragment {
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
                 intent.putExtra("FUN_DEVICE_SCENE", mFunDevices.get(pos).sceneName);
                 intent.putExtra("FUN_DEVICE_TYPE", mFunDevices.get(pos).type);
+                intent.putExtra("FUN_DEVICE_SN", mFunDevices.get(pos).sn);
+                intent.putExtra("FUN_DEVICE_MAC", mFunDevices.get(pos).mac);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 //startFragment(deviceCameraFragment);

@@ -43,6 +43,8 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!-- bluetooth lock -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -478,7 +480,7 @@
 
         <!--mqtt service-->
         <!--<service android:name="io.fogcloud.fog_mqtt.service.MqttService" />-->
-        <service android:name="org.eclipse.paho.android.service.MqttService" />
+        <service android:name="org.eclipse.paho.android.service.MqttService" android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

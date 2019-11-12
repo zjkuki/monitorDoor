@@ -47,7 +47,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<Recycl
     protected Bitmap makeQRCode(String content){
         // 生成二维码
         Bitmap qrCodeBmp = UIFactory.createCode(
-                content, 600, 0xff202020);
+                content, 800, 0xff202020);
         if ( null != qrCodeBmp ) {
             if ( null !=  mQrCodeBmp ) {
                 mQrCodeBmp.recycle();

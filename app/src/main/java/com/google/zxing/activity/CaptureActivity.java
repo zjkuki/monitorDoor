@@ -281,7 +281,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 		/** 计算最终截取的矩形的高度 */
 		int height = cropHeight * cameraHeight / containerHeight;
 
+		int delta = (int) ((int) width * 0.51);
 		/** 生成最终的截取的矩形 */
+		//mCropRect = new Rect(x, y, width + x, height + y);
 		mCropRect = new Rect(x, y, width + x, height + y);
 	}
 

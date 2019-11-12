@@ -192,8 +192,13 @@ public class DeviceCameraActivity
             return null;
         }
     }
-	private void initCamera(int devId, String sn){
+	private void initCamera(int devId,String sn, String mac){
         //cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));
+		/*cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_MAC, mac));
+		if(cams.size()>0){
+			camera = cams.get(0);
+		}*/
+
         cams = MyApplication.liteOrm.query(Camera.class);
         if(cams.size()>0){
             currIndex = 0;
@@ -201,9 +206,15 @@ public class DeviceCameraActivity
                 if(cams.get(i).sn.equals(sn)) {
                     camera = cams.get(i);
                     currIndex = i;
-                }
+                }else{
+					if(cams.get(i).mac.equals(mac)) {
+						camera = cams.get(i);
+						currIndex = i;
+					}
+				}
             }
         }
+
 		//mTextTitle.setText(mFunDevice.devName);
 		if(!camera.isOnline){
 			mTextTitle.setText(camera.sceneName+"-摄像机(离线)");
@@ -416,8 +427,9 @@ public class DeviceCameraActivity
 		int devId = getIntent().getIntExtra("FUN_DEVICE_ID", 0);
 		String sceneName = getIntent().getStringExtra("FUN_DEVICE_SCENE");
 		String sn = getIntent().getStringExtra("FUN_DEVICE_SN");
+		String mac = getIntent().getStringExtra("FUN_DEVICE_MAC");
 
-		initCamera(devId, sn);
+		initCamera(devId, sn, mac);
 
 		setStatusBar();
 	}
@@ -683,7 +695,7 @@ public class DeviceCameraActivity
 
                 if(getCamera(currIndex)!=null){
                     camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn);
+                    initCamera(camera.devId, camera.sn, camera.mac);
                 }else{
                 	currIndex++;
                 	Log.d("---DCA----","切换摄像机失败");
@@ -700,7 +712,7 @@ public class DeviceCameraActivity
 				}
                 if(getCamera(currIndex)!=null){
                     camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn);
+                    initCamera(camera.devId, camera.sn, camera.mac);
                 }else{
 					currIndex --;
 					Log.d("---DCA----","切换摄像机失败");

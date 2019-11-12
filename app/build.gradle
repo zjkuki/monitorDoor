@@ -35,6 +35,13 @@ android {
         ndk {
             abiFilters "armeabi",'x86'
         }
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
+
     }
 
     sourceSets {

@@ -4,15 +4,21 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.MqttUtil;
+import com.janady.common.JQrcodePopDialog;
+import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -24,6 +30,7 @@ import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
@@ -56,7 +63,11 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
 
     @Override
     public void bindData(RecyclerViewHolder holder, final int position, Bluetooth item) {
-        mCurrBleDev = item;
+        if (mDevs!=null) {
+            mCurrBleDev = mDevs.get(position);
+        }else{
+            return;
+        }
 
         holder.getTextView(R.id.item_ble_name).setText("场景："+item.sceneName);
         holder.getTextView(R.id.item_ble_sn).setText("SN："+item.name);
@@ -95,6 +106,32 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             }
         });
 
+        holder.getImageButton(R.id.ibbleshare).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    JSONObject json = new com.alibaba.fastjson.JSONObject();
+
+                    json.put("from", MqttUtil.getCLIENTID());
+                    json.put("action", "shareBluetoothDevice");
+                    json.put("mac", mCurrBleDev.mac);
+
+                    String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
+                    //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
+                    JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
+                    Bitmap mQrCodeBmp=makeQRCode(content);
+                    dialogBuild.setImage(mQrCodeBmp);
+                    dialogBuild.setDialog_msg("您正在分享蓝牙控制器-"+mCurrBleDev.sceneName);
+                    JQrcodePopDialog dialog = dialogBuild.create();
+                    dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
+                    dialog.show();
+                    //Dialogs.alertMessage(context, "json", json.toJSONString());
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
         mWaitDialog = new DialogWaitting(context);
 
         ibChaPasswd=holder.getImageButton(R.id.ibBleChangePassword);
