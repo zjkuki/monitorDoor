@@ -21,6 +21,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.example.funsdkdemo.MyApplication;
 import com.lkd.smartlocker.R;
 import com.janady.Dialogs;
 import com.janady.setup.JBaseFragment;
@@ -51,6 +52,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
     private RadioButton rbWifiRemoter = null;
     private TextView tvWifiReadMe = null;
     private TextView tvTips = null;
+
+    private CountDownTimer countDownTimer = null;
 
     private int mWifiDevice = 0;  //0-摄像头 1-控制板
     private EasyLink el;
@@ -248,7 +251,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                     }
                 });*/
             }
-            new CountDownTimer(60000, 1000) {
+            countDownTimer = new CountDownTimer(60000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     Log.i("WifiConfigFragment", "seconds remaining: " + millisUntilFinished / 1000);
@@ -257,8 +260,10 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
 
                 public void onFinish() {
                     //FunSupport.getInstance().stopWiFiQuickConfig();
+                    this.cancel();
                     hideWaitDialog();
-                    Dialogs.alertMessage(getContext(),"WIFI配置失败","设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
+                    //Dialogs.alertMessage(MyApplication.context,"WIFI配置失败","设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
+                    Log.d("WifiConfigFragment", "WIFI配置失败，设备配置WIFI超时，请检查WIFI或设备是否正常开启，请根据使用说明进行操作，使设备进入WIFI配网模式后重试。");
                     Log.i("WifiConfigFragment", "done!");
                 }
             }.start();
@@ -338,6 +343,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 intent.setClass(getContext(), DeviceAddByUser.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+
+                countDownTimer.cancel();
 
                 popBackStack();
             }

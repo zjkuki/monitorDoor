@@ -33,6 +33,7 @@ import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
 import com.example.funsdkdemo.MyApplication;
 import com.janady.AppManager;
 import com.janady.HomeActivity;
+import com.janady.MqttUtil;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.config.ModifyPassword;
 import com.lkd.smartlocker.R;
@@ -343,7 +344,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			@Override
 			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
 				//mWifiRemoterBoard = wifiRemoterBoard;
-				mWifiRemoter = wifiRemoterBoard.getWifiRemoter();
+				mWifiRemoter = wifiRemoterBoard.getMWifiRemoter();
 				List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
 						mWifiRemoter.mac));
 				if (wr != null && wr.size() > 0) {
@@ -359,15 +360,15 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mEditDevSN.setText(mWifiRemoter.name);
 				}
 
-				Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoterBoard.getWifiRemoter().name
-						+"\ndevName:"+wifiRemoterBoard.getWifiRemoter().devName
-						+"\nHost Url:"+wifiRemoterBoard.getWifiRemoter().hostUrl
-						+"\nPublic Topics:"+wifiRemoterBoard.getWifiRemoter().publictopic
-						+"\nSubscribe Topics:"+wifiRemoterBoard.getWifiRemoter().subscribetopic
-						+"\nClient Id:"+wifiRemoterBoard.getWifiRemoter().clientid
-						+"\nDevice Local IP:"+wifiRemoterBoard.getWifiRemoter().devIpAddr
-						+"\nDevice Local Port:"+ wifiRemoterBoard.getWifiRemoter().devPort
-						+"\nMac:"+wifiRemoterBoard.getWifiRemoter().mac);
+				Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoterBoard.getMWifiRemoter().name
+						+"\ndevName:"+wifiRemoterBoard.getMWifiRemoter().devName
+						+"\nHost Url:"+wifiRemoterBoard.getMWifiRemoter().hostUrl
+						+"\nPublic Topics:"+wifiRemoterBoard.getMWifiRemoter().publictopic
+						+"\nSubscribe Topics:"+wifiRemoterBoard.getMWifiRemoter().subscribetopic
+						+"\nClient Id:"+wifiRemoterBoard.getMWifiRemoter().clientid
+						+"\nDevice Local IP:"+wifiRemoterBoard.getMWifiRemoter().devIpAddr
+						+"\nDevice Local Port:"+ wifiRemoterBoard.getMWifiRemoter().devPort
+						+"\nMac:"+wifiRemoterBoard.getMWifiRemoter().mac);
 			}
 		});
 
@@ -653,20 +654,20 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								}
 
 								/*正式版应该从服务器获取设备MQTT设置*/
-								wr.hostUrl = "tcp://mqtt.xuanma.tech:1883";
+								wr.hostUrl = MqttUtil.getHOST();
 								wr.hostPort = "1883";
-								wr.clientid = "LKD_SMART_LOCKER_CLIENT";
+								wr.clientid = MqttUtil.getCLIENTID();
 								wr.publictopic = "hardware/from/server/" + tmp.getString("MAC").replace(":","");
 								wr.subscribetopic = "hardware/from/client/" + tmp.getString("MAC").replace(":","");
-								wr.hostUsername = "kuki";
-								wr.hostPassword = "123123";
+								wr.hostUsername = MqttUtil.getUSERNAME();
+								wr.hostPassword = MqttUtil.getPASSWORD();
 
 								wr.devName = tmp.getString("Name");
 								wr.devIpAddr = tmp.getString("IP");
 								wr.devPort = tmp.getString("Port");
 								wr.mac = tmp.getString("MAC");
 
-								WifiRemoterBoard wrb = new WifiRemoterBoard(mcontext, wr,null);
+								WifiRemoterBoard wrb = new WifiRemoterBoard(mcontext, wr);
 
 								if(matchWifiRemoterInList(wr.mac)){
 									Log.d("DeviceAddByUser", "Found Device in List");
@@ -693,7 +694,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		if (!Mac.equals("") ||  mWifiRemoterBoards.size()>0) {
 			//否则，匹配相应的数据
 			for (int i = 0; i < mWifiRemoterBoards.size(); i++) {
-				if (mWifiRemoterBoards.get(i).getWifiRemoter().mac.contains(Mac)) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
+				if (mWifiRemoterBoards.get(i).getMWifiRemoter().mac.contains(Mac)) {//这里可拓展自己想要的，甚至可以拆分搜索汉字来匹配
 					return true;
 				}
 			}

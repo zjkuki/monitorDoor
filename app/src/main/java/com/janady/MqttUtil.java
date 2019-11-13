@@ -35,7 +35,7 @@ import lombok.Setter;
 public class MqttUtil {
     private final String TAG = "------------->mqtt";
     private static MqttUtil mqttUtil;
-    private Context context;
+    @Getter @Setter private Context context;
 
     @Getter private MqttAndroidClient mqttAndroidClient;
 
@@ -46,7 +46,7 @@ public class MqttUtil {
 
     //MQTT相关配置
     private final static long cid = System.currentTimeMillis();
-    @Getter @Setter public static String CLIENTID = "LKD_APP_"+FunSupport.getInstance().getUserName()+"@"+cid;
+    @Getter @Setter public static String CLIENTID = FunSupport.getInstance().getUserName()+"@"+cid;
 
     @Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
     @Getter @Setter public static String USERNAME = "admin";//用户名
@@ -189,8 +189,8 @@ public class MqttUtil {
 
     }
 
-    private MqttUtil(Context context) {
-        this.context = context;
+    protected MqttUtil(Context context) {
+        this.context = this.context;
         initMqtt();
     }
 

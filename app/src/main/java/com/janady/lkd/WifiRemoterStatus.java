@@ -12,19 +12,19 @@ public enum WifiRemoterStatus {
     SET_STOP(7,"控制停\n"),
     DISCONNECTED(7,"已断开\n"),
     CONNECTED(8,"已连接\n"),
-    NOTIFY_SUCCESS(9,"消息通知\n"),
-    WRITE_SUCCESS(10,"发送成功\n"),
-    WRITE_FAIL(11,"发送失败\n"),
-    HEARTBEAT_SUCCESS(12,"心跳包\n"),
-    READ_RESPONSE_SUCCESS(13,"读取回复成功\n"),
-    READ_RESPONSE_FAIL(14,"读取回复失败\n"),
-    DEVICE_REDAY(15,"已准备\n"),
-    DEVICE_RSSI_GETTING(16,"获取Rssi\n"),
     LOCKED(17,"已锁\n"),
     UNLOCKED(18,"无锁\n"),
-    REDAY(19,"设备已就绪\n"),
     RESETTED(20,"设备已重置为出厂状态\n"),
-    NORESETTED(21,"正常配置状态\n");
+    NORESETTED(21,"正常配置状态\n"),
+    SET_OPEN_SUCCESS(200,"开门成功"),
+    SET_OPEN_FAILE(201,"开门失败"),
+    SET_CLOSE_SUCCESS(202,"关门成功"),
+    SET_CLOSE_FAILE(203,"关门失败"),
+    SET_LOCK_SUCCESS(204,"锁成功"),
+    SET_LOCK_FAILE(205,"锁失败"),
+    SET_STOP_SUCCESS(206,"停成功"),
+    SET_STOP_FAILE(207,"停失败");
+
 
 
     private int mStatusId;

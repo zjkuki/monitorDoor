@@ -561,7 +561,7 @@ public class WifiRemoterBoardActivity
 		List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
 		if(wifiRemoters.size()>0) {
 			mWifiRemoter = wifiRemoters.get(0);
-			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter, null);
+			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
 			if(mWifiRemoter.camera!=null) {
 				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn);
 			}else{
@@ -693,7 +693,7 @@ public class WifiRemoterBoardActivity
 						showCamera(cams.get(index[0]-1).devId, cams.get(index[0]-1).sn);
 
 						mWifiRemoter.camera = cams.get(index[0]-1);
-						wifiRemoterBoard.setWifiRemoter(mWifiRemoter);
+						wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
 						MyApplication.liteOrm.cascade().save(mWifiRemoter);
 						//MyApplication.liteOrm.save(mWifiRemoter);
 
@@ -992,10 +992,10 @@ public class WifiRemoterBoardActivity
 			case R.id.btnOpenCamear:
 			{
 
-				if(wifiRemoterBoard!=null && wifiRemoterBoard.getWifiRemoter()!=null){
-					if(wifiRemoterBoard.getWifiRemoter().camera!=null){
+				if(wifiRemoterBoard!=null && wifiRemoterBoard.getMWifiRemoter()!=null){
+					if(wifiRemoterBoard.getMWifiRemoter().camera!=null){
 						if(!mIsCameraOpend) {
-							showCamera(wifiRemoterBoard.getWifiRemoter().camera.devId, wifiRemoterBoard.getWifiRemoter().camera.sn);
+							showCamera(wifiRemoterBoard.getMWifiRemoter().camera.devId, wifiRemoterBoard.getMWifiRemoter().camera.sn);
 						}else{
 							showCamera(0,"");
 						}
@@ -1023,6 +1023,42 @@ public class WifiRemoterBoardActivity
 			case R.id.btnRemoveDoor:
 			{
 				RemoveDoor();
+			}
+			break;
+			case R.id.btnOpenDoor:
+			{
+				try {
+					wifiRemoterBoard.sendCommand("801","open", currWifiRemoterDoorIndex);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+			case R.id.btnCloseDoor:
+			{
+				try {
+					wifiRemoterBoard.sendCommand("801","close", currWifiRemoterDoorIndex);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+			case R.id.btnLockLocker:
+			{
+				try {
+					wifiRemoterBoard.sendCommand("801","lock", currWifiRemoterDoorIndex);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			break;
+			case R.id.btnLockStop:
+			{
+				try {
+					wifiRemoterBoard.sendCommand("801","stop", currWifiRemoterDoorIndex);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			break;
         default:

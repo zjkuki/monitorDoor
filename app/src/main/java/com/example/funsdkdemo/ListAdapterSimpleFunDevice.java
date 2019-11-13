@@ -204,7 +204,7 @@ public class ListAdapterSimpleFunDevice extends BaseAdapter implements Comparato
 			}else{
 				final WifiRemoterBoard result = (WifiRemoterBoard) getItem(groupPosition);
 				holder.imgDevIcon.setImageResource(currentDevType.getDrawableResId());
-				holder.txtDevName.setText(result.getWifiRemoter().name);
+				holder.txtDevName.setText(result.getMWifiRemoter().name);
 
 				holder.txtDevName.setTextColor(mContext.getResources().getColor(R.color.title_text_bg_gray));
 

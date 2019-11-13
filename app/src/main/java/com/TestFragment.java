@@ -906,7 +906,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     //MQTT是否连接成功的监听
     private IMqttActionListener iMqttActionListener = new IMqttActionListener() {
-
         @Override
         public void onSuccess(IMqttToken arg0) {
             Log.i("TF-MQTT----", "连接成功 ");

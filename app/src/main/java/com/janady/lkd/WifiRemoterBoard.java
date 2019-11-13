@@ -1,130 +1,67 @@
 package com.janady.lkd;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.DateUtils;
+import com.janady.Dialogs;
+import com.janady.MqttUtil;
 import com.janady.database.model.WifiRemoteLocker;
 import com.janady.database.model.WifiRemoter;
+import com.litesuits.orm.db.utils.DataUtil;
+
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.fogcloud.fog_mqtt.api.MQTT;
 import io.fogcloud.fog_mqtt.helper.ListenDeviceCallBack;
-import io.fogcloud.fog_mqtt.helper.ListenDeviceParams;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Data
 public class WifiRemoterBoard {
     private String TAG = "WifiRemoterBoard";
     private final int _EL_S = 1;
     private final int _EL_F = 2;
 
 
-    public ListenDeviceCallBack setListenDeviceCallBack;
+    @Getter @Setter public ListenDeviceCallBack setListenDeviceCallBack;
 
-    private Context mcontext;
-    private MQTT mqtt;
+    @Getter @Setter private Context mcontext;
 
+    @Getter @Setter private WifiRemoter mWifiRemoter;
 
-    public WifiRemoter getWifiRemoter() {
-        return mWifiRemoter;
-    }
+    @Getter @Setter private String mPublicTopic;
+    @Getter @Setter private String mSubscribeTopic;
 
-    public void setWifiRemoter(WifiRemoter wifiRemoter) {
-        this.mWifiRemoter = wifiRemoter;
-    }
-
-    private WifiRemoter mWifiRemoter;
-
-
-    public String getPublicTopic() {
-        return mPublicTopic;
-    }
-
-    public void setPublicTopic(String mPublicTopic) {
-        this.mPublicTopic = mPublicTopic;
-    }
-
-    public String getSubscribeTopic() {
-        return mSubscribeTopic;
-    }
-
-    public void setSubscribeTopic(String mSubscribeTopic) {
-        this.mSubscribeTopic = mSubscribeTopic;
-    }
-
-    private String mPublicTopic;
-    private String mSubscribeTopic;
-
-    private ListenDeviceParams mqttDeviceParams;
-
+    @Getter private MqttUtil mqttUtil = null;
 
     public WifiRemoterBoard(Context context){
         this.mcontext = context;
 
     }
 
-    public WifiRemoterBoard(Context context, WifiRemoter wifiRemoter, ListenDeviceCallBack listenDeviceCallBack){
+    public WifiRemoterBoard(Context context, WifiRemoter wifiRemoter){
         this.mcontext = context;
         this.mWifiRemoter = wifiRemoter;
-        WifiRemoterBoard(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
-                , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false,listenDeviceCallBack);
+        initMqttService(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
+                , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false);
 
     }
 
-    public void WifiRemoterBoard(Context context, String host, String port, String username, String password, String PubTopic, String SubTopic, String clientid, boolean isencrypt, ListenDeviceCallBack listenDeviceCallBack){
+    public void initMqttService(Context context, String host, String port, String username, String password, String PubTopic, String SubTopic, String clientid, boolean isencrypt){
         mcontext = context;
         mPublicTopic = PubTopic;
         mSubscribeTopic = SubTopic;
 
-        mqttDeviceParams = new ListenDeviceParams();
-        mqttDeviceParams.host = host;
-        mqttDeviceParams.port = port;
-        mqttDeviceParams.userName = username;
-        mqttDeviceParams.passWord = password;
-        mqttDeviceParams.topic = SubTopic;
-        mqttDeviceParams.clientID = clientid;
-        mqttDeviceParams.isencrypt = isencrypt;
-
-        setListenDeviceCallBack = listenDeviceCallBack;
-
-        mqtt = new MQTT(mcontext);
-
-    }
-
-    public void connect() {
-
-        mqtt.startMqtt(mqttDeviceParams,new WiFiRemoterCallBack());
-    }
-
-    public void disconnect() {
-        mqtt.stopMqtt(new WiFiRemoterCallBack());
-    }
-
-    public void setTag(String command){
-        //String topic = "d64f517c/c8934691813c/in/write/0012";
-        //String command = "{\"4\":true}";
-
-        mqtt.publish(mPublicTopic, command, 0, false, new WiFiRemoterCallBack());
-/*        mqtt.publish(topic, command, 0, false, new ListenDeviceCallBack() {
-            @Override
-            public void onSuccess(int code, String message) {
-                Log.d(TAG, code + " " + message);
-                send2handler(_EL_S, message);
-            }
-
-            @Override
-            public void onFailure(int code, String message) {
-                Log.d(TAG, code + " " + message);
-                send2handler(_EL_F, message);
-            }
-        });*/
-    }
-
-    public void subscribe(){
-        //String addtopic = "d64f517c/c8934691813c/in/write";
-        mqtt.subscribe(mSubscribeTopic, 0, new WiFiRemoterCallBack());
-    }
-
-    public void unSubscribe(){
-        mqtt.unsubscribe(mSubscribeTopic,new WiFiRemoterCallBack());
+        mqttUtil = new MqttUtil(context,host,username,password,clientid,0,mPublicTopic,mPublicTopic,iMqttActionListener,mqttCallback);
     }
 
     public boolean addWifiRemoteLocker(WifiRemoteLocker wifiRemoteLocker){
@@ -142,10 +79,74 @@ public class WifiRemoterBoard {
         }
     }
 
-    public int getWifiRemoteLockersCount() {
-        return getWifiRemoter().Lockers.size();
+    public void sendCommand(String funCode, String buttonValue, int doorNo) throws Exception{
+
+        JSONObject json = new JSONObject();
+        json.put("device_type", mWifiRemoter.name);
+        json.put("device_id", mWifiRemoter.devName);
+        json.put("function_code", funCode);
+
+        JSONObject data_json = new JSONObject();
+        data_json.put("door_no", doorNo);
+        if(funCode!="802") {
+            data_json.put("button_value", buttonValue);
+        }
+        data_json.put("time", DateUtils.getNowTimeStamp());
+        data_json.put("version", "1.0");
+        json.put("data",data_json);
+
+        mqttUtil.publish(json.toString());
+        Log.d(TAG, "publish function operations:\n"+json.toString());
     }
 
+    //MQTT是否连接成功的监听
+    private IMqttActionListener iMqttActionListener = new IMqttActionListener() {
+
+        @Override
+        public void onSuccess(IMqttToken arg0) {
+            Log.i(TAG, "连接成功 ");
+            mqttUtil.isConnectSuccess = true;
+            try {
+                mqttUtil.getMqttAndroidClient().subscribe(mSubscribeTopic, 0);//订阅主题，参数：主题、服务质量
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onFailure(IMqttToken arg0, Throwable arg1) {
+            arg1.printStackTrace();
+            Log.i(TAG, "onFailure 连接失败:" + arg1.getMessage());
+            mqttUtil.isConnectSuccess = false;
+            mqttUtil.getHandler().sendEmptyMessageDelayed(mqttUtil.getHAND_RECONNECT(), mqttUtil.getRECONNECT_TIME_CONFIG());
+        }
+    };
+
+    //订阅主题的回调
+    @Getter @Setter private MqttCallback mqttCallback = new MqttCallback() {
+
+        @Override
+        public void messageArrived(String topic, MqttMessage message) throws Exception {
+            Log.i(TAG, "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
+            Dialogs.alertMessage(mcontext, "收到消息：",new String(message.getPayload()) + "\tToString:" + message.toString());
+            //收到其他客户端的消息后，响应给对方告知消息已到达或者消息有问题等
+            //response("message arrived:"+message);
+        }
+
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken arg0) {
+
+            Log.i(TAG, "deliveryComplete");
+        }
+
+        @Override
+        public void connectionLost(Throwable arg0) {
+            Log.i(TAG, "连接断开");
+            Log.i(TAG, "onFailure 连接失败:" + arg0.getMessage());
+            mqttUtil.isConnectSuccess = false;
+            mqttUtil.getHandler().sendEmptyMessageDelayed(mqttUtil.getHAND_RECONNECT(), mqttUtil.getRECONNECT_TIME_CONFIG());
+        }
+    };
 
 
     public interface IWifiRemoterListener {
