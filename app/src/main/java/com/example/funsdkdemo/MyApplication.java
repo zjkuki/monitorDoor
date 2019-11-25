@@ -1,7 +1,12 @@
 package com.example.funsdkdemo;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.example.download.XDownloadFileManager;
 import com.lib.funsdk.support.FunPath;
@@ -17,6 +22,7 @@ public class MyApplication extends Application {
 	public static LiteOrm liteOrm;
 	//public static LiteOrm liteOrmCascade;
 	public static Context context;
+	public static boolean networkConnected;
 
 	public static String mqttClientId;
 
@@ -46,7 +52,36 @@ public class MyApplication extends Application {
 				);
 
 		mqttClientId = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
+
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		registerReceiver(receiver, filter);
+
 	}
+
+
+	@Override
+	public void onTerminate(){
+		super.onTerminate();
+		unregisterReceiver(receiver);
+	}
+
+	private final BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+			if(networkInfo != null)
+			{
+				networkConnected = networkInfo.isAvailable();
+			}
+			else
+			{
+				networkConnected = false;
+			}
+		}
+	};
 
 	public void exit() {
 

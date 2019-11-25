@@ -811,4 +811,6 @@
     <string name="devices">设备列表</string>
 
     <string name="connecting">正在连接</string>
+    <string name="network_error">网络异常</string>
+    <string name="network_unconnected">未连接网络</string>
 </resources>

@@ -2,7 +2,9 @@ package com.janady;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import com.example.funsdkdemo.MyApplication;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.dialog.PermissionDialog;
 import com.janady.setup.FragmentSetup;
@@ -28,6 +30,11 @@ public class MainActivity extends QMUIFragmentActivity {
         checkPermission(getString(R.string.all_permission), Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if(!MyApplication.networkConnected){
+            Toast.makeText(MyApplication.context,"请先连接网络",Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
     private boolean checkPermission(final String permissionTitle, final String... permission) {
         try{

@@ -15,5 +15,4 @@
     <string name="cancel">取消</string>
     <string name="md5Fail">md5不一致，是否重新下载</string>
     <string name="downloadFail">文件下载失败，是否重试？</string>
-
 </resources>

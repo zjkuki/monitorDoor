@@ -48,9 +48,10 @@ public class MqttUtil {
     private final static long cid = System.currentTimeMillis();
     @Getter @Setter public static String CLIENTID = FunSupport.getInstance().getUserName()+"@"+cid;
 
-    @Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
-    @Getter @Setter public static String USERNAME = "admin";//用户名
-    @Getter @Setter public static String PASSWORD = "public";//密码
+    //@Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
+    @Getter @Setter public static String HOST = "tcp://mqtt.lkd.365yiding.com:1883";//服务器地址（协议+地址+端口号）
+    @Getter @Setter public static String USERNAME = "lkd";//用户名
+    @Getter @Setter public static String PASSWORD = "lkd123!@#";//密码
     @Getter @Setter public static String PUBLISH_TOPIC = "lkd_smart_locker_app/message";//发布主题
     @Getter @Setter public static String RESPONSE_TOPIC = "lkd_smart_locker_app/message";//订阅主题
     @Getter @Setter public static String[] PUBLISH_TOPICS = {""};//发布主题

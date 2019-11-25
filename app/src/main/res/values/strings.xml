@@ -516,6 +516,10 @@
     <string name="test_1">Test1</string>
     <string name="test_2">Test2</string>
     <string name="test_3">Test3</string>
+    <string name="network_error">Network Error</string>
+    <string name="network_unconnected">Network Unconnect</string>
+
+
     <string-array name="pic_type">
         <item>All</item>
         <item>Alarm</item>

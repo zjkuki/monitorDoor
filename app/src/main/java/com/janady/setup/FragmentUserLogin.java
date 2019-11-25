@@ -1,18 +1,24 @@
 package com.janady.setup;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.example.common.DialogSavedUsers;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityGuideDeviceList;
 import com.example.funsdkdemo.ActivityGuideUserForgetPassw;
 import com.example.funsdkdemo.ActivityGuideUserRegister;
+import com.example.funsdkdemo.MyApplication;
 import com.janady.Dialogs;
+import com.janady.OkHttpUtils;
+import com.janady.StringUtils;
 import com.lkd.smartlocker.R;
 import com.janady.HomeActivity;
 import com.lib.funsdk.support.FunError;
@@ -20,6 +26,22 @@ import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class FragmentUserLogin extends JBaseFragment implements View.OnClickListener, OnFunLoginListener {
     private QMUITopBarLayout mTopBar;
@@ -122,6 +144,53 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
             case R.id.userLoginBtn:
             {
                 tryToLogin();
+                //showUserInfo();
+                String passMd5 = StringUtils.toMd5(mEditPassWord.getText().toString());
+                Map<String,String> map = new HashMap<>();
+                map.put("mbName", mEditUserName.getText().toString());
+                map.put("mbPassword", mEditPassWord.getText().toString());
+                JSONObject j = new JSONObject();
+                try {
+                    j.put("mbName", mEditUserName.getText().toString());
+                    j.put("mbPassword", mEditPassWord.getText().toString());
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                OkHttpClient client=new OkHttpClient();
+
+                FormBody.Builder Body = new FormBody.Builder();
+                for(Map.Entry<String,String> entry:map.entrySet()){
+                    Body.add(entry.getKey(),entry.getValue());
+                }
+
+                RequestBody requestBody = Body.build();
+
+                Request request = new Request.Builder()
+                        .url("http://ydkuki.frp.365yiding.cn:3277/api/signIn")//请求的url
+                        .post(requestBody)
+                        .build();
+
+                Call call = client.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        final String res = response.body().string();
+                        Log.v("Main.ID=", res);
+                        if (!res.equals(null)) {
+                            Toast.makeText(getContext(), "登陆成功", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            Toast.makeText(getContext(), "登陆失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                });
             }
             break;
             case R.id.userloginForgotPasswd:
@@ -219,9 +288,10 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
     public void onLoginSuccess() {
         hideWaitDialog();
         showToast(R.string.user_register_login_success);
-
         // 显示用户信息
-        showUserInfo();
+        //showUserInfo();
+        // 显示用户信息
+
     }
 
     @Override
