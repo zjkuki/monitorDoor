@@ -12,4 +12,7 @@ public class AppConstants {
     public static final String bleNotifitesCharacter = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     public static final String bleWriteCharacter = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 
+    public static final String IOT_API_HOST = "http://kukipc.frp.365yiding.cn:3277";
+
+
 }

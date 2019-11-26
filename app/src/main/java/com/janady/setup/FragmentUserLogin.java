@@ -144,6 +144,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
             case R.id.userLoginBtn:
             {
                 tryToLogin();
+
                 //showUserInfo();
                 String passMd5 = StringUtils.toMd5(mEditPassWord.getText().toString());
                 Map<String,String> map = new HashMap<>();
@@ -167,7 +168,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                 RequestBody requestBody = Body.build();
 
                 Request request = new Request.Builder()
-                        .url("http://ydkuki.frp.365yiding.cn:3277/api/signIn")//请求的url
+                        .url("http://kukipc.frp.365yiding.cn:3277/xm/user/"+FunSupport.APP_KEY+"/login")//请求的url
                         .post(requestBody)
                         .build();
 
