@@ -54,9 +54,9 @@ public class MyApplication extends Application {
 		mqttClientId = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 
 
-		/*IntentFilter filter = new IntentFilter();
+		IntentFilter filter = new IntentFilter();
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-		registerReceiver(receiver, filter);*/
+		registerReceiver(receiver, filter);
 
 	}
 
@@ -64,7 +64,7 @@ public class MyApplication extends Application {
 	@Override
 	public void onTerminate(){
 		super.onTerminate();
-		//unregisterReceiver(receiver);
+		unregisterReceiver(receiver);
 	}
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {

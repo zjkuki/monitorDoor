@@ -31,10 +31,6 @@ public class MainActivity extends QMUIFragmentActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if(!MyApplication.networkConnected){
-            Toast.makeText(MyApplication.context,"请先连接网络",Toast.LENGTH_SHORT).show();
-            return;
-        }
     }
     private boolean checkPermission(final String permissionTitle, final String... permission) {
         try{

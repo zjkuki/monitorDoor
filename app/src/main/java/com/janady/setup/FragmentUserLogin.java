@@ -106,6 +106,9 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
         mEditUserName.setText(FunSupport.getInstance().getSavedUserName());
         mEditPassWord.setText(FunSupport.getInstance().getSavedPassword());
 
+        if(!MyApplication.networkConnected){
+            Toast.makeText(MyApplication.context,"请先连接网络",Toast.LENGTH_SHORT).show();
+        }
         // 用户相关的操作,必须切换网络访问方式
         FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
 
@@ -148,15 +151,9 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                 //showUserInfo();
                 String passMd5 = StringUtils.toMd5(mEditPassWord.getText().toString());
                 Map<String,String> map = new HashMap<>();
-                map.put("mbName", mEditUserName.getText().toString());
-                map.put("mbPassword", mEditPassWord.getText().toString());
-                JSONObject j = new JSONObject();
-                try {
-                    j.put("mbName", mEditUserName.getText().toString());
-                    j.put("mbPassword", mEditPassWord.getText().toString());
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
+                map.put("appkey", FunSupport.APP_KEY);
+                map.put("uname", mEditUserName.getText().toString());
+                map.put("password", mEditPassWord.getText().toString());
 
                 OkHttpClient client=new OkHttpClient();
 
@@ -168,7 +165,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                 RequestBody requestBody = Body.build();
 
                 Request request = new Request.Builder()
-                        .url("http://kukipc.frp.365yiding.cn:3277/xm/user/"+FunSupport.APP_KEY+"/login")//请求的url
+                        .url("http://ydkuki.frp.365yiding.cn:3277/xm/user/login")//请求的url
                         .post(requestBody)
                         .build();
 
@@ -184,10 +181,10 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                         final String res = response.body().string();
                         Log.v("Main.ID=", res);
                         if (!res.equals(null)) {
-                            Toast.makeText(getContext(), "登陆成功", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(FragmentUserLogin.super.getContext(), "登陆成功", Toast.LENGTH_SHORT).show();
 
                         } else {
-                            Toast.makeText(getContext(), "登陆失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(FragmentUserLogin.super.getContext(), "登陆失败", Toast.LENGTH_SHORT).show();
                         }
                     }
 
