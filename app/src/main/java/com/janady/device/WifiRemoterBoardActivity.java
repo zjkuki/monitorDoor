@@ -183,6 +183,7 @@ public class WifiRemoterBoardActivity
 
 
 	private TextView mTextVideoStat = null;
+	private TextView mLdpMsg = null;
 	private AlertDialog alert = null;
 	private AlertDialog.Builder builder = null;
 
@@ -437,6 +438,9 @@ public class WifiRemoterBoardActivity
 
 		mTextTitle = (TextView) findViewById(R.id.textViewInTopLayout);
 
+		mLdpMsg = (TextView) findViewById(R.id.ldp_msg);
+		mLdpMsg.setText("");
+
 		mBtnBack = (ImageButton) findViewById(R.id.backBtnInTopLayout);
 		mBtnBack.setOnClickListener(this);
 
@@ -519,7 +523,7 @@ public class WifiRemoterBoardActivity
 		mBtnLockStop.setOnClickListener(this);
 
 		mBtnLockLocker.setOnClickListener(this);
-		mBtnLockLocker.setOnTouchListener(mLockerLockTouchLs);
+		//mBtnLockLocker.setOnTouchListener(mLockerLockTouchLs);
 
 		mBtnOpenCamera.setOnClickListener(this);
 		mBtnOpenCamera.setOnTouchListener(null);
@@ -561,6 +565,8 @@ public class WifiRemoterBoardActivity
 		String wifiSn = getIntent().getStringExtra("WIFI_DEVICE_SN");
 
 		initWifiDevice(wifiMac, wifiSceneName, wifiSn);
+
+		wifiRemoterBoard.mLdpMsg = mLdpMsg;
 
 		setStatusBar();
 	}

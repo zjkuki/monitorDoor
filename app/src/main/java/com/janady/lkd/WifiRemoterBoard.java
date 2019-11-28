@@ -2,6 +2,7 @@ package com.janady.lkd;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.DateUtils;
 import com.janady.Dialogs;
@@ -16,6 +17,7 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class WifiRemoterBoard {
 
     @Getter @Setter private Context mcontext;
 
+    @Getter @Setter private String mCurrentMsg;
+    @Getter @Setter public TextView mLdpMsg;
     @Getter @Setter private WifiRemoter mWifiRemoter;
 
     @Getter @Setter private String mPublicTopic;
@@ -79,12 +83,13 @@ public class WifiRemoterBoard {
         }
     }
 
+
     public void sendCommand(String funCode, String buttonValue, int doorNo) throws Exception{
 
         JSONObject json = new JSONObject();
         json.put("device_type", mWifiRemoter.devType);
         json.put("device_id", mWifiRemoter.mac.replace(":",""));
-        json.put("function_code", funCode);
+        json.put("funtion_code", Integer.parseInt(funCode));
 
         JSONObject data_json = new JSONObject();
         data_json.put("door_no", doorNo);
@@ -128,9 +133,59 @@ public class WifiRemoterBoard {
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             Log.i(TAG, "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
-            Dialogs.alertMessage(mcontext, "收到消息：",new String(message.getPayload()) + "\tToString:" + message.toString());
+            //Dialogs.alertMessage(mcontext, "收到消息：",new String(message.getPayload()) + "\tToString:" + message.toString());
             //收到其他客户端的消息后，响应给对方告知消息已到达或者消息有问题等
             //response("message arrived:"+message);
+            try {
+                com.alibaba.fastjson.JSONObject json = com.alibaba.fastjson.JSONObject.parseObject(message.toString());
+                com.alibaba.fastjson.JSONObject data = new com.alibaba.fastjson.JSONObject();
+                data = json.getJSONObject("data");
+                String msg="";
+                switch(data.getIntValue("operation_result")){
+                    case 200:
+                        msg="开门成功";
+                        break;
+                    case 201:
+                        msg="开门失败";
+                        break;
+                    case 202:
+                        msg="关门成功";
+                        break;
+                    case 203:
+                        msg="关门失败";
+                        break;
+                    case 204:
+                        msg="锁成功";
+                        break;
+                    case 205:
+                        msg="锁失败";
+                        break;
+                    case 206:
+                        msg="停成功";
+                        break;
+                    case 207:
+                        msg="停失败";
+                        break;
+                    case 208:
+                        msg="更改默认门号为:"+data.getString("door_no")+"成功";
+                        break;
+                }
+
+                mCurrentMsg = msg;
+                if(mLdpMsg!=null){
+                    mLdpMsg.setText(msg);
+                }
+                Log.i(TAG,msg);
+
+               //Dialogs.alertMessage(mcontext, "操作结果",msg);
+
+            }catch(Exception e){
+                e.printStackTrace();
+                mCurrentMsg = "";
+                if(mLdpMsg!=null){
+                    mLdpMsg.setText("");
+                }
+            }
         }
 
         @Override
