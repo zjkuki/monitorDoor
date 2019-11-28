@@ -82,8 +82,8 @@ public class WifiRemoterBoard {
     public void sendCommand(String funCode, String buttonValue, int doorNo) throws Exception{
 
         JSONObject json = new JSONObject();
-        json.put("device_type", mWifiRemoter.name);
-        json.put("device_id", mWifiRemoter.devName);
+        json.put("device_type", mWifiRemoter.devType);
+        json.put("device_id", mWifiRemoter.mac.replace(":",""));
         json.put("function_code", funCode);
 
         JSONObject data_json = new JSONObject();

@@ -34,6 +34,7 @@ import com.example.funsdkdemo.MyApplication;
 import com.janady.AppManager;
 import com.janady.HomeActivity;
 import com.janady.MqttUtil;
+import com.janady.setup.FragmentUserLogin;
 import com.janady.setup.JBaseFragment;
 import com.lib.funsdk.support.config.ModifyPassword;
 import com.lkd.smartlocker.R;
@@ -67,6 +68,8 @@ import com.lib.funsdk.support.models.FunDevice;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.litesuits.orm.db.assit.QueryBuilder;
+import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,7 +83,7 @@ import io.fogcloud.sdk.mdns.helper.SearchDeviceCallBack;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BLUETOOTH;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_BOUTIQUEROTOT;
 import static com.lib.funsdk.support.models.FunDevType.EE_DEV_NORMAL_MONITOR;
-import static com.lib.funsdk.support.models.FunDevType.EE_DEV_REMOTER;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_OW_REMOTER;
 
 
 public class DeviceAddByUser extends ActivityDemo implements OnClickListener, OnFunDeviceListener, OnFunDeviceOptListener, OnItemSelectedListener, OnItemClickListener,  OnAddSubDeviceResultListener {
@@ -161,7 +164,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			FunDevType.EE_DEV_CAMERA,
 			FunDevType.EE_DEV_BOUTIQUEROTOT,*/
 			FunDevType.EE_DEV_BLUETOOTH,
-			FunDevType.EE_DEV_REMOTER
+			FunDevType.EE_DEV_OW_REMOTER
 
 	};
 
@@ -600,7 +603,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					}
 
-					//finish();
+					finish();
 				}
 			}
 			break;
@@ -649,8 +652,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								String s=tmp.getString("Name").substring(tmp.getString("Name").lastIndexOf("#")+1);
 								if(tmp.getString("Name").contains("-19#")){
 									wr.name = "WIFI主控器（单向）@ "+ s ;
+									wr.devType = "One_Way_Smart_Lock";
+									wr.devTypeId = EE_DEV_OW_REMOTER.getDevIndex();
 								}else{
 									wr.name = "WIFI主控器（双向）@ "+s;
+                                    wr.devType = "One_Way_Smart_Lock";
+                                    wr.devTypeId = EE_DEV_OW_REMOTER.getDevIndex();
 								}
 
 								/*正式版应该从服务器获取设备MQTT设置*/
@@ -714,10 +721,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	}
 	
 	private void startLogin() {
-		Intent intent = new Intent();
-		intent.setClass(this, ActivityGuideUserLogin.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
+		//Intent intent = new Intent();
+		//intent.setClass(this, ActivityGuideUserLogin.class);
+		//replaceFragment(android.R.id.content, new FragmentUserLogin());
+		replaceFragment(R.id.dab_container, new FragmentUserLogin());
+
 	}
 	
 	// 扫描二维码
@@ -1152,7 +1160,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					requestToGetLanDeviceList();
 				}
 			}else{
-				if(mCurrDevType == EE_DEV_REMOTER) {
+				if(mCurrDevType == EE_DEV_OW_REMOTER) {
 					searchEasyLinkDevices();
 				}else{
 					return;

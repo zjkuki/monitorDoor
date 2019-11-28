@@ -149,7 +149,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                 tryToLogin();
 
                 //showUserInfo();
-                String passMd5 = StringUtils.toMd5(mEditPassWord.getText().toString());
+/*                String passMd5 = StringUtils.toMd5(mEditPassWord.getText().toString());
                 Map<String,String> map = new HashMap<>();
                 map.put("appkey", FunSupport.APP_KEY);
                 map.put("uname", mEditUserName.getText().toString());
@@ -188,7 +188,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
                         }
                     }
 
-                });
+                });*/
             }
             break;
             case R.id.userloginForgotPasswd:
@@ -287,8 +287,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
         hideWaitDialog();
         showToast(R.string.user_register_login_success);
         // 显示用户信息
-        //showUserInfo();
-        // 显示用户信息
+        showUserInfo();
 
     }
 

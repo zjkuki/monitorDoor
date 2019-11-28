@@ -3,7 +3,11 @@ package com.example.funsdkdemo;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Build;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -17,8 +21,11 @@ import android.widget.Toast;
 
 import com.example.common.DialogWaitting;
 import com.example.common.UIFactory;
+import com.janady.setup.JBaseFragment;
 import com.lib.FunSDK;
 import com.lkd.smartlocker.R;
+import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.xm.ui.widget.SpinnerSelectItem;
 
 import java.util.Arrays;
@@ -239,4 +246,19 @@ public class ActivityDemo extends FragmentActivity {
 		}
 		return 0;
 	}
+
+	public void replaceFragment(int resId, Fragment fragment) {
+// 1.获取FragmentManager，在活动中可以直接通过调用getFragmentManager()方法得到
+		FragmentManager fragmentManager =getSupportFragmentManager();
+// 2.开启一个事务，通过调用beginTransaction()方法开启
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+// 3.向容器内添加或替换碎片，一般使用replace()方法实现，需要传入容器的id和待添加的碎片实例
+		transaction.replace(resId, fragment);  //fr_container不能为fragment布局，可使用线性布局相对布局等。
+// 4.使用addToBackStack()方法，将事务添加到返回栈中，填入的是用于描述返回栈的一个名字
+		transaction.addToBackStack(null);
+// 5.提交事物,调用commit()方法来完成
+		transaction.commit();
+	}
+
+
 }

@@ -81,7 +81,7 @@ public class ActivityGuideDeviceAddByUser extends ActivityDemo implements OnClic
 			FunDevType.EE_DEV_DRUM,
 			FunDevType.EE_DEV_CAMERA,
 			FunDevType.EE_DEV_BLUETOOTH,
-			FunDevType.EE_DEV_REMOTER
+			FunDevType.EE_DEV_OW_REMOTER
 	};
 	
 	

@@ -3,7 +3,9 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	xmlns:custom="http://schemas.android.com/apk/res-auto"
-	android:background="@color/bg_gray">
+	xmlns:tool="http://schemas.android.com/tools"
+	android:background="@color/bg_gray"
+	android:id="@+id/dab_container">
 
     <include
         android:id="@+id/layoutTop"
@@ -164,5 +166,6 @@
 		android:listSelector="@drawable/common_list_selector"
 		android:visibility="gone"
 		/>
+
 
 </RelativeLayout>

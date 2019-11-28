@@ -37,6 +37,7 @@ public class WifiRemoter {// 指定一对多关系
     @Column(COL_MAC) // 指定列名
     @Unique
     public String mac;
+    public int devTypeId=FunDevType.EE_DEV_OW_REMOTER.getDevIndex();
     public String loginPsw;
     public String hostUrl;
     public String hostPort;
@@ -48,7 +49,7 @@ public class WifiRemoter {// 指定一对多关系
     public String publictopic;
     public String subscribetopic;
     public String sceneName;
-    public int devType = FunDevType.EE_DEV_REMOTER.getDevIndex();
+    public String devType = "One_Way_Smart_Lock";
 
     public int defaultDoorId = 0;
 

@@ -386,6 +386,12 @@ public class WifiRemoterBoardActivity
 				if(cbSelectedDoor.isChecked()){
 					mWifiRemoter.defaultDoorId = mTabDoors.getSelectedTabPosition();
 					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+					//下发指令修改门号
+					try {
+						wifiRemoterBoard.sendCommand("802","", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}else{
 
 				}
@@ -406,7 +412,9 @@ public class WifiRemoterBoardActivity
 					cbSelectedDoor.setChecked(false);
 				}
 
-				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(tab.getPosition()).no+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
+				currWifiRemoterDoorIndex = tab.getPosition();
+
+				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
@@ -1028,7 +1036,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnOpenDoor:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","open", currWifiRemoterDoorIndex);
+					wifiRemoterBoard.sendCommand("801","open", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1037,7 +1045,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnCloseDoor:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","close", currWifiRemoterDoorIndex);
+					wifiRemoterBoard.sendCommand("801","close", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1046,7 +1054,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnLockLocker:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","lock", currWifiRemoterDoorIndex);
+					wifiRemoterBoard.sendCommand("801","lock", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1055,7 +1063,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnLockStop:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","stop", currWifiRemoterDoorIndex);
+					wifiRemoterBoard.sendCommand("801","stop", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1090,7 +1098,7 @@ public class WifiRemoterBoardActivity
 
 						currWifiRemoterDoorIndex++;
 					}else {
-						door.no = 0;
+						door.no = 1;
 						mWifiRemoter.defaultDoorId = 0;
 						currWifiRemoterDoorIndex = 0;
 					}

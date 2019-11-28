@@ -900,6 +900,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         public void connectionLost(Throwable arg0) {
             Log.i("TF", "连接断开");
             mqttUtil.disconnect();//连接断开，重连
+            if(mqttclientid==null && shareDevicePublishTopic ==null && shareDeviceResponseTopic ==null){return;}
             mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
         }
     };
@@ -911,6 +912,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             Log.i("TF-MQTT----", "连接成功 ");
             mqttUtil.isConnectSuccess = true;
             try {
+                if(mqttaction==null && toMsgClientId == null && fromMsgClientId==null){return;}
                 mqttUtil.getMqttAndroidClient().subscribe(mqttUtil.getPUBLISH_TOPIC(), 0);//订阅主题，参数：主题、服务质量
                 JSONObject json = new JSONObject();
                 if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("sharealldevices")){

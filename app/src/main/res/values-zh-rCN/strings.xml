@@ -9,10 +9,10 @@
     <string name="common_delete">删除</string>
     <string name="common_retry">重试</string>
     <string name="guide_module_title_user">1. 用户相关</string>
-    <string name="guide_module_title_user_register">1.1 用户注册</string>
+    <string name="guide_module_title_user_register">用户注册</string>
     <string name="guide_module_title_user_login">用户登录</string>
-    <string name="guide_module_title_user_change_passwd">1.3 修改密码</string>
-    <string name="guide_module_title_user_forgot_passwd">1.4 忘记密码</string>
+    <string name="guide_module_title_user_change_passwd">修改密码</string>
+    <string name="guide_module_title_user_forgot_passwd">忘记密码</string>
     <string name="guide_module_title_user_info">1.5 用户信息</string>
     <string name="guide_module_title_user_debug">1.5 设备密码本地保存</string>
     <string name="guide_module_title_device">2. 设备相关</string>

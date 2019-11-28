@@ -111,7 +111,7 @@ public enum FunDevType {
 			R.drawable.ic_bluetooth_black_24dp),
 
 	// 26, 远程控制设备
-	EE_DEV_REMOTER(26,
+	EE_DEV_OW_REMOTER(19,
 			R.string.dev_type_remoter,
 			R.drawable.ic_remote_3),
 	// 未知设备
