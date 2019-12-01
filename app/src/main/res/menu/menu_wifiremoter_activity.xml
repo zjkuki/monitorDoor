@@ -8,10 +8,22 @@
         android:orderInCategory="0"
         android:title="绑定摄像头"
         app:showAsAction="never"/>
+    <item
+        android:title="增加门"
+        android:id="@+id/action_add_door"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="删除门"
+        android:id="@+id/action_del_door"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
 
     <item
         android:title="设置"
         android:id="@+id/action_setup"
         android:orderInCategory="1"
+        android:visible="false"
         app:showAsAction="never"/>
 </menu>

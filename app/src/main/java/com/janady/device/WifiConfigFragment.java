@@ -208,10 +208,16 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 elp.password = wifiPwd.trim();
                 elp.sleeptime = 50;
                 elp.runSecond = 60000;
+                showWaitDialog();
                 el.startEasyLink(elp, new EasyLinkCallBack() {
                     @Override
                     public void onSuccess(int code, String message) {
                         hideWaitDialog();
+                        try{
+                            Thread.sleep(3000);
+                        }catch(Exception e){
+                            e.printStackTrace();
+                        }
                         showToast(String.format(
                                 getResources().getString(R.string.device_opt_set_wifi_success),
                                 "wifi remoter ok!"));

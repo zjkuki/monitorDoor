@@ -342,11 +342,13 @@ public class WifiRemoterBoardActivity
 		mCanToPlay = false;
 
 		// 如果设备未登录,先登录设备
-		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
+		/*if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
 			loginDevice(camera.loginName, camera.loginPsw);
 		} else {
 			requestSystemInfo();
-		}
+		}*/
+
+		requestSystemInfo();
 
 		// 注册设备操作回调
 		FunSupport.getInstance().registerOnFunDeviceOptListener(this);
@@ -495,7 +497,7 @@ public class WifiRemoterBoardActivity
 
 
 		mLayoutFunctionButtons = (RelativeLayout) findViewById(R.id.layoutFunctionButtons);
-		mLayoutFunctionButtons.setVisibility(View.GONE);
+		//mLayoutFunctionButtons.setVisibility(View.GONE);
 
 		mLayoutDirectionControl = (RelativeLayout) findViewById(R.id.layoutDirectionControl);
 
@@ -653,8 +655,8 @@ public class WifiRemoterBoardActivity
 
 		if(devId!=0) {
 			mLayoutVideoWnd.setVisibility(View.VISIBLE);
-			//mLayoutFunctionButtons.setVisibility(View.VISIBLE);
-			mLayoutCameraButtons.setVisibility(View.VISIBLE);
+			mLayoutFunctionButtons.setVisibility(View.VISIBLE);
+			//mLayoutCameraButtons.setVisibility(View.VISIBLE);
 			lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
 			lp.topMargin=0;
 			mLayoutControls.setLayoutParams(lp);
@@ -663,8 +665,8 @@ public class WifiRemoterBoardActivity
 			mIsCameraOpend = true;
 		}else{
 			mLayoutVideoWnd.setVisibility(View.GONE);
-			//mLayoutFunctionButtons.setVisibility(View.GONE);
-			mLayoutCameraButtons.setVisibility(View.GONE);
+			mLayoutFunctionButtons.setVisibility(View.GONE);
+			//mLayoutCameraButtons.setVisibility(View.GONE);
 			lp.addRule(RelativeLayout.BELOW, R.id.layoutTop);
 			lp.topMargin=0;
 			mLayoutControls.setLayoutParams(lp);
@@ -1383,6 +1385,14 @@ public class WifiRemoterBoardActivity
 				switch(item.getItemId()) {
 					case R.id.action_bindCam: {
 						selectCamera();
+					}
+					break;
+					case R.id.action_add_door: {
+						AddDoor();
+					}
+					break;
+					case R.id.action_del_door: {
+						RemoveDoor();
 					}
 					break;
 					case R.id.setup: {
