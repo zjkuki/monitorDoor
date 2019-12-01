@@ -898,10 +898,16 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         @Override
         public void connectionLost(Throwable arg0) {
-            Log.i("TF", "连接断开");
-            mqttUtil.disconnect();//连接断开，重连
-            if(mqttclientid==null && shareDevicePublishTopic ==null && shareDeviceResponseTopic ==null){return;}
-            mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
+            try {
+                Log.i("TF", "连接断开");
+                mqttUtil.disconnect();//连接断开，重连
+                if (mqttclientid == null && shareDevicePublishTopic == null && shareDeviceResponseTopic == null) {
+                    return;
+                }
+                mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     };
 

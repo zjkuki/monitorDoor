@@ -6,7 +6,7 @@
     <item
         android:id="@+id/action_bindCam"
         android:orderInCategory="0"
-        android:title="绑定摄像头"
+        android:title="绑定摄像机"
         app:showAsAction="never"/>
     <item
         android:title="增加门"
@@ -21,9 +21,22 @@
         app:showAsAction="never"/>
 
     <item
-        android:title="设置"
-        android:id="@+id/action_setup"
+        android:title="修改门名称"
+        android:id="@+id/action_edit_door"
         android:orderInCategory="1"
         android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="删除所有门"
+        android:id="@+id/action_del_all_door"
+        android:orderInCategory="1"
+        android:visible="false"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="摄像机设置"
+        android:id="@+id/action_setup"
+        android:orderInCategory="1"
         app:showAsAction="never"/>
 </menu>

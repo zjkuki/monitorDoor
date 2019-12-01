@@ -493,16 +493,16 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					});
 				}else {
-					if(mEditPassword.getText().toString().equals("")) {
-						Dialogs.alertMessage(mcontext, "错误", "密码不能为空，请输入正确密码", new DialogInterface.OnCancelListener() {
-							@Override
-							public void onCancel(DialogInterface dialog) {
-								return;
-							}
-						});
-					}
-
 					if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
+						if(mEditPassword.getText().toString().equals("")) {
+							Dialogs.alertMessage(mcontext, "错误", "密码不能为空，请输入正确密码", new DialogInterface.OnCancelListener() {
+								@Override
+								public void onCancel(DialogInterface dialog) {
+									return;
+								}
+							});
+						}
+
 						if(mEditPassword.getText().length() > 6 || mEditPassword.getText().length()< 6) {
 							Dialogs.alertMessage(mcontext, "错误", "请输入六位密码", new DialogInterface.OnCancelListener() {
 								@Override

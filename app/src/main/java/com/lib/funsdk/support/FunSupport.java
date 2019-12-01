@@ -1375,6 +1375,7 @@ public class FunSupport implements IFunSDKResult {
         String devicePasswd = FunDevicePassword.getInstance().getDevicePassword(
                 funDevice.getDevSn());
 
+        //直接用已保存的密码
         if (devicePasswd != null && devicePasswd.equals(loginPsd)) {
             loginPsd = devicePasswd;
         }

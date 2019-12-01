@@ -106,12 +106,16 @@ public class Dialogs {
 
     //单选Dialog
     public static void alertDialogSingleSelect(Context context, String title, String[] list, int icon, DialogInterface.OnClickListener selectedClick, DialogInterface.OnClickListener positviteClick){
+        alertDialogSingleSelect(context,title,list,0,icon,selectedClick,positviteClick);
+    }
+
+    public static void alertDialogSingleSelect(Context context, String title, String[] list, int defaultIndex, int icon, DialogInterface.OnClickListener selectedClick, DialogInterface.OnClickListener positviteClick){
         alert = null;
         builder = new AlertDialog.Builder(context);
         //alert = builder.setIcon(R.drawable.xmjp_camera)
         alert = builder.setIcon(icon)
                 .setTitle(title)
-                .setSingleChoiceItems(list, 0, selectedClick)
+                .setSingleChoiceItems(list, defaultIndex, selectedClick)
                 .setPositiveButton("确定", positviteClick)
                 .create();
         alert.show();

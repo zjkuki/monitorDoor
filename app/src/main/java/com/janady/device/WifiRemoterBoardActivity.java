@@ -342,13 +342,13 @@ public class WifiRemoterBoardActivity
 		mCanToPlay = false;
 
 		// 如果设备未登录,先登录设备
-		/*if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
+		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
 			loginDevice(camera.loginName, camera.loginPsw);
 		} else {
 			requestSystemInfo();
-		}*/
+		}
 
-		requestSystemInfo();
+		//requestSystemInfo();
 
 		// 注册设备操作回调
 		FunSupport.getInstance().registerOnFunDeviceOptListener(this);
@@ -417,19 +417,22 @@ public class WifiRemoterBoardActivity
 
 				currWifiRemoterDoorIndex = tab.getPosition();
 
-				Toast.makeText(mContext, "选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(mContext, "选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no+"   text:"+tab.getText(), Toast.LENGTH_SHORT).show();
+				Log.d("WRBA","选中的"+tab.getPosition()+"   doorNo:"+mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no+"   text:"+tab.getText());
 			}
 
 			@Override
 			public void onTabUnselected(TabLayout.Tab tab) {
 
-				Toast.makeText(mContext, "未选中的"+tab.getText(), Toast.LENGTH_SHORT).show();
+				//Toast.makeText(mContext, "未选中的"+tab.getText(), Toast.LENGTH_SHORT).show();
+				Log.d("WRBA","未选中的 text:"+tab.getText());
 			}
 
 			@Override
 			public void onTabReselected(TabLayout.Tab tab) {
-
-				Toast.makeText(mContext, "复选的"+tab.getText(), Toast.LENGTH_SHORT).show();
+				currWifiRemoterDoorIndex = tab.getPosition();
+				//Toast.makeText(mContext, "复选的"+tab.getText(), Toast.LENGTH_SHORT).show();
+				Log.d("WRBA", "复选的 text:"+tab.getText());
 
 			}
 		});
@@ -477,9 +480,10 @@ public class WifiRemoterBoardActivity
 		mBtnVoiceTalk = (RelativeLayout) findViewById(R.id.btnVoiceTalk);
 		mBtnVoiceTalk.setVisibility(View.VISIBLE);
 
-		//mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
-		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch_jcdp);
-		mBtnVoice.setVisibility(View.GONE);
+		mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch);
+		mBtnVoice.setVisibility(View.VISIBLE);
+		//mBtnVoice = (Button) findViewById(R.id.Btn_Talk_Switch_jcdp);
+		//mBtnVoice.setVisibility(View.GONE);
 
         mBtnQuitVoice = (ImageButton) findViewById(R.id.btn_quit_voice);
         mBtnQuitVoice.setVisibility(View.GONE);
@@ -532,6 +536,10 @@ public class WifiRemoterBoardActivity
 
 		mBtnVoiceTalk_jcdp.setOnClickListener(this);
 		mBtnVoiceTalk_jcdp.setOnTouchListener(mIntercomTouchLs);
+
+		mBtnVoiceTalk.setOnClickListener(this);
+		mBtnVoiceTalk.setOnTouchListener(mIntercomTouchLs);
+
 		mBtnVoice.setOnClickListener(this);
         mBtnQuitVoice.setOnClickListener(this);
 		mBtnDevCapture.setOnClickListener(this);
@@ -610,10 +618,11 @@ public class WifiRemoterBoardActivity
 				TabLayout.Tab tab = mTabDoors.newTab();
 				tab.setText(mWifiRemoter.doorList.get(i).name);
 				mTabDoors.addTab(tab);
-				currWifiRemoterDoorIndex = i;
 			}
 			if(mTabDoors.getTabCount()>0) {
 				mTabDoors.getTabAt(mWifiRemoter.defaultDoorId).select();
+				currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
+				//mTabDoors.getTabAt(0).select();
 			}
 			//cbSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
 		}else{
@@ -677,11 +686,12 @@ public class WifiRemoterBoardActivity
 	}
 
 	private void selectCamera(){
+		int defaultIndex = 0;
 		final int[] index = new int[1];
 		final List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
 		if(cams.size()>0) {
 			String[] s=new String[cams.size()+1];
-			s[0] = "隐藏摄像机";
+			s[0] = "不绑定";
 			for(int i=0;i<cams.size();i++){
 				s[i+1]=cams.get(i).sceneName;
 				if(cams.get(i).isOnline) {
@@ -689,9 +699,17 @@ public class WifiRemoterBoardActivity
 				}else{
 					s[i + 1] = s[i + 1] + "（离线）";
 				}
+				
+				if(mWifiRemoter.camera!=null){
+					if(mWifiRemoter.camera.sceneName.equals(cams.get(i).sceneName)){
+						defaultIndex = i+1;
+					}else{
+						defaultIndex = 0;
+					}
+				}
 			}
 
-			Dialogs.alertDialogSingleSelect(mContext, "请选择一个摄像机",s , R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
+			Dialogs.alertDialogSingleSelect(mContext, "请选择一个摄像机",s ,defaultIndex, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if(which==0) {
@@ -705,6 +723,9 @@ public class WifiRemoterBoardActivity
 				public void onClick(DialogInterface dialog, int which) {
 					if(index[0]==0) {
 						showCamera(0,"");
+						mWifiRemoter.camera = null;
+						wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
+						MyApplication.liteOrm.cascade().save(mWifiRemoter);
 					}else{
 						showCamera(cams.get(index[0]-1).devId, cams.get(index[0]-1).sn);
 
@@ -1103,12 +1124,9 @@ public class WifiRemoterBoardActivity
 					if(mWifiRemoter.doorList.size()>0){
 						maxDoorNo = MaxDoorNo(mWifiRemoter.doorList);
 						door.no = maxDoorNo+1;
-
-						currWifiRemoterDoorIndex++;
 					}else {
 						door.no = 1;
 						mWifiRemoter.defaultDoorId = 0;
-						currWifiRemoterDoorIndex = 0;
 					}
 					door.name = doorName[0];
 					door.remote=mWifiRemoter;
@@ -1123,7 +1141,7 @@ public class WifiRemoterBoardActivity
 						mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
 					}
 					//cbSelectedDoor.setText(mWifiRemoter.doorList.get(mWifiRemoter.defaultDoorId).name);
-					mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name));
+					mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(mWifiRemoter.doorList.size()-1).name));
 				}
                 myAlertInputDialog.dismiss();
             }
@@ -1146,10 +1164,12 @@ public class WifiRemoterBoardActivity
 		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				currWifiRemoterDoorIndex --;
 				mWifiRemoter.doorList.remove(mTabDoors.getSelectedTabPosition());
 				mTabDoors.removeTabAt(mTabDoors.getSelectedTabPosition());
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+				if(mTabDoors.getTabCount()>=0) {
+					currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
+				}
 			}
 		}).setNegativeButton("取消", new View.OnClickListener() {
 			@Override
@@ -1160,6 +1180,32 @@ public class WifiRemoterBoardActivity
 		myAlertDialog.show();
 	}
 
+	private void RemoveAllDoor(){
+		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
+				.setTitle("删除门锁")
+				.setMsg("确定删除所有门锁吗？");
+		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int i=mWifiRemoter.doorList.size()-1;
+				do{
+					final Door door = mWifiRemoter.doorList.get(i);
+					mWifiRemoter.doorList.remove(i);
+					mTabDoors.removeTabAt(i);
+					i--;
+				}while(i>=0);
+				currWifiRemoterDoorIndex = 0;
+				mWifiRemoter.defaultDoorId = 0;
+				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+			}
+		}).setNegativeButton("取消", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "取消");
+			}
+		});
+		myAlertDialog.show();
+	}
 	private void tryToRecord() {
 
 		if (!mFunVideoView.isPlaying() || mFunVideoView.isPaused()) {
@@ -1395,6 +1441,10 @@ public class WifiRemoterBoardActivity
 						RemoveDoor();
 					}
 					break;
+					case R.id.action_del_all_door: {
+						RemoveAllDoor();
+					}
+					break;
 					case R.id.setup: {
 						Intent intent = new Intent();
 						intent.putExtra("FUNDEVICE_ID", mFunDevice.getId());
@@ -1456,6 +1506,7 @@ public class WifiRemoterBoardActivity
 		showWaitDialog();
 
 		FunSupport.getInstance().requestDeviceLogin1(mFunDevice,loginName,pwd);
+		//FunSupport.getInstance().requestDeviceLogin(mFunDevice);
 	}
 
 
@@ -1634,10 +1685,12 @@ public class WifiRemoterBoardActivity
 						if (!mIsDoubleTalkPress) {
 							startTalkByDoubleDirection();
 							mBtnVoiceTalk_jcdp.setBackgroundResource(R.drawable.icon_voice_talk_selected_60dp);
+							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk_selected_60dp);
 							mIsDoubleTalkPress = true;
 						}else {
 							stopTalkByDoubleDirection();
 							mBtnVoiceTalk_jcdp.setBackgroundResource(R.drawable.icon_voice_talk_normal_60dp);
+							mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk_normal_60dp);
 							mIsDoubleTalkPress = false;
 						}
 					}else {
@@ -1697,6 +1750,7 @@ public class WifiRemoterBoardActivity
 		}
 		mIsDoubleTalkPress = false;
 		mBtnVoiceTalk_jcdp.setBackgroundResource(R.drawable.icon_voice_talk);
+		mBtnVoiceTalk.setBackgroundResource(R.drawable.icon_voice_talk);
 	}
 
     private void openVoiceChannel(){
@@ -1706,6 +1760,9 @@ public class WifiRemoterBoardActivity
             ani.setDuration(200);
             mBtnVoiceTalk_jcdp.setAnimation(ani);
             mBtnVoiceTalk_jcdp.setVisibility(View.VISIBLE);
+
+            mBtnVoiceTalk.setAnimation(ani);
+			mBtnVoiceTalk.setVisibility(View.VISIBLE);
             mBtnVoice.setVisibility(View.GONE);
             mFunVideoView.setMediaSound(false);			//关闭本地音频
         }
@@ -1718,6 +1775,9 @@ public class WifiRemoterBoardActivity
             ani.setDuration(200);
             mBtnVoiceTalk_jcdp.setAnimation(ani);
             mBtnVoiceTalk_jcdp.setVisibility(View.GONE);
+
+			mBtnVoiceTalk.setAnimation(ani);
+			mBtnVoiceTalk.setVisibility(View.GONE);
             mBtnVoice.setVisibility(View.VISIBLE);
 			destroyTalk();
             mHandler.sendEmptyMessageDelayed(MESSAGE_OPEN_VOICE, delayTime);
@@ -1761,7 +1821,7 @@ public class WifiRemoterBoardActivity
 				super.cancel();
 
 				// 取消输入密码,直接退出
-				finish();
+				//finish();
 			}
 
 		};
