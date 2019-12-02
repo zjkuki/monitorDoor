@@ -1,6 +1,5 @@
 package com;
 
-import android.app.Notification;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,21 +16,17 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.MyApplication;
 import com.google.zxing.activity.CaptureActivity;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
-import com.janady.GZIP;
-import com.janady.MqttUtil;
-import com.janady.SimpleCrypto;
+import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
 import com.janady.setup.FragmentUserLogin;
 import com.lkd.smartlocker.R;
@@ -66,7 +61,6 @@ import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
 
-import org.eclipse.jetty.util.IO;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -74,7 +68,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

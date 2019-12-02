@@ -15,16 +15,16 @@
         app:showAsAction="never"/>
 
     <item
-        android:title="删除门"
-        android:id="@+id/action_del_door"
+        android:title="修改门"
+        android:id="@+id/action_edit_door"
         android:orderInCategory="1"
+        android:visible="true"
         app:showAsAction="never"/>
 
     <item
-        android:title="修改门名称"
-        android:id="@+id/action_edit_door"
+        android:title="删除门"
+        android:id="@+id/action_del_door"
         android:orderInCategory="1"
-        android:visible="false"
         app:showAsAction="never"/>
 
     <item

@@ -4,12 +4,10 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.DateUtils;
-import com.janady.Dialogs;
-import com.janady.MqttUtil;
+import com.janady.utils.DateUtils;
+import com.janady.utils.MqttUtil;
 import com.janady.database.model.WifiRemoteLocker;
 import com.janady.database.model.WifiRemoter;
-import com.litesuits.orm.db.utils.DataUtil;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -17,7 +15,6 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;

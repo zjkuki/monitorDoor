@@ -16,8 +16,8 @@ import com.inuker.bluetooth.library.connect.response.BleWriteResponse;
 import com.inuker.bluetooth.library.model.BleGattProfile;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.janady.CommonUtils;
-import com.janady.StringUtils;
+import com.janady.utils.CommonUtils;
+import com.janady.utils.StringUtils;
 import com.janady.database.model.Bluetooth;
 
 import java.util.UUID;

@@ -19,9 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
-import android.text.Html;
 import android.text.InputType;
-import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -30,13 +28,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -52,13 +48,11 @@ import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.MyApplication;
 import com.hb.dialog.myDialog.MyAlertDialog;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
-import com.janady.Util;
 import com.janady.database.model.Door;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
 import com.example.funsdkdemo.devices.ActivityGuideDeviceSportPicList;
-import com.example.funsdkdemo.devices.monitor.ActivityGuideDevicePreview;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;
@@ -91,8 +85,6 @@ import com.litesuits.orm.db.assit.QueryBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
@@ -343,7 +335,8 @@ public class WifiRemoterBoardActivity
 
 		// 如果设备未登录,先登录设备
 		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
-			loginDevice(camera.loginName, camera.loginPsw);
+			//loginDevice(camera.loginName, camera.loginPsw);
+			loginDevice();
 		} else {
 			requestSystemInfo();
 		}
@@ -1155,6 +1148,35 @@ public class WifiRemoterBoardActivity
 		myAlertInputDialog.show();
 	}
 
+	private void EditDoor(){
+		final String[] doorName = {mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name};
+
+		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
+				.setTitle("请输入新的门锁的名称")
+				.setEditText("");
+		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, myAlertInputDialog.getResult());
+				doorName[0] = myAlertInputDialog.getResult();
+				if(mWifiRemoter!=null){
+					mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name = doorName[0];
+					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+
+					mTabDoors.getTabAt(mTabDoors.getSelectedTabPosition()).setText(doorName[0]);
+				}
+				myAlertInputDialog.dismiss();
+			}
+		}).setNegativeButton("取消", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d(TAG, "取消");
+				myAlertInputDialog.dismiss();
+			}
+		});
+		myAlertInputDialog.show();
+	}
+
 	private void RemoveDoor(){
 		final Door door = mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition());
 
@@ -1437,6 +1459,10 @@ public class WifiRemoterBoardActivity
 						AddDoor();
 					}
 					break;
+					case R.id.action_edit_door: {
+						EditDoor();
+					}
+					break;
 					case R.id.action_del_door: {
 						RemoveDoor();
 					}
@@ -1445,11 +1471,12 @@ public class WifiRemoterBoardActivity
 						RemoveAllDoor();
 					}
 					break;
-					case R.id.setup: {
+					case R.id.action_setup: {
 						Intent intent = new Intent();
-						intent.putExtra("FUNDEVICE_ID", mFunDevice.getId());
-						intent.setClass(mContext, ActivityGuideDevicePreview.class);
-						startActivityForResult(intent, 0);
+						intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
+						intent.setClass(mContext, ActivityGuideDeviceSetup.class);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						startActivity(intent);
 					}
 					break;
 				}
@@ -1460,7 +1487,8 @@ public class WifiRemoterBoardActivity
 		popupMenu.setOnDismissListener(new PopupMenu.OnDismissListener() {
 			@Override
 			public void onDismiss(PopupMenu menu) {
-				Toast.makeText(getApplicationContext(), "关闭PopupMenu", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), "关闭PopupMenu", Toast.LENGTH_SHORT).show();
+				Log.d("WRBA", "关闭PopupMenu");
 			}
 		});
 
@@ -1500,6 +1528,11 @@ public class WifiRemoterBoardActivity
 			return false;
 		}
 
+	}
+	private void loginDevice() {
+		showWaitDialog();
+
+		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
 	}
 
 	private void loginDevice(String loginName, String pwd) {
@@ -1795,6 +1828,7 @@ public class WifiRemoterBoardActivity
 
 	/**
 	 * 显示输入设备密码对话框
+	 * 如果强制弹出密码输入框，需要把onDeviceSaveNativepws禁用
 	 */
 	private void showInputPasswordDialog() {
 		DialogInputPasswd inputDialog = new DialogInputPasswd(this,
@@ -1806,12 +1840,13 @@ public class WifiRemoterBoardActivity
 				// 重新以新的密码登录
 				if (null != mFunDevice) {
 					newPsd = editText;
-					//NativeLoginPsw = editText;
+					NativeLoginPsw = editText;
 
-					//onDeviceSaveNativePws();
+					onDeviceSaveNativePws();
 
 					// 重新登录
-					loginDevice(camera.loginName, newPsd);
+					//loginDevice(camera.loginName, newPsd);
+					loginDevice();
 				}
 				return super.confirm(editText);
 			}

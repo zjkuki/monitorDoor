@@ -1316,7 +1316,7 @@ public class FunSupport implements IFunSDKResult {
                 funDevice.getDevSn());
 
         if (devicePasswd != null) {
-            //loginPsd = devicePasswd;
+            loginPsd = devicePasswd;
         }
 
 //			switch (mVerificationPassword) {

@@ -8,16 +8,14 @@ import android.widget.TextView;
 import com.example.funsdkdemo.MyApplication;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.janady.Util;
+import com.janady.utils.Util;
 import com.janady.base.JBaseSegmentFragment;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class BluetoothOperatorFragment extends JBaseSegmentFragment implements View.OnClickListener {

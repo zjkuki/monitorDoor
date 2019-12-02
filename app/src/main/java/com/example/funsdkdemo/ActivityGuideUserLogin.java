@@ -4,33 +4,20 @@ package com.example.funsdkdemo;
 import com.example.common.DialogSavedUsers;
 import com.example.common.DialogSavedUsers.OnSavedUserSelectListener;
 import com.example.common.UIFactory;
-import com.janady.OkHttpUtils;
-import com.janady.StringUtils;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.lkd.smartlocker.R;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ActivityGuideUserLogin extends ActivityDemo implements OnClickListener, OnFunLoginListener{
 

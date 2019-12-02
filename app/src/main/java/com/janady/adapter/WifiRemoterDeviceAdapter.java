@@ -13,27 +13,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
-import com.basic.G;
-import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
-import com.janady.MqttUtil;
+import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
-import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
-import com.inuker.bluetooth.library.utils.ByteUtils;
-import com.janady.Dialogs;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.RecyclerViewHolder;
 import com.janady.common.JDialogModifyPasswd;
-import com.janady.database.model.Bluetooth;
 import com.janady.database.model.WifiRemoter;
-import com.janady.lkd.BleLocker;
-import com.janady.lkd.BleLockerStatus;
 import com.janady.lkd.WifiRemoterBoard;
 
-import java.util.Date;
 import java.util.List;
 
 public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {

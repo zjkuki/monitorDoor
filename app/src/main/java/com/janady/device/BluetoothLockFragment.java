@@ -19,7 +19,7 @@ import com.inuker.bluetooth.library.search.response.SearchResponse;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.Dialogs;
-import com.janady.Util;
+import com.janady.utils.Util;
 import com.janady.common.JDialogModifyPasswd;
 import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;

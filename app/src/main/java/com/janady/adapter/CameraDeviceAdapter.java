@@ -15,9 +15,8 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.funsdkdemo.MyApplication;
-import com.janady.MqttUtil;
+import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
-import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.janady.base.BaseRecyclerAdapter;
@@ -27,7 +26,6 @@ import com.lib.funsdk.support.FunPath;
 import com.lib.funsdk.support.models.FunDevice;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 
 public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {

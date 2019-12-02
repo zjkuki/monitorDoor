@@ -1,7 +1,6 @@
 package com.janady.setup;
 
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -9,16 +8,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.example.common.DialogSavedUsers;
 import com.example.common.UIFactory;
-import com.example.funsdkdemo.ActivityGuideDeviceList;
-import com.example.funsdkdemo.ActivityGuideUserForgetPassw;
-import com.example.funsdkdemo.ActivityGuideUserRegister;
 import com.example.funsdkdemo.MyApplication;
 import com.janady.Dialogs;
-import com.janady.OkHttpUtils;
-import com.janady.StringUtils;
 import com.lkd.smartlocker.R;
 import com.janady.HomeActivity;
 import com.lib.funsdk.support.FunError;
@@ -26,22 +19,6 @@ import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.lib.funsdk.support.models.FunLoginType;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class FragmentUserLogin extends JBaseFragment implements View.OnClickListener, OnFunLoginListener {
     private QMUITopBarLayout mTopBar;

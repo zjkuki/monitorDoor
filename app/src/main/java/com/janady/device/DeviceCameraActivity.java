@@ -307,7 +307,8 @@ public class DeviceCameraActivity
 
 		// 如果设备未登录,先登录设备
 		if (!mFunDevice.hasLogin() || !mFunDevice.hasConnected()) {
-			loginDevice(camera.loginName, camera.loginPsw);
+			//loginDevice(camera.loginName, camera.loginPsw);
+			loginDevice();
 		} else {
 			requestSystemInfo();
 		}
@@ -977,6 +978,12 @@ public class DeviceCameraActivity
 
 	}
 
+	private void loginDevice() {
+		showWaitDialog();
+
+		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
+	}
+
 	private void loginDevice(String loginName, String pwd) {
 		showWaitDialog();
 
@@ -1257,6 +1264,7 @@ public class DeviceCameraActivity
 
 	/**
 	 * 显示输入设备密码对话框
+	 * 如果强制弹出密码输入框，需要把onDeviceSaveNativepws禁用
 	 */
 	private void showInputPasswordDialog() {
 		DialogInputPasswd inputDialog = new DialogInputPasswd(this,
@@ -1268,12 +1276,13 @@ public class DeviceCameraActivity
 				// 重新以新的密码登录
 				if (null != mFunDevice) {
 					newPsd = editText;
-					//NativeLoginPsw = editText;
+					NativeLoginPsw = editText;
 
-					//onDeviceSaveNativePws();
+					onDeviceSaveNativePws();
 
 					// 重新登录
-					loginDevice(camera.loginName, newPsd);
+					//loginDevice(camera.loginName, newPsd);
+					loginDevice();
 				}
 				return super.confirm(editText);
 			}

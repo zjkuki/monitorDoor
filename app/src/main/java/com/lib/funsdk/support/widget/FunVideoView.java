@@ -9,7 +9,6 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.opengl.GLSurfaceView;
 import android.os.Looper;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,7 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.basic.G;
-import com.janady.Util;
+import com.janady.utils.Util;
 import com.lib.EFUN_ATTR;
 import com.lib.EUIMSG;
 import com.lib.FunSDK;

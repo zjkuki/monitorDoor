@@ -16,9 +16,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.common.DialogInputPasswd;
 import com.example.common.DialogWaitting;
 import com.example.funsdkdemo.MyApplication;
-import com.janady.MqttUtil;
+import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
-import com.lib.funsdk.support.FunSupport;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
@@ -30,7 +29,6 @@ import com.janady.database.model.Bluetooth;
 import com.janady.lkd.BleLocker;
 import com.janady.lkd.BleLockerStatus;
 
-import java.util.Date;
 import java.util.List;
 
 public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {

@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.lkd.smartlocker.R;
-import com.janady.StringUtils;
+import com.janady.utils.StringUtils;
 
 public class PullHeadView extends ViewGroup{
 	private final static int UPDATING_IDLE = 0;
