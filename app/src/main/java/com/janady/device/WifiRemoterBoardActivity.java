@@ -619,7 +619,7 @@ public class WifiRemoterBoardActivity
 			}
 			//cbSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
 		}else{
-			Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加门锁，马上添加门锁吗？", new DialogInterface.OnClickListener() {
+			Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					AddDoor();
@@ -1100,7 +1100,7 @@ public class WifiRemoterBoardActivity
 		final String[] doorName = {""};
 
 		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
-				.setTitle("请输入门锁的名称")
+				.setTitle("请输入遥控器的名称")
 				.setEditText("");
 		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
             @Override
@@ -1152,8 +1152,8 @@ public class WifiRemoterBoardActivity
 		final String[] doorName = {mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name};
 
 		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
-				.setTitle("请输入新的门锁的名称")
-				.setEditText("");
+				.setTitle("请输入新的遥控器的名称")
+				.setEditText(doorName[0]);
 		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -1181,8 +1181,8 @@ public class WifiRemoterBoardActivity
 		final Door door = mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition());
 
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
-				.setTitle("删除门锁")
-				.setMsg("确定删除【"+door.name+"】吗？");
+				.setTitle("删除遥控器")
+				.setMsg("确定删除【"+door.name+"】遥控器吗？");
 		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -1204,8 +1204,8 @@ public class WifiRemoterBoardActivity
 
 	private void RemoveAllDoor(){
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
-				.setTitle("删除门锁")
-				.setMsg("确定删除所有门锁吗？");
+				.setTitle("删除遥控器")
+				.setMsg("确定删除所有遥控器吗？");
 		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
