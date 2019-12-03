@@ -107,7 +107,7 @@ public class BluetoothListFragment extends JBaseFragment {
                 BluetoothLockFragment bluetoothLockFragment = new BluetoothLockFragment();
                 bluetoothLockFragment.bleLocker = new BleLocker(mBluetooths.get(pos),false,800,null);
                 bluetoothLockFragment.bleLocker.setmNoRssi(true);
-                bluetoothLockFragment.isDebugViewOpen = true;
+                bluetoothLockFragment.isDebugViewOpen = false;
                 startFragment(bluetoothLockFragment);
                 //popBackStack();
             }

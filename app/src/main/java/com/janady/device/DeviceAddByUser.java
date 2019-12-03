@@ -118,6 +118,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
     private BleLocker bleLocker = null;
     private boolean needCheckSTA = false;
 
+    private boolean isModifing = false;
+
     DialogInputPasswd inputDialog = null;
 
     private CountDownTimer countDownTimer = null;
@@ -250,6 +252,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 						mTextTitle.setText("修改设备");
 						mBtnDevAdd.setText("修改");
+						isModifing = true;
 
 						bleOldPsw = bles.get(0).password;
 						mBluetooth = bles.get(0);
@@ -266,6 +269,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					} else {
 						mTextTitle.setText("添加设备");
 						mBtnDevAdd.setText("添加");
+						isModifing = false;
 
 						bleOldPsw = "LKD.CN";
 						mEditSceneName.setText("");
@@ -304,6 +308,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					//mFunDevice.loginPsw = cams.get(0).loginPsw;
 					mTextTitle.setText("修改设备");
 					mBtnDevAdd.setText("修改");
+					isModifing = true;
 
 					if(!cams.get(0).loginPsw.equals("")){
 						showInputPasswordDialog(EE_DEV_NORMAL_MONITOR);
@@ -311,6 +316,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				}else{
 					mTextTitle.setText("添加设备");
 					mBtnDevAdd.setText("添加");
+					isModifing = false;
 					mEditSceneName.setText("");
 					mFunDevice.loginPsw ="";
 					camOldPsw = "";
@@ -345,12 +351,14 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				if (wr != null && wr.size() > 0) {
 					mTextTitle.setText("修改设备");
 					mBtnDevAdd.setText("修改");
+					isModifing = true;
 
 					mEditDevSN.setText(wr.get(0).name);
 					mEditSceneName.setText(wr.get(0).sceneName);
 				}else{
 					mTextTitle.setText("添加设备");
 					mBtnDevAdd.setText("添加");
+					isModifing = false;
 					mEditSceneName.setText("");
 					mEditDevSN.setText(mWifiRemoter.name);
 				}

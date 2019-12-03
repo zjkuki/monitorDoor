@@ -412,7 +412,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 //((BluetoothOperatorFragment)fragment).setBleLocker(bleLocker);
                 ((BluetoothLockFragment)fragment).title = citem.sceneName;
                 ((BluetoothLockFragment)fragment).bleLocker = bleLocker;
-                ((BluetoothLockFragment)fragment).isDebugViewOpen = true;
+                ((BluetoothLockFragment)fragment).isDebugViewOpen = false;
 
                 startFragment(fragment);
             }
