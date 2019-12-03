@@ -138,7 +138,7 @@ public class CameraListFragment extends JBaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        /*LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("android.intent.action.CART_BROADCAST");
         BroadcastReceiver mDeviceAddByUserReceiver = new BroadcastReceiver() {
@@ -151,7 +151,7 @@ public class CameraListFragment extends JBaseFragment {
             }
         };
 
-        broadcastManager.registerReceiver(mDeviceAddByUserReceiver, intentFilter);
+        broadcastManager.registerReceiver(mDeviceAddByUserReceiver, intentFilter);*/
 
     }
 }

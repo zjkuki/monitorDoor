@@ -72,14 +72,16 @@
                     style="@style/video_control_button"
                     android:background="@drawable/video_control_button_selector"
                     android:text="@string/device_opt_play"
-                    android:textColor="@drawable/common_text_selector" />
+                    android:textColor="@drawable/common_text_selector"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btnStop"
                     style="@style/video_control_button"
                     android:background="@drawable/video_control_button_selector"
                     android:text="@string/device_opt_stop"
-                    android:textColor="@drawable/common_text_selector" />
+                    android:textColor="@drawable/common_text_selector"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btnStream"

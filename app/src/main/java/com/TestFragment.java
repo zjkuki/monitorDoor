@@ -174,7 +174,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
         shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
-        mqttUtil =  new MqttUtil(getContext(), mqttclientid,0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener,mqttCallback);
+        if(mqttUtil==null) {
+            mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+        }
 
         initTopBar();
         initRecyclerView();
@@ -201,6 +203,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ClientManager.getClient().stopSearch();
                 mHandler.removeCallbacksAndMessages(null);
                 startFragment(new JTabSegmentFragment());
+
             }
         });
 
@@ -428,6 +431,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
+
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (java.lang.InstantiationException e) {

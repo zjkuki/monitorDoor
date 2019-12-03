@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_marginTop="48dp"
-        android:background="#ff000000" >
+        android:background="#ff000000"
+        android:longClickable="true">
 
         <com.lib.funsdk.support.widget.FunVideoView
             android:id="@+id/funVideoView"
@@ -69,14 +70,16 @@
                     style="@style/video_control_button"
                     android:background="@drawable/video_control_button_selector"
                     android:text="@string/device_opt_play"
-                    android:textColor="@drawable/common_text_selector" />
+                    android:textColor="@drawable/common_text_selector"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btnStop"
                     style="@style/video_control_button"
                     android:background="@drawable/video_control_button_selector"
                     android:text="@string/device_opt_stop"
-                    android:textColor="@drawable/common_text_selector" />
+                    android:textColor="@drawable/common_text_selector"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/btnStream"
@@ -175,7 +178,8 @@
                 android:layout_below="@+id/cb_double_talk_switch"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:background="@color/transparent">
+                android:background="@color/transparent"
+                android:visibility="gone">
 
                 <Button
                     android:id="@+id/Btn_Talk_Switch"
@@ -205,43 +209,53 @@
             </RelativeLayout>
             <ImageButton
                 android:id="@+id/btnDevCapture"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_alignTop="@+id/btnDevRecord"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="24dp"
-                android:layout_toLeftOf="@+id/VoiceTalk"
+                android:layout_toLeftOf="@+id/btnDevRecord"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_devcapture" />
 
             <ImageButton
                 android:id="@+id/btnDevRecord"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="24dp"
-                android:layout_toLeftOf="@id/btnDevCapture"
                 android:background="@color/transparent"
+                android:layout_toLeftOf="@+id/btnDevSound"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_record" />
 
+            <ImageButton
+                android:id="@+id/btnDevSound"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
+                android:background="@color/transparent"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_btn_sound_selector" />
 
             <ImageButton
                 android:id="@+id/btnDevPre"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_alignTop="@+id/btnDevRecord"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="24dp"
-                android:layout_toRightOf="@+id/VoiceTalk"
+                android:layout_toRightOf="@+id/btnDevSound"
                 android:background="@color/transparent"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_devskipprevios" />
             <ImageButton
                 android:id="@+id/btnDevNext"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_alignTop="@+id/btnDevRecord"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="24dp"

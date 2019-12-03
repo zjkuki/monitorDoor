@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.TestFragment;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
@@ -603,7 +604,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					}
 
-					finish();
+					//replaceFragment(android.R.id.content, new TestFragment());
+					//finish();
+					onBackPressed();
 				}
 			}
 			break;
@@ -1039,10 +1042,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	@Override
 	public void onBackPressed() {
 		//AppManager.getAppManager().getActivity(HomeActivity.class);
-		Intent intent = new Intent();
+		/*Intent intent = new Intent();
 		intent.setClass(mcontext, HomeActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		startActivity(intent);
+		startActivity(intent);*/
 		finish();
 	}
 

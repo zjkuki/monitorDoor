@@ -207,7 +207,7 @@ public class WifiRemoterBoardActivity
     List<Camera> cams = null;
     private int currIndex = 0;
     private boolean mIsCameraOpend = false;
-
+	private boolean isMute = true;
 
 
     private WifiRemoterBoard wifiRemoterBoard = null;
@@ -270,6 +270,7 @@ public class WifiRemoterBoardActivity
 
 		mCanToPlay = false;
         isGetSysFirst = true;
+		isMute = true;
 
 		mFunVideoView = (FunVideoView) findViewById(R.id.funVideoView);
         mFunVideoView.clearVideo();
@@ -299,8 +300,8 @@ public class WifiRemoterBoardActivity
 		// 允许横竖屏切换
 		// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
-		//showVideoControlBar();
-		hideVideoControlBar();
+		showVideoControlBar();
+		//hideVideoControlBar();
 
 		mFunVideoView.setMediaSound(false);			//关闭本地音频
 
@@ -656,6 +657,7 @@ public class WifiRemoterBoardActivity
 		RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
 
 		if(devId!=0) {
+
 			mLayoutVideoWnd.setVisibility(View.VISIBLE);
 			mLayoutFunctionButtons.setVisibility(View.VISIBLE);
 			//mLayoutCameraButtons.setVisibility(View.VISIBLE);
@@ -665,7 +667,16 @@ public class WifiRemoterBoardActivity
 			initCamera(devId, sn);
 			mBtnOpenCamera.setImageResource(R.drawable.icon_btn_camera_selected);
 			mIsCameraOpend = true;
+
+			mFunVideoView.setMediaSound(true);
+			isMute = false;
+
 		}else{
+			destroyTalk();
+			//closeVoiceChannel(0);
+			closeVoiceChannel1(0);
+			mFunVideoView.setMediaSound(false);
+			isMute = true;
 			mLayoutVideoWnd.setVisibility(View.GONE);
 			mLayoutFunctionButtons.setVisibility(View.GONE);
 			//mLayoutCameraButtons.setVisibility(View.GONE);
@@ -1515,7 +1526,8 @@ public class WifiRemoterBoardActivity
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			System.out.println("TTT-->>> event = " + event.getAction());
-			if (event.getAction() == MotionEvent.ACTION_UP) {
+			//if (event.getAction() == MotionEvent.ACTION_UP) {
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
 				// 显示或隐藏视频操作菜单
 				if (mVideoControlLayout.getVisibility() == View.VISIBLE) {
@@ -1592,7 +1604,11 @@ public class WifiRemoterBoardActivity
 		}
 
 		// 打开声音
-		//mFunVideoView.setMediaSound(true);
+		if(isMute){
+			mFunVideoView.setMediaSound(true);
+		}else{
+			mFunVideoView.setMediaSound(false);
+		}
 
 		// 设置当前播放的码流类型
 		if (FunStreamType.STREAM_SECONDARY == mFunVideoView.getStreamType()) {
@@ -2042,25 +2058,30 @@ public class WifiRemoterBoardActivity
 	@Override
 	public void onGestureRight() {
 		onContrlPTZ1(EPTZCMD.PAN_RIGHT, false);
+		hideVideoControlBar();
 	}
 
 	@Override
 	public void onGestureLeft() {
 		onContrlPTZ1(EPTZCMD.PAN_LEFT, false);
+		hideVideoControlBar();
 	}
 
 	@Override
 	public void onGestureUp() {
 		onContrlPTZ1(EPTZCMD.TILT_UP, false);
+		hideVideoControlBar();
 	}
 
 	@Override
 	public void onGestureDown() {
 		onContrlPTZ1(EPTZCMD.TILT_DOWN, false);
+		hideVideoControlBar();
 	}
 	@Override
 	public void onGestureStop() {
 		onContrlPTZ1(EPTZCMD.TILT_DOWN, true);
+		showVideoControlBar();
 	}
 
 	@Override
