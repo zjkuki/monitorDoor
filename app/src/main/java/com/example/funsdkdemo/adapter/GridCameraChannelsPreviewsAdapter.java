@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.lib.funsdk.support.models.FunDevice;
 import com.lkd.smartlocker.R;
 import com.lib.funsdk.support.widget.FunVideoView;
 
@@ -68,6 +69,7 @@ public class GridCameraChannelsPreviewsAdapter extends BaseAdapter{
 		
 		public TextView textView;
 		public FunVideoView funVideoView;
+		public FunDevice funDevice;
 		
 	}
 	

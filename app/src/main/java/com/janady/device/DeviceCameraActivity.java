@@ -35,6 +35,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +47,7 @@ import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.MyApplication;
+import com.example.funsdkdemo.adapter.GridCameraChannelsPreviewsAdapter;
 import com.janady.AppManager;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
@@ -81,10 +83,12 @@ import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
 
@@ -168,9 +172,11 @@ public class DeviceCameraActivity
 	private final int MESSAGE_AUTO_HIDE_CONTROL_BAR = 0x102;
 	private final int MESSAGE_TOAST_SCREENSHOT_PREVIEW = 0x103;
 	private final int MESSAGE_OPEN_VOICE = 0x104;
+	private final int MESSAGE_PLAY_MEDIA_MULIT = 0x105;
+	private final int MESSAGE_STOP_MEDIA_MULIT = 0x106;
 
 	// 自动隐藏底部的操作控制按钮栏的时间
-	private final int AUTO_HIDE_CONTROL_BAR_DURATION = 10000;
+	private final int AUTO_HIDE_CONTROL_BAR_DURATION = 3000;
 
 	private TalkManager mTalkManager = null;
 
@@ -179,6 +185,15 @@ public class DeviceCameraActivity
 	public String NativeLoginPsw; //本地密码
 	private boolean mIsDoubleTalkPress;
 	private TourActivity mTourFragment;
+	//-----------------------------------------------
+	//分屏预览专用变量
+	private TextView textStart;
+	private GridView gridview;
+	private FunVideoView funVideoView;
+	private GridCameraChannelsPreviewsAdapter cadapter;
+	private List<TextView> textvlist = new ArrayList<TextView>();
+	private List<FunVideoView> funvideovlist = new ArrayList<FunVideoView>();
+	private int currFunDeviceIdx =0 ;
 
 	private Camera camera;
     List<Camera> cams = null;
@@ -259,8 +274,8 @@ public class DeviceCameraActivity
 
 		// 如果支持云台控制，显示方向键和预置点按钮
 		if (mFunDevice.isSupportPTZ()) {
-			mSplitView.setVisibility(View.VISIBLE);
-			mLayoutDirectionControl.setVisibility(View.VISIBLE);
+			mSplitView.setVisibility(VISIBLE);
+			mLayoutDirectionControl.setVisibility(VISIBLE);
 		}
 
 
@@ -365,7 +380,7 @@ public class DeviceCameraActivity
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
 		mBtnVoiceTalk_jcdp = (RelativeLayout) findViewById(R.id.btnVoiceTalk_jcdp);
-		mBtnVoiceTalk_jcdp.setVisibility(View.VISIBLE);
+		mBtnVoiceTalk_jcdp.setVisibility(VISIBLE);
 
 		mBtnVoiceTalk = (RelativeLayout) findViewById(R.id.btnVoiceTalk);
 		mBtnVoiceTalk.setVisibility(GONE);
@@ -451,6 +466,7 @@ public class DeviceCameraActivity
 	protected void onDestroy() {
 
 		stopMedia();
+		stopMediaMuilt();
 
 		FunSupport.getInstance().removeOnFunDeviceOptListener(this);
 
@@ -517,6 +533,137 @@ public class DeviceCameraActivity
 		}
 
 		super.onConfigurationChanged(newConfig);
+	}
+
+	private void showMuiltPreview(int showNum){
+		gridview = (GridView) findViewById(R.id.Frames_grid_view);
+		mLayoutVideoWnd.setVisibility(GONE);
+		gridview.setVisibility(VISIBLE);
+		cadapter = new GridCameraChannelsPreviewsAdapter(this, showNum);
+		gridview.setAdapter(cadapter);
+
+		Message message = new Message();
+		message.what = MESSAGE_PLAY_MEDIA_MULIT;
+		mHandler.sendMessageDelayed(message, 100);
+	}
+
+	private class OnItemViewTouchListener implements View.OnTouchListener {
+
+		private int mChannel;
+
+		public OnItemViewTouchListener(int channel){
+			mChannel = channel;
+			currFunDeviceIdx = channel;
+		}
+
+		@SuppressLint("ClickableViewAccessibility")
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			System.out.println("TTT-->>> event = " + event.getAction());
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				Message message = new Message();
+				message.what = MESSAGE_STOP_MEDIA_MULIT;
+				mHandler.sendMessageDelayed(message, 100);
+				//选中后，显示打开独立的摄像头
+				//this.setResult(mChannel, null);
+				//ActivityGuideDevicePreview.this.finish();
+			}
+
+			return false;
+		}
+
+	}
+
+	public void playrealvideoMuilt(){
+		int cam_count = cams.size();
+		mFunVideoView.stopPlayback();
+		mFunVideoView.stopRecordVideo();
+		mFunVideoView.invalidate();
+		mFunVideoView.clearVideo();
+		FunDevice fundev= null;
+		for (int i = 0; i < cam_count; i++) {
+			View v = gridview.findViewWithTag(i);
+			if ( null != v ) {
+				funVideoView = (FunVideoView)v.findViewById(R.id.funVideoView1);
+				textStart = (TextView) v.findViewById(R.id.textVideoStat1);
+			}
+			funVideoView.clearVideo();
+			funVideoView.setOnErrorListener(this);
+			funVideoView.setOnInfoListener(this);
+			funVideoView.setOnTouchListener(new OnItemViewTouchListener(i));
+			funVideoView.setStreamType(FunStreamType.STREAM_SECONDARY);
+			funvideovlist.add(funVideoView);
+			textvlist.add(textStart);
+			// 显示状态: 正在打开视频...
+			textStart.setText(R.string.media_player_opening);
+			textStart.setVisibility(VISIBLE);
+
+			//cadapter.notifyDataSetInvalidated();
+			//mTextTitle.setText(mFunDevice.devName);
+			if(cams.get(i).isOnline) {
+				fundev = FunSupport.getInstance().findDeviceById(cams.get(i).devId);
+				if (null == fundev) {
+					fundev = FunSupport.getInstance().findLanDevice(camera.sn);
+					if (fundev == null) {
+						fundev = FunSupport.getInstance().findLanDevice(camera.name);
+						if (fundev== null) {
+							fundev = FunSupport.getInstance().findDeviceBySn(camera.sn);
+							if (fundev == null) {
+								fundev = FunSupport.getInstance().findTempDevice(camera.mac);
+								if (fundev == null) {
+									//finish();
+									return;
+								}
+							}
+						}
+					}
+				}
+
+				if (fundev.isRemote) {
+					funVideoView.setRealDevice(fundev.getDevSn(), i);
+				} else {
+					String deviceIp = FunSupport.getInstance().getDeviceWifiManager().getGatewayIp();
+					funVideoView.setRealDevice(deviceIp, i);
+				}
+			}
+		}
+	}
+
+	private void stopMediaMuilt() {
+		if(gridview!=null) {
+			for (int i = 0; i < cams.size(); i++) {
+				View v = gridview.findViewWithTag(i);
+				if (null != v) {
+					funVideoView = (FunVideoView) v.findViewById(R.id.funVideoView1);
+					textStart = (TextView) v.findViewById(R.id.textVideoStat1);
+				}
+				funVideoView.stopRecordVideo();
+				funVideoView.stopPlayback();
+				funVideoView.clearVideo();
+				funVideoView.setVisibility(GONE);
+			}
+		}
+
+		if (funvideovlist != null) {
+			for (int i = 0; i < funvideovlist.size(); i++) {
+				if (null != funvideovlist.get(i)) {
+					/*funvideovlist.get(i).stopPlayback();
+					funvideovlist.get(i).stopRecordVideo();
+					funvideovlist.get(i).clearVideo();
+					funvideovlist.get(i).setVisibility(GONE);*/
+					funvideovlist.remove(i);
+				}
+			}
+		}
+
+		if(funVideoView != null) {
+			funVideoView.stopPlayback();
+			funVideoView.stopRecordVideo();
+			funVideoView.clearVideo();
+			funVideoView.setVisibility(GONE);
+			funVideoView.invalidate();
+			funVideoView = null;
+		}
 	}
 
 	@SuppressLint("ResourceType")
@@ -707,7 +854,9 @@ public class DeviceCameraActivity
 		case R.id.btnFishEyeInfo:
 			{
 				// 显示鱼眼信息
-				showFishEyeInfo();
+				//showFishEyeInfo();
+				//startDevicesPreview();
+				showMuiltPreview(cams.size());
 			}
 			break;
         case R.id.btnDevPre:
@@ -764,7 +913,7 @@ public class DeviceCameraActivity
 			toastRecordSucess(mFunVideoView.getFilePath());
 		} else {
 			mFunVideoView.startRecordVideo(null);
-			mLayoutRecording.setVisibility(View.VISIBLE);
+			mLayoutRecording.setVisibility(VISIBLE);
 			showToast(R.string.media_record_start);
 		}
 
@@ -864,11 +1013,11 @@ public class DeviceCameraActivity
 	}
 
 	private void showVideoControlBar() {
-		if (mVideoControlLayout.getVisibility() != View.VISIBLE) {
+		if (mVideoControlLayout.getVisibility() != VISIBLE) {
 			TranslateAnimation ani = new TranslateAnimation(0, 0, UIFactory.dip2px(this, 42), 0);
 			ani.setDuration(200);
 			mVideoControlLayout.startAnimation(ani);
-			mVideoControlLayout.setVisibility(View.VISIBLE);
+			mVideoControlLayout.setVisibility(VISIBLE);
 		}
 
 		if (getResources().getConfiguration().orientation
@@ -877,9 +1026,9 @@ public class DeviceCameraActivity
 			TranslateAnimation ani = new TranslateAnimation(0, 0, -UIFactory.dip2px(this, 48), 0);
 			ani.setDuration(200);
 			mLayoutTop.startAnimation(ani);
-			mLayoutTop.setVisibility(View.VISIBLE);
+			mLayoutTop.setVisibility(VISIBLE);
 		} else {
-			mLayoutTop.setVisibility(View.VISIBLE);
+			mLayoutTop.setVisibility(VISIBLE);
 		}
 
 		// 显示后设置10秒后自动隐藏
@@ -932,7 +1081,7 @@ public class DeviceCameraActivity
 
 		// 还原上面标题栏背景
 		mLayoutTop.setBackgroundColor(getResources().getColor(R.color.theme_color));
-		mLayoutTop.setVisibility(View.VISIBLE);
+		mLayoutTop.setVisibility(VISIBLE);
 
 		// 视频显示为小窗口
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
@@ -942,7 +1091,7 @@ public class DeviceCameraActivity
 		mLayoutVideoWnd.setLayoutParams(lpWnd);
 
 		// 显示底部的控制按钮区域
-		mLayoutControls.setVisibility(View.VISIBLE);
+		mLayoutControls.setVisibility(VISIBLE);
 
 		mBtnScreenRatio.setText(R.string.device_opt_fullscreen);
 	}
@@ -992,7 +1141,7 @@ public class DeviceCameraActivity
 			//if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
 				// 显示或隐藏视频操作菜单
-				if (mVideoControlLayout.getVisibility() == View.VISIBLE) {
+				if (mVideoControlLayout.getVisibility() == VISIBLE) {
 					hideVideoControlBar();
 				} else {
 					showVideoControlBar();
@@ -1055,7 +1204,7 @@ public class DeviceCameraActivity
 
 		// 显示状态: 正在打开视频...
 		mTextVideoStat.setText(R.string.media_player_opening);
-		mTextVideoStat.setVisibility(View.VISIBLE);
+		mTextVideoStat.setVisibility(VISIBLE);
 
 		if (mFunDevice.isRemote) {
 			mFunVideoView.setRealDevice(mFunDevice.getDevSn(), mFunDevice.CurrChannel);
@@ -1119,6 +1268,7 @@ public class DeviceCameraActivity
 
 	}
 
+
 	private void stopMedia() {
 		if (null != mFunVideoView) {
 			mFunVideoView.stopPlayback();
@@ -1157,6 +1307,23 @@ public class DeviceCameraActivity
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
+			case MESSAGE_STOP_MEDIA_MULIT:
+			{
+				stopMediaMuilt();
+
+				gridview.setVisibility(GONE);
+				mLayoutVideoWnd.setVisibility(VISIBLE);
+				mLayoutVideoWnd.refreshDrawableState();
+				mFunVideoView.clearVideo();
+				mHandler.sendEmptyMessageDelayed(MESSAGE_PLAY_MEDIA, 1000);
+				initCamera(cams.get(currFunDeviceIdx).devId, cams.get(currFunDeviceIdx).sn, cams.get(currFunDeviceIdx).mac);
+			}
+				break;
+			case MESSAGE_PLAY_MEDIA_MULIT:
+			{
+				playrealvideoMuilt();
+			}
+					break;
 			case MESSAGE_PLAY_MEDIA:
 				{
 				playRealMedia();
@@ -1264,13 +1431,13 @@ public class DeviceCameraActivity
 
     private void openVoiceChannel(){
 
-        if (mBtnVoice.getVisibility() == View.VISIBLE) {
+        if (mBtnVoice.getVisibility() == VISIBLE) {
             TranslateAnimation ani = new TranslateAnimation(0, 0, UIFactory.dip2px(this, 100), 0);
             ani.setDuration(200);
             mBtnVoiceTalk.setAnimation(ani);
-            mBtnVoiceTalk.setVisibility(View.VISIBLE);
+            mBtnVoiceTalk.setVisibility(VISIBLE);
 			mBtnVoiceTalk_jcdp.setAnimation(ani);
-			mBtnVoiceTalk_jcdp.setVisibility(View.VISIBLE);
+			mBtnVoiceTalk_jcdp.setVisibility(VISIBLE);
             mBtnVoice.setVisibility(GONE);
             mFunVideoView.setMediaSound(false);			//关闭本地音频
         }
@@ -1278,14 +1445,14 @@ public class DeviceCameraActivity
 
     private void closeVoiceChannel(int delayTime){
 
-        if (mBtnVoiceTalk.getVisibility() == View.VISIBLE) {
+        if (mBtnVoiceTalk.getVisibility() == VISIBLE) {
             TranslateAnimation ani = new TranslateAnimation(0, 0, 0, UIFactory.dip2px(this, 100));
             ani.setDuration(200);
             mBtnVoiceTalk.setAnimation(ani);
             mBtnVoiceTalk.setVisibility(GONE);
 			mBtnVoiceTalk_jcdp.setAnimation(ani);
 			mBtnVoiceTalk_jcdp.setVisibility(GONE);
-            mBtnVoice.setVisibility(View.VISIBLE);
+            mBtnVoice.setVisibility(VISIBLE);
 			destroyTalk();
             mHandler.sendEmptyMessageDelayed(MESSAGE_OPEN_VOICE, delayTime);
         }
@@ -1583,10 +1750,19 @@ public class DeviceCameraActivity
 	public boolean onInfo(MediaPlayer arg0, int what, int extra) {
 		if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
 			mTextVideoStat.setText(R.string.media_player_buffering);
-			mTextVideoStat.setVisibility(View.VISIBLE);
+			mTextVideoStat.setVisibility(VISIBLE);
+
+			if(textvlist!=null && textvlist.size()>0) {
+				textvlist.get(extra).setText(R.string.media_player_buffering);
+				textvlist.get(extra).setVisibility(VISIBLE);
+			}
 		} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
 			mTextVideoStat.setVisibility(GONE);
+			if(textvlist!=null && textvlist.size()>0) {
+				textvlist.get(extra).setVisibility(View.GONE);
+			}
 		}
+
 		return true;
 	}
 

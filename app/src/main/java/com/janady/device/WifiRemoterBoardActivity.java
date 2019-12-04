@@ -193,7 +193,7 @@ public class WifiRemoterBoardActivity
 	private final int MESSAGE_OPEN_VOICE = 0x104;
 
 	// 自动隐藏底部的操作控制按钮栏的时间
-	private final int AUTO_HIDE_CONTROL_BAR_DURATION = 10000;
+	private final int AUTO_HIDE_CONTROL_BAR_DURATION = 3000;
 
 	private TalkManager mTalkManager = null;
 

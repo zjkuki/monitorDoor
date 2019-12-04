@@ -6,130 +6,149 @@
     android:longClickable="true">
 
     <RelativeLayout
-        android:id="@+id/layoutPlayWnd"
+        android:id="@+id/rl_VideoScreen"
         android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:layout_marginTop="48dp"
-        android:background="#ff000000"
-        android:longClickable="true">
-
-        <com.lib.funsdk.support.widget.FunVideoView
-            android:id="@+id/funVideoView"
+        android:layout_height="280dp">
+        <GridView
+            android:id="@+id/Frames_grid_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:id="@+id/textVideoStat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="#40000000"
-            android:textColor="#ffffffff"
-            android:textSize="14dp" />
-
+            android:layout_height="280dp"
+            android:gravity="center"
+            android:horizontalSpacing="5dip"
+            android:verticalSpacing="5dip"
+            android:numColumns="2"
+            android:stretchMode="columnWidth"
+            android:layout_marginTop="48dp"
+            android:background="#ff000000"
+            android:visibility="gone"
+            >
+        </GridView>
         <RelativeLayout
-            android:id="@+id/layout_recording"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="28dp"
-            android:visibility="invisible" >
+            android:id="@+id/layoutPlayWnd"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginTop="48dp"
+            android:background="#ff000000"
+            android:longClickable="true"
+            android:visibility="visible">
 
-            <ImageView
-                android:id="@+id/img_recording"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/recording" />
+            <com.lib.funsdk.support.widget.FunVideoView
+                android:id="@+id/funVideoView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
             <TextView
+                android:id="@+id/textVideoStat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/img_recording"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:text="录制中" />
-        </RelativeLayout>
+                android:layout_centerInParent="true"
+                android:background="#40000000"
+                android:textColor="#ffffffff"
+                android:textSize="14dp" />
 
-        <HorizontalScrollView
-            android:layout_width="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:id="@+id/layoutVideoControl"
-                android:layout_width="match_parent"
+            <RelativeLayout
+                android:id="@+id/layout_recording"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#6c000000"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="28dp"
+                android:visibility="invisible" >
 
-                android:orientation="horizontal" >
+                <ImageView
+                    android:id="@+id/img_recording"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/recording" />
 
-                <Button
-                    android:id="@+id/btnPlay"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_play"
-                    android:textColor="@drawable/common_text_selector"
-                    android:visibility="gone"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/img_recording"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="5dp"
+                    android:text="录制中" />
+            </RelativeLayout>
 
-                <Button
-                    android:id="@+id/btnStop"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_stop"
-                    android:textColor="@drawable/common_text_selector"
-                    android:visibility="gone"/>
+            <HorizontalScrollView
+                android:layout_width="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_height="40dp">
+                <LinearLayout
+                    android:id="@+id/layoutVideoControl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#6c000000"
 
-                <Button
-                    android:id="@+id/btnStream"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/media_stream_switch"
-                    android:textColor="@drawable/common_text_selector" />
+                    android:orientation="horizontal" >
 
-                <Button
-                    android:id="@+id/btnCapture"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_capture"
-                    android:textColor="@drawable/common_text_selector" />
+                    <Button
+                        android:id="@+id/btnPlay"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_play"
+                        android:textColor="@drawable/common_text_selector"
+                        android:visibility="gone"/>
 
-                <Button
-                    android:id="@+id/btnRecord"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_record"
-                    android:textColor="@drawable/common_text_selector" />
+                    <Button
+                        android:id="@+id/btnStop"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_stop"
+                        android:textColor="@drawable/common_text_selector"
+                        android:visibility="gone"/>
 
-                <Button
-                    android:id="@+id/btnScreenRatio"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_fullscreen"
-                    android:textColor="@drawable/common_text_selector" />
+                    <Button
+                        android:id="@+id/btnStream"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/media_stream_switch"
+                        android:textColor="@drawable/common_text_selector" />
 
-                <Button
-                    android:id="@+id/btnFishEyeInfo"
-                    style="@style/video_control_button"
-                    android:background="@drawable/video_control_button_selector"
-                    android:text="@string/device_opt_fisheye_info"
-                    android:textColor="@drawable/common_text_selector" />
-            </LinearLayout>
-        </HorizontalScrollView>
+                    <Button
+                        android:id="@+id/btnCapture"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_capture"
+                        android:textColor="@drawable/common_text_selector" />
 
-        <!-- 主/辅码流类型显示 -->
+                    <Button
+                        android:id="@+id/btnRecord"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_record"
+                        android:textColor="@drawable/common_text_selector" />
 
-        <TextView
-            android:id="@+id/textStreamStat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="#80000000"
-            android:padding="5dp"
-            android:textColor="#ffffffff"
-            android:textSize="10dp" />
+                    <Button
+                        android:id="@+id/btnScreenRatio"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_fullscreen"
+                        android:textColor="@drawable/common_text_selector" />
+
+                    <Button
+                        android:id="@+id/btnFishEyeInfo"
+                        style="@style/video_control_button"
+                        android:background="@drawable/video_control_button_selector"
+                        android:text="@string/device_opt_fisheye_info"
+                        android:textColor="@drawable/common_text_selector" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- 主/辅码流类型显示 -->
+
+            <TextView
+                android:id="@+id/textStreamStat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#80000000"
+                android:padding="5dp"
+                android:textColor="#ffffffff"
+                android:textSize="10dp" />
+        </RelativeLayout>
     </RelativeLayout>
-
     <include
         android:id="@+id/layoutTop"
         layout="@layout/layout_top_navigate_theme" />
@@ -138,7 +157,7 @@
         android:id="@+id/layoutFunctionControl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/layoutPlayWnd"
+        android:layout_below="@+id/rl_VideoScreen"
         android:orientation="vertical" >
 
         <HorizontalScrollView

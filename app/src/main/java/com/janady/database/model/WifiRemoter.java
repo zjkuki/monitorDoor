@@ -57,6 +57,9 @@ public class WifiRemoter {// 指定一对多关系
     public Camera camera;
 
     @Mapping(Relation.OneToMany)
+    public ArrayList<Camera> cameras;
+
+    @Mapping(Relation.OneToMany)
     public ArrayList<WifiRemoteLocker> Lockers;
 
     @Mapping(Relation.OneToMany)

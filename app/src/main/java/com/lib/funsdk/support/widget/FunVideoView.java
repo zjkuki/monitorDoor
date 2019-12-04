@@ -24,6 +24,7 @@ import com.lib.EUIMSG;
 import com.lib.FunSDK;
 import com.lib.IFunSDKResult;
 import com.lib.MsgContent;
+import com.lib.SDKCONST;
 import com.lib.funsdk.support.FunError;
 import com.lib.funsdk.support.FunLog;
 import com.lib.funsdk.support.FunPath;
@@ -537,8 +538,9 @@ public class FunVideoView extends LinearLayout implements IFunSDKResult {
 						playPath,
 						mChannel,
 						mStreamType.getTypeId(), mSufaceView, 0);
-//                FunSDK.SetIntAttr(mPlayerHandler, EFUN_ATTR.EOA_SET_MEDIA_DATA_USER, getUserId());
+                FunSDK.SetIntAttr(mPlayerHandler, EFUN_ATTR.EOA_SET_MEDIA_DATA_USER, getUserId());
 //                FunSDK.MediaSetFluency(mPlayerHandler, SDKCONST.EDECODE_TYPE.EDECODE_REAL_TIME_STREAM0, 0); //设置流畅度（实时<-->流畅）
+				FunSDK.MediaSetFluency(mPlayerHandler, SDKCONST.EDECODE_TYPE.EDECODE_REAL_TIME_STREAM6, 0); //设置流畅度（实时<-->流畅）
 				if (mIsGetYUVData) {
 					//传入EOA_MEDIA_YUV_USER 表示不显示直接输出YUV数据 对应的是EUIMSG.ON_YUV_DATA:
 					FunSDK.SetIntAttr(mPlayerHandler, EOA_MEDIA_YUV_USER, mUserID);
