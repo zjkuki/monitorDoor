@@ -620,10 +620,10 @@ public class DeviceCameraActivity
 				}
 
 				if (fundev.isRemote) {
-					funVideoView.setRealDevice(fundev.getDevSn(), i);
+					funVideoView.setRealDevice(fundev.getDevSn(), fundev.CurrChannel);
 				} else {
 					String deviceIp = FunSupport.getInstance().getDeviceWifiManager().getGatewayIp();
-					funVideoView.setRealDevice(deviceIp, i);
+					funVideoView.setRealDevice(deviceIp, fundev.CurrChannel);
 				}
 			}
 		}
