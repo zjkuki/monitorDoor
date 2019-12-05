@@ -34,6 +34,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +47,7 @@ import com.example.common.DialogInputPasswd;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.MyApplication;
+import com.example.funsdkdemo.adapter.GridCameraChannelsPreviewsAdapter;
 import com.hb.dialog.myDialog.MyAlertDialog;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.janady.database.model.Door;
@@ -87,6 +89,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
 
 /**
@@ -118,6 +123,7 @@ public class WifiRemoterBoardActivity
 	private LinearLayout mVideoControlLayout = null;
 	private LinearLayout mLayoutCameraButtons = null;
 	private LinearLayout mLayoutLockerButtons = null;
+	private RelativeLayout mLayoutVideoScreen = null;
 
 	private TextView mTextStreamType = null;
 
@@ -153,7 +159,7 @@ public class WifiRemoterBoardActivity
 
 	private ImageButton mBtnSkipNext = null;
     private ImageButton mBtnSkipPrevious = null;
-
+	private ImageButton mBtnDevSound = null;
 
 	private RelativeLayout mLayoutDirectionControl = null;
 	private ImageButton mPtz_up = null;
@@ -186,11 +192,14 @@ public class WifiRemoterBoardActivity
 	private boolean isGetSysFirst = true;
 
 	private boolean mIsLocked = false;
+	private boolean isMute = false;
 
 	private final int MESSAGE_PLAY_MEDIA = 0x100;
 	private final int MESSAGE_AUTO_HIDE_CONTROL_BAR = 0x102;
 	private final int MESSAGE_TOAST_SCREENSHOT_PREVIEW = 0x103;
 	private final int MESSAGE_OPEN_VOICE = 0x104;
+	private final int MESSAGE_PLAY_MEDIA_MULIT = 0x105;
+	private final int MESSAGE_STOP_MEDIA_MULIT = 0x106;
 
 	// 自动隐藏底部的操作控制按钮栏的时间
 	private final int AUTO_HIDE_CONTROL_BAR_DURATION = 3000;
@@ -203,12 +212,21 @@ public class WifiRemoterBoardActivity
 	private boolean mIsDoubleTalkPress;
 	private TourActivity mTourFragment;
 
+	//-----------------------------------------------
+	//分屏预览专用变量
+	private TextView textStart;
+	private GridView gridview;
+	private FunVideoView funVideoView;
+	private GridCameraChannelsPreviewsAdapter cadapter;
+	private List<TextView> textvlist = new ArrayList<TextView>();
+	private List<FunVideoView> funvideovlist = new ArrayList<FunVideoView>();
+	private int currFunDeviceIdx =0 ;
+	private boolean mulitScreenNow = false;
+
 	private Camera camera;
     List<Camera> cams = null;
     private int currIndex = 0;
     private boolean mIsCameraOpend = false;
-	private boolean isMute = true;
-
 
     private WifiRemoterBoard wifiRemoterBoard = null;
     private WifiRemoter mWifiRemoter = null;
@@ -231,18 +249,29 @@ public class WifiRemoterBoardActivity
             return null;
         }
     }
-	private void initCamera(int devId, String sn){
+	private void initCamera(int devId, String sn, String mac){
         //cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));
-        cams = MyApplication.liteOrm.query(Camera.class);
-        if(cams.size()>0){
-            currIndex = 0;
-            for(int i=0;i<cams.size();i++){
-                if(cams.get(i).sn.equals(sn)) {
-                    camera = cams.get(i);
-                    currIndex = i;
-                }
-            }
-        }
+		mulitScreenNow = false;
+
+		mBtnSkipPrevious.setEnabled(true);
+		mBtnSkipNext.setEnabled(true);
+
+		cams = MyApplication.liteOrm.query(Camera.class);
+		if(cams.size()>0){
+			currIndex = 0;
+			for(int i=0;i<cams.size();i++){
+				if(cams.get(i).sn.equals(sn)) {
+					camera = cams.get(i);
+					currIndex = i;
+				}else{
+					if(cams.get(i).mac.equals(mac)) {
+						camera = cams.get(i);
+						currIndex = i;
+					}
+				}
+			}
+		}
+
 		//mTextTitle.setText(mFunDevice.devName);
 		if(!camera.isOnline){
 			tvSelectedCamera.setText("摄像机："+camera.sceneName+"(离线)");
@@ -443,6 +472,7 @@ public class WifiRemoterBoardActivity
 		mBtnBack = (ImageButton) findViewById(R.id.backBtnInTopLayout);
 		mBtnBack.setOnClickListener(this);
 
+		mLayoutVideoScreen = (RelativeLayout) findViewById(R.id.rl_VideoScreen);
 		mLayoutVideoWnd = (RelativeLayout) findViewById(R.id.layoutPlayWnd);
 
 		mBtnPlay = (Button) findViewById(R.id.btnPlay);
@@ -454,6 +484,7 @@ public class WifiRemoterBoardActivity
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
         mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
         mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
+		mBtnDevSound = (ImageButton) findViewById(R.id.btnDevSound_jdp);
 
 		mLayoutRecording = (RelativeLayout) findViewById(R.id.layout_recording);
 		mBtnPlay.setOnClickListener(this);
@@ -465,6 +496,7 @@ public class WifiRemoterBoardActivity
 		mBtnFishEyeInfo.setOnClickListener(this);
 		mBtnSkipNext.setOnClickListener(this);
 		mBtnSkipPrevious.setOnClickListener(this);
+		mBtnDevSound.setOnClickListener(this);
 
 		mTextVideoStat = (TextView) findViewById(R.id.textVideoStat);
 
@@ -581,14 +613,14 @@ public class WifiRemoterBoardActivity
 			mWifiRemoter = wifiRemoters.get(0);
 			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
 			if(mWifiRemoter.camera!=null) {
-				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn);
+				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn, camera.mac);
 			}else{
-				showCamera(0,"");
+				showCamera(0,"","");
 			}
 		}else{
 			mWifiRemoter = null;
 			wifiRemoterBoard = null;
-			showCamera(0, "");
+			showCamera(0, "", "");
 		}
 
 		mTextTitle.setText(sceneName);
@@ -653,7 +685,7 @@ public class WifiRemoterBoardActivity
 
 	}
 
-	private void showCamera(int devId, String sn){
+	private void showCamera(int devId, String sn, String mac){
 		RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
 
 		if(devId!=0) {
@@ -664,7 +696,7 @@ public class WifiRemoterBoardActivity
 			lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
 			lp.topMargin=0;
 			mLayoutControls.setLayoutParams(lp);
-			initCamera(devId, sn);
+			initCamera(devId, sn, mac);
 			mBtnOpenCamera.setImageResource(R.drawable.icon_btn_camera_selected);
 			mIsCameraOpend = true;
 
@@ -726,12 +758,12 @@ public class WifiRemoterBoardActivity
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if(index[0]==0) {
-						showCamera(0,"");
+						showCamera(0,"","");
 						mWifiRemoter.camera = null;
 						wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
 						MyApplication.liteOrm.cascade().save(mWifiRemoter);
 					}else{
-						showCamera(cams.get(index[0]-1).devId, cams.get(index[0]-1).sn);
+						showCamera(cams.get(index[0]-1).devId, cams.get(index[0]-1).sn, cams.get(index[0]-1).mac);
 
 						mWifiRemoter.camera = cams.get(index[0]-1);
 						wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
@@ -818,6 +850,169 @@ public class WifiRemoterBoardActivity
 		super.onConfigurationChanged(newConfig);
 	}
 
+	private void showMuiltPreview(int showNum){
+		gridview = (GridView) findViewById(R.id.Frames_grid_view);
+		mLayoutVideoWnd.setVisibility(GONE);
+		gridview.setVisibility(VISIBLE);
+		cadapter = new GridCameraChannelsPreviewsAdapter(this, showNum);
+		gridview.setAdapter(cadapter);
+
+		mulitScreenNow = true;
+		mBtnSkipPrevious.setEnabled(false);
+		mBtnSkipNext.setEnabled(false);
+
+		Message message = new Message();
+		message.what = MESSAGE_PLAY_MEDIA_MULIT;
+		mHandler.sendMessageDelayed(message, 100);
+	}
+
+	private class OnItemViewTouchListener implements View.OnTouchListener {
+
+		private int mChannel;
+
+		public OnItemViewTouchListener(int channel){
+			mChannel = channel;
+		}
+
+		@SuppressLint("ClickableViewAccessibility")
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			System.out.println("TTT-->>> event = " + event.getAction());
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				currFunDeviceIdx = mChannel;
+				Message message = new Message();
+				message.what = MESSAGE_STOP_MEDIA_MULIT;
+				mHandler.sendMessageDelayed(message, 100);
+				//选中后，显示打开独立的摄像头
+				//this.setResult(mChannel, null);
+				//ActivityGuideDevicePreview.this.finish();
+			}
+
+			return true;
+			//巨坑！为false时只触发ACTION_DOWN
+			//return false;
+		}
+
+	}
+
+	public void playrealvideoMuilt(){
+		int cam_count = cams.size();
+		mFunVideoView.stopPlayback();
+		mFunVideoView.stopRecordVideo();
+		mFunVideoView.invalidate();
+		mFunVideoView.clearVideo();
+		FunDevice fundev= null;
+
+		mTextTitle.setText("实时预览");
+
+		for (int i = 0; i < cam_count; i++) {
+			View v = gridview.findViewWithTag(i);
+			if ( null != v ) {
+				funVideoView = (FunVideoView)v.findViewById(R.id.funVideoView1);
+				textStart = (TextView) v.findViewById(R.id.textVideoStat1);
+			}
+			funVideoView.clearVideo();
+			funVideoView.setOnErrorListener(this);
+			final int finalI = i;
+			funVideoView.setOnInfoListener(new OnInfoListener() {
+				@Override
+				public boolean onInfo(MediaPlayer mp, int what, int extra) {
+					if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+						textvlist.get(finalI).setText(R.string.media_player_buffering);
+						textvlist.get(finalI).setVisibility(VISIBLE);
+					} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+						textvlist.get(finalI).setVisibility(GONE);
+					}
+
+					return true;
+				}
+			});
+			funVideoView.setOnTouchListener(new OnItemViewTouchListener(i));
+			funVideoView.setGestureListner(this);
+			funVideoView.setStreamType(FunStreamType.STREAM_SECONDARY);
+			funvideovlist.add(funVideoView);
+
+			// 显示状态: 正在打开视频...
+			textStart.setText(R.string.media_player_opening);
+			textStart.setVisibility(VISIBLE);
+			textvlist.add(textStart);
+
+			//cadapter.notifyDataSetInvalidated();
+			if(cams.get(i).isOnline) {
+				fundev = FunSupport.getInstance().findDeviceById(cams.get(i).devId);
+				if (null == fundev) {
+					fundev = FunSupport.getInstance().findLanDevice(cams.get(i).sn);
+					if (fundev == null) {
+						fundev = FunSupport.getInstance().findLanDevice(cams.get(i).name);
+						if (fundev== null) {
+							fundev = FunSupport.getInstance().findDeviceBySn(cams.get(i).sn);
+							if (fundev == null) {
+								fundev = FunSupport.getInstance().findTempDevice(cams.get(i).mac);
+								if (fundev == null) {
+									//finish();
+									return;
+								}
+							}
+						}
+					}
+				}
+
+				if (fundev.isRemote) {
+					funVideoView.setRealDevice(fundev.getDevSn(), fundev.CurrChannel);
+				} else {
+					String deviceIp = FunSupport.getInstance().getDeviceWifiManager().getGatewayIp();
+					funVideoView.setRealDevice(deviceIp, fundev.CurrChannel);
+				}
+
+				//gridview.setSelection(i);
+			}
+		}
+	}
+
+	private void stopMediaMuilt() {
+		if(gridview!=null) {
+			for (int i = 0; i < cams.size(); i++) {
+				View v = gridview.findViewWithTag(i);
+				if (null != v) {
+					funVideoView = (FunVideoView) v.findViewById(R.id.funVideoView1);
+					textStart = (TextView) v.findViewById(R.id.textVideoStat1);
+				}
+				funVideoView.stopRecordVideo();
+				funVideoView.stopPlayback();
+				funVideoView.clearVideo();
+				funVideoView.setVisibility(GONE);
+			}
+		}
+
+		if (funvideovlist != null) {
+			for (int i = 0; i < funvideovlist.size(); i++) {
+				if (null != funvideovlist.get(i)) {
+					/*funvideovlist.get(i).stopPlayback();
+					funvideovlist.get(i).stopRecordVideo();
+					funvideovlist.get(i).clearVideo();
+					funvideovlist.get(i).setVisibility(GONE);*/
+					funvideovlist.remove(i);
+					textvlist.remove(i);
+				}
+			}
+
+			funvideovlist = null;
+			textvlist = null;
+		}
+
+		if(funVideoView != null) {
+			funVideoView.stopPlayback();
+			funVideoView.stopRecordVideo();
+			funVideoView.clearVideo();
+			funVideoView.setVisibility(GONE);
+			funVideoView.invalidate();
+			funVideoView = null;
+		}
+
+		cadapter = null;
+	}
+
+
 	@SuppressLint("ResourceType")
 	@Override
 	public void onClick(View v) {
@@ -830,6 +1025,20 @@ public class WifiRemoterBoardActivity
 		case 1101: {
 			startDevicesPreview();
 		}
+			break;
+			case R.id.btnDevSound: // 声音播放
+			{
+				if(isMute){
+					mBtnDevSound.setImageResource(R.drawable.icon_btn_sound_selector);
+					//mBtnDevSound.setBackgroundResource(R.drawable.icon_btn_sound_normal);
+					mFunVideoView.setMediaSound(true);
+					isMute = false;
+				}else{
+					mBtnDevSound.setImageResource(R.drawable.icon_btn_mute_selector);
+					mFunVideoView.setMediaSound(false);
+					isMute = true;
+				}
+			}
 			break;
 		case R.id.backBtnInTopLayout: {
 			// 返回/退出
@@ -995,6 +1204,11 @@ public class WifiRemoterBoardActivity
 				showFishEyeInfo();
 			}
 			break;
+		case R.id.btnDevPreview:
+			{
+				showMuiltPreview(cams.size());
+			}
+			break;
         case R.id.btnDevPre:
             {
                 currIndex --;
@@ -1006,7 +1220,7 @@ public class WifiRemoterBoardActivity
 
                 if(getCamera(currIndex)!=null){
                     camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn);
+                    initCamera(camera.devId, camera.sn, camera.mac);
                 }else{
                 	currIndex++;
                 	Log.d("---DCA----","切换摄像机失败");
@@ -1023,7 +1237,7 @@ public class WifiRemoterBoardActivity
 				}
                 if(getCamera(currIndex)!=null){
                     camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn);
+                    initCamera(camera.devId, camera.sn,camera.mac);
                 }else{
 					currIndex --;
 					Log.d("---DCA----","切换摄像机失败");
@@ -1036,9 +1250,9 @@ public class WifiRemoterBoardActivity
 				if(wifiRemoterBoard!=null && wifiRemoterBoard.getMWifiRemoter()!=null){
 					if(wifiRemoterBoard.getMWifiRemoter().camera!=null){
 						if(!mIsCameraOpend) {
-							showCamera(wifiRemoterBoard.getMWifiRemoter().camera.devId, wifiRemoterBoard.getMWifiRemoter().camera.sn);
+							showCamera(wifiRemoterBoard.getMWifiRemoter().camera.devId, wifiRemoterBoard.getMWifiRemoter().camera.sn, camera.mac);
 						}else{
-							showCamera(0,"");
+							showCamera(0,"","");
 						}
 					}else{
 						Dialogs.alertDialogBtn(mContext, "打开摄像机失败", "此设备还未绑定摄像机，马上进行摄像机绑定吗？", new DialogInterface.OnClickListener() {
@@ -1404,6 +1618,13 @@ public class WifiRemoterBoardActivity
 		mLayoutControls.setVisibility(View.GONE);
 
 		// 视频窗口全屏显示
+		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
+		lpVs.height = LayoutParams.MATCH_PARENT;
+
+		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		lpGd.height = LayoutParams.MATCH_PARENT;
+
+
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
 		lpWnd.height = LayoutParams.MATCH_PARENT;
 		// lpWnd.removeRule(RelativeLayout.BELOW);
@@ -1424,6 +1645,13 @@ public class WifiRemoterBoardActivity
 		mLayoutTop.setVisibility(View.VISIBLE);
 
 		// 视频显示为小窗口
+		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
+		lpVs.height = UIFactory.dip2px(this, 280);
+
+		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		lpGd.height = UIFactory.dip2px(this, 280);
+
+
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
 		lpWnd.height = UIFactory.dip2px(this, 240);
 		lpWnd.topMargin = UIFactory.dip2px(this, 48);
@@ -1696,6 +1924,25 @@ public class WifiRemoterBoardActivity
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
+				case MESSAGE_STOP_MEDIA_MULIT:
+				{
+					stopMediaMuilt();
+
+					gridview.setVisibility(GONE);
+					gridview = null;
+					mLayoutVideoWnd.setVisibility(VISIBLE);
+					mLayoutVideoWnd.refreshDrawableState();
+					mFunVideoView.clearVideo();
+					mFunVideoView = null;
+					mHandler.sendEmptyMessageDelayed(MESSAGE_PLAY_MEDIA, 1000);
+					initCamera(cams.get(currFunDeviceIdx).devId, cams.get(currFunDeviceIdx).sn, cams.get(currFunDeviceIdx).mac);
+				}
+				break;
+				case MESSAGE_PLAY_MEDIA_MULIT:
+				{
+					playrealvideoMuilt();
+				}
+				break;
 			case MESSAGE_PLAY_MEDIA:
 				{
 				playRealMedia();

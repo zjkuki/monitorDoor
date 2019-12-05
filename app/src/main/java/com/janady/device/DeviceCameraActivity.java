@@ -127,6 +127,7 @@ public class DeviceCameraActivity
 	private Button mBtnFishEyeInfo = null;
 	private Button mBtnGetPreset = null;
 	private Button mBtnSetPreset = null;
+    private Button mBtnDevPreview = null;
 
 	private View mSplitView = null;
 	private CheckBox mCbDoubleTalk = null;
@@ -139,6 +140,7 @@ public class DeviceCameraActivity
 	private LinearLayout mLayoutChannel = null;
 	private RelativeLayout mBtnVoiceTalk = null;
 	private RelativeLayout mBtnVoiceTalk_jcdp = null;
+	private RelativeLayout mLayoutVideoScreen = null;
 
 	private Button mBtnVoice = null;
     private ImageButton mBtnQuitVoice = null;
@@ -194,6 +196,7 @@ public class DeviceCameraActivity
 	private List<TextView> textvlist = new ArrayList<TextView>();
 	private List<FunVideoView> funvideovlist = new ArrayList<FunVideoView>();
 	private int currFunDeviceIdx =0 ;
+	private boolean mulitScreenNow = false;
 
 	private Camera camera;
     List<Camera> cams = null;
@@ -214,6 +217,11 @@ public class DeviceCameraActivity
 		if(cams.size()>0){
 			camera = cams.get(0);
 		}*/
+
+        mulitScreenNow = false;
+
+        mBtnSkipPrevious.setEnabled(true);
+        mBtnSkipNext.setEnabled(true);
 
         cams = MyApplication.liteOrm.query(Camera.class);
         if(cams.size()>0){
@@ -344,6 +352,8 @@ public class DeviceCameraActivity
 		mContext = this;
 
 		mLayoutTop = (RelativeLayout) findViewById(R.id.layoutTop);
+		mLayoutVideoScreen = (RelativeLayout) findViewById(R.id.rl_VideoScreen);
+
 
 		mTextTitle = (TextView) findViewById(R.id.textViewInTopLayout);
 
@@ -359,6 +369,7 @@ public class DeviceCameraActivity
 		mBtnRecord = (Button) findViewById(R.id.btnRecord);
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
+        mBtnDevPreview = (Button) findViewById(R.id.btnDevPreview);
 		//mBtnLocker = (ImageButton) findViewById(R.id.btnLocker);
 		mBtnDevSound = (ImageButton) findViewById(R.id.btnDevSound);
 
@@ -373,6 +384,7 @@ public class DeviceCameraActivity
 		mBtnRecord.setOnClickListener(this);
 		mBtnScreenRatio.setOnClickListener(this);
 		mBtnFishEyeInfo.setOnClickListener(this);
+        mBtnDevPreview.setOnClickListener(this);
 		mBtnSkipNext.setOnClickListener(this);
 		mBtnSkipPrevious.setOnClickListener(this);
 		mBtnDevSound.setOnClickListener(this);
@@ -542,6 +554,10 @@ public class DeviceCameraActivity
 		cadapter = new GridCameraChannelsPreviewsAdapter(this, showNum);
 		gridview.setAdapter(cadapter);
 
+		mulitScreenNow = true;
+		mBtnSkipPrevious.setEnabled(false);
+		mBtnSkipNext.setEnabled(false);
+
 		Message message = new Message();
 		message.what = MESSAGE_PLAY_MEDIA_MULIT;
 		mHandler.sendMessageDelayed(message, 100);
@@ -553,14 +569,14 @@ public class DeviceCameraActivity
 
 		public OnItemViewTouchListener(int channel){
 			mChannel = channel;
-			currFunDeviceIdx = channel;
 		}
 
 		@SuppressLint("ClickableViewAccessibility")
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
 			System.out.println("TTT-->>> event = " + event.getAction());
-			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+			    currFunDeviceIdx = mChannel;
 				Message message = new Message();
 				message.what = MESSAGE_STOP_MEDIA_MULIT;
 				mHandler.sendMessageDelayed(message, 100);
@@ -569,7 +585,9 @@ public class DeviceCameraActivity
 				//ActivityGuideDevicePreview.this.finish();
 			}
 
-			return false;
+			return true;
+			//巨坑！为false时只触发ACTION_DOWN
+			//return false;
 		}
 
 	}
@@ -581,6 +599,9 @@ public class DeviceCameraActivity
 		mFunVideoView.invalidate();
 		mFunVideoView.clearVideo();
 		FunDevice fundev= null;
+
+        mTextTitle.setText("实时预览");
+
 		for (int i = 0; i < cam_count; i++) {
 			View v = gridview.findViewWithTag(i);
 			if ( null != v ) {
@@ -589,27 +610,41 @@ public class DeviceCameraActivity
 			}
 			funVideoView.clearVideo();
 			funVideoView.setOnErrorListener(this);
-			funVideoView.setOnInfoListener(this);
+			final int finalI = i;
+			funVideoView.setOnInfoListener(new OnInfoListener() {
+				@Override
+				public boolean onInfo(MediaPlayer mp, int what, int extra) {
+					if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+						textvlist.get(finalI).setText(R.string.media_player_buffering);
+						textvlist.get(finalI).setVisibility(VISIBLE);
+					} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+						textvlist.get(finalI).setVisibility(GONE);
+					}
+
+					return true;
+				}
+			});
 			funVideoView.setOnTouchListener(new OnItemViewTouchListener(i));
+            funVideoView.setGestureListner(this);
 			funVideoView.setStreamType(FunStreamType.STREAM_SECONDARY);
 			funvideovlist.add(funVideoView);
-			textvlist.add(textStart);
+
 			// 显示状态: 正在打开视频...
 			textStart.setText(R.string.media_player_opening);
 			textStart.setVisibility(VISIBLE);
+			textvlist.add(textStart);
 
 			//cadapter.notifyDataSetInvalidated();
-			//mTextTitle.setText(mFunDevice.devName);
 			if(cams.get(i).isOnline) {
 				fundev = FunSupport.getInstance().findDeviceById(cams.get(i).devId);
 				if (null == fundev) {
-					fundev = FunSupport.getInstance().findLanDevice(camera.sn);
+					fundev = FunSupport.getInstance().findLanDevice(cams.get(i).sn);
 					if (fundev == null) {
-						fundev = FunSupport.getInstance().findLanDevice(camera.name);
+						fundev = FunSupport.getInstance().findLanDevice(cams.get(i).name);
 						if (fundev== null) {
-							fundev = FunSupport.getInstance().findDeviceBySn(camera.sn);
+							fundev = FunSupport.getInstance().findDeviceBySn(cams.get(i).sn);
 							if (fundev == null) {
-								fundev = FunSupport.getInstance().findTempDevice(camera.mac);
+								fundev = FunSupport.getInstance().findTempDevice(cams.get(i).mac);
 								if (fundev == null) {
 									//finish();
 									return;
@@ -625,6 +660,8 @@ public class DeviceCameraActivity
 					String deviceIp = FunSupport.getInstance().getDeviceWifiManager().getGatewayIp();
 					funVideoView.setRealDevice(deviceIp, fundev.CurrChannel);
 				}
+
+				//gridview.setSelection(i);
 			}
 		}
 	}
@@ -652,8 +689,12 @@ public class DeviceCameraActivity
 					funvideovlist.get(i).clearVideo();
 					funvideovlist.get(i).setVisibility(GONE);*/
 					funvideovlist.remove(i);
+					textvlist.remove(i);
 				}
 			}
+
+			funvideovlist = null;
+			textvlist = null;
 		}
 
 		if(funVideoView != null) {
@@ -664,6 +705,8 @@ public class DeviceCameraActivity
 			funVideoView.invalidate();
 			funVideoView = null;
 		}
+
+		cadapter = null;
 	}
 
 	@SuppressLint("ResourceType")
@@ -856,9 +899,14 @@ public class DeviceCameraActivity
 				// 显示鱼眼信息
 				//showFishEyeInfo();
 				//startDevicesPreview();
-				showMuiltPreview(cams.size());
+				//showMuiltPreview(cams.size());
 			}
 			break;
+        case R.id.btnDevPreview:
+            {
+                showMuiltPreview(cams.size());
+            }
+            break;
         case R.id.btnDevPre:
             {
                 currIndex --;
@@ -1064,6 +1112,12 @@ public class DeviceCameraActivity
 		mLayoutControls.setVisibility(GONE);
 
 		// 视频窗口全屏显示
+		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
+		lpVs.height = LayoutParams.MATCH_PARENT;
+
+		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		lpGd.height = LayoutParams.MATCH_PARENT;
+
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
 		lpWnd.height = LayoutParams.MATCH_PARENT;
 		// lpWnd.removeRule(RelativeLayout.BELOW);
@@ -1084,6 +1138,12 @@ public class DeviceCameraActivity
 		mLayoutTop.setVisibility(VISIBLE);
 
 		// 视频显示为小窗口
+		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
+		lpVs.height = UIFactory.dip2px(this, 280);
+
+		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		lpGd.height = UIFactory.dip2px(this, 280);
+
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
 		lpWnd.height = UIFactory.dip2px(this, 240);
 		lpWnd.topMargin = UIFactory.dip2px(this, 48);
@@ -1148,7 +1208,9 @@ public class DeviceCameraActivity
 				}
 			}
 
-			return false;
+			return true;
+			//巨坑！！！false不触发action_up
+			//return false;
 		}
 
 	}
@@ -1312,9 +1374,11 @@ public class DeviceCameraActivity
 				stopMediaMuilt();
 
 				gridview.setVisibility(GONE);
+				gridview = null;
 				mLayoutVideoWnd.setVisibility(VISIBLE);
 				mLayoutVideoWnd.refreshDrawableState();
 				mFunVideoView.clearVideo();
+				mFunVideoView = null;
 				mHandler.sendEmptyMessageDelayed(MESSAGE_PLAY_MEDIA, 1000);
 				initCamera(cams.get(currFunDeviceIdx).devId, cams.get(currFunDeviceIdx).sn, cams.get(currFunDeviceIdx).mac);
 			}
@@ -1751,16 +1815,8 @@ public class DeviceCameraActivity
 		if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
 			mTextVideoStat.setText(R.string.media_player_buffering);
 			mTextVideoStat.setVisibility(VISIBLE);
-
-			if(textvlist!=null && textvlist.size()>0) {
-				textvlist.get(extra).setText(R.string.media_player_buffering);
-				textvlist.get(extra).setVisibility(VISIBLE);
-			}
 		} else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
 			mTextVideoStat.setVisibility(GONE);
-			if(textvlist!=null && textvlist.size()>0) {
-				textvlist.get(extra).setVisibility(View.GONE);
-			}
 		}
 
 		return true;

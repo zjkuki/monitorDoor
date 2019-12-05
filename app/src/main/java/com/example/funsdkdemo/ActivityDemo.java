@@ -71,6 +71,7 @@ public class ActivityDemo extends FragmentActivity {
 	}
 	
 	public void showToast(String text){
+		if(MyApplication.noToatsShow){return;}
 		if ( null != text ) {
 			if ( null != mToast ) {
 				mToast.cancel();
@@ -81,6 +82,7 @@ public class ActivityDemo extends FragmentActivity {
 	}
 	
 	public void showToast(int resid){
+		if(MyApplication.noToatsShow){return;}
 		if ( resid > 0 ) {
 			if ( null != mToast ) {
 				mToast.cancel();
