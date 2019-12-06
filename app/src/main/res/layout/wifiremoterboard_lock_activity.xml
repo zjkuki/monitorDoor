@@ -178,7 +178,7 @@
             android:id="@+id/layoutFunctionButtons"
             android:layout_width="fill_parent"
             android:layout_height="90dp"
-            android:layout_below="@+id/rl_VideoScreen"
+            android:layout_below="@+id/layoutPlayWnd"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="0dp"
             android:layout_marginBottom="0dp"

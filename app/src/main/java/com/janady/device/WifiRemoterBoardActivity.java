@@ -3,6 +3,7 @@ package com.janady.device;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,14 +24,17 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -38,8 +42,10 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,7 +93,9 @@ import com.litesuits.orm.db.assit.QueryBuilder;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -240,6 +248,12 @@ public class WifiRemoterBoardActivity
     private CheckBox cbSelectedDoor;
 	private ImageView imgLockLockerStat;
 	private List<String> doorNo;
+
+	private String[] mlistText;
+	private Boolean[] bl;
+	private SimpleAdapter adapter;
+	private ArrayList<Camera> selectedCameras;
+
 	private Context mContext;
 
 	private Camera getCamera(int index){
@@ -613,7 +627,7 @@ public class WifiRemoterBoardActivity
 			mWifiRemoter = wifiRemoters.get(0);
 			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
 			if(mWifiRemoter.camera!=null) {
-				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn, camera.mac);
+				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn, mWifiRemoter.camera.mac);
 			}else{
 				showCamera(0,"","");
 			}
@@ -722,12 +736,20 @@ public class WifiRemoterBoardActivity
 	}
 
 	private void selectCamera(){
-		int defaultIndex = 0;
+		final int[] defaultIndex = {0};
 		final int[] index = new int[1];
+
+		final List<Camera> wrb_cams = mWifiRemoter.cameras;
+		selectedCameras = new ArrayList<Camera>();
+
 		final List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
 		if(cams.size()>0) {
 			String[] s=new String[cams.size()+1];
-			s[0] = "不绑定";
+			Boolean[] bl = new Boolean[cams.size()+1];
+
+			//s[0] = "不绑定";
+			s[0] = "全选";
+			bl[0] = false;
 			for(int i=0;i<cams.size();i++){
 				s[i+1]=cams.get(i).sceneName;
 				if(cams.get(i).isOnline) {
@@ -735,17 +757,56 @@ public class WifiRemoterBoardActivity
 				}else{
 					s[i + 1] = s[i + 1] + "（离线）";
 				}
-				
+
+
+				if(wrb_cams!=null && wrb_cams.size()>0){
+					for(Camera c:wrb_cams) {
+						if (c.sn.equals(cams.get(i).sn) || c.mac.equals(cams.get(i).mac) || c.devId == cams.get(i).devId) {
+							bl[i + 1] = true;
+							selectedCameras.add(c);
+						} else {
+							bl[i + 1] = false;
+						}
+					}
+				}else{
+					bl[i+1] = false;
+				}
+
+
 				if(mWifiRemoter.camera!=null){
 					if(mWifiRemoter.camera.sceneName.equals(cams.get(i).sceneName)){
-						defaultIndex = i+1;
+						defaultIndex[0] = i+1;
 					}else{
-						defaultIndex = 0;
+						defaultIndex[0] = 0;
 					}
 				}
 			}
 
-			Dialogs.alertDialogSingleSelect(mContext, "请选择一个摄像机",s ,defaultIndex, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
+			CreateDialog(mContext, "请选择摄像机", s, bl, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(selectedCameras!=null && selectedCameras.size()>0) {
+								mWifiRemoter.cameras = selectedCameras;
+								mWifiRemoter.camera = selectedCameras.get(0);
+								showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
+							}else{
+								showCamera(0,"","");
+								mWifiRemoter.camera = null;
+							}
+							wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
+							MyApplication.liteOrm.cascade().save(mWifiRemoter);
+							selectedCameras.clear();
+							selectedCameras = null;
+						}
+					}, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							selectedCameras.clear();
+							selectedCameras = null;
+							dialog.dismiss();
+						}
+					});
+			/*Dialogs.alertDialogSingleSelect(mContext, "请选择一个摄像机",s ,defaultIndex, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if(which==0) {
@@ -772,7 +833,7 @@ public class WifiRemoterBoardActivity
 
 					}
 				}
-			});
+			});*/
 		}else{
 			Dialogs.alertMessage(mContext,"失败", "您还没添加摄像机。");
 		}
@@ -2565,5 +2626,144 @@ public class WifiRemoterBoardActivity
 			throw ex;
 		}
 
+	}
+
+	class ItemOnClick implements AdapterView.OnItemClickListener {
+
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+			CheckBox cBox = (CheckBox) view.findViewById(R.id.X_checkbox);
+			if (cBox.isChecked()) {
+				cBox.setChecked(false);
+			} else {
+				Log.i("TAG", "取消该选项");
+				cBox.setChecked(true);
+			}
+
+			if (position == 0 && (cBox.isChecked())) {
+				//如果是选中 全选  就把所有的都选上 然后更新
+				for (int i = 0; i < bl.length; i++) {
+					bl[i] = true;
+					selectedCameras.add(cams.get(i+1));
+				}
+				adapter.notifyDataSetChanged();
+			} else if (position == 0 && (!cBox.isChecked())) {
+				//如果是取消全选 就把所有的都取消 然后更新
+				for (int i = 0; i < bl.length; i++) {
+					bl[i] = false;
+					if(selectedCameras !=null && selectedCameras.size()>0) {
+						selectedCameras.remove(cams.get(i+1));
+					}
+				}
+				adapter.notifyDataSetChanged();
+			}
+			if (position != 0 && (!cBox.isChecked())) {
+				// 如果把其它的选项取消   把全选取消
+				bl[0] = false;
+				bl[position]=false;
+				if(selectedCameras !=null && selectedCameras.size()>0) {
+					selectedCameras.remove(cams.get(position+1));
+				}
+				adapter.notifyDataSetChanged();
+			} else if (position != 0 && (cBox.isChecked())) {
+				//如果选择其它的选项，看是否全部选择
+				//先把该选项选中 设置为true
+				bl[position]=true;
+				selectedCameras.add(cams.get(position+1));
+
+				int a = 0;
+				for (int i = 1; i < bl.length; i++) {
+					if (bl[i] == false) {
+						//如果有一个没选中  就不是全选 直接跳出循环
+						break;
+					} else {
+						//计算有多少个选中的
+						a++;
+						if (a == bl.length - 1) {
+							//如果选项都选中，就把全选 选中，然后更新
+							bl[0] = true;
+							adapter.notifyDataSetChanged();
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	public void CreateDialog(Context context, String title, String[] mlistText, Boolean[] bl, int icon, DialogInterface.OnClickListener btnOk, DialogInterface.OnClickListener btnCancle ) {
+		ArrayList<Map<String, Object>> mData = new ArrayList<Map<String, Object>>();
+		for (int i = 0; i < mlistText.length; i++) {
+			Map<String, Object> item = new HashMap<String, Object>();
+			item.put("text", mlistText[i]);
+			mData.add(item);
+		}
+
+		// 动态加载一个listview的布局文件进来
+		LayoutInflater inflater = LayoutInflater.from(this);
+
+		View getlistview = inflater.inflate(R.layout.layout_mulitselect_listview, null);
+
+		// 给ListView绑定内容
+		ListView listview = (ListView) getlistview.findViewById(R.id.X_listview);
+		adapter = new SetSimpleAdapter(this, mData, R.layout.layout_mulitselect_listview_item, new String[] { "text" },
+				new int[] { R.id.X_item_text });
+		// 给listview加入适配器
+		listview.setAdapter(adapter);
+		listview.setItemsCanFocus(false);
+		listview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		listview.setOnItemClickListener(new ItemOnClick());
+
+		builder = new AlertDialog.Builder(this);
+		//builder.setTitle("请选择查询类型");
+		builder.setTitle(title);
+		//builder.setIcon(R.drawable.ic_launcher);
+		builder.setIcon(icon);
+		//设置加载的listview
+		builder.setView(getlistview);
+		builder.setPositiveButton("确定", btnOk);
+		builder.setNegativeButton("取消", btnCancle);
+		builder.create().show();
+	}
+
+	class DialogOnClick implements DialogInterface.OnClickListener {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			switch (which) {
+				case Dialog.BUTTON_POSITIVE:
+					//确定按钮的事件
+					break;
+				case Dialog.BUTTON_NEGATIVE:
+					//取消按钮的事件
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	//重写simpleadapterd的getview方法
+	class SetSimpleAdapter extends SimpleAdapter {
+
+		public SetSimpleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from,
+								int[] to) {
+			super(context, data, resource, from, to);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = LinearLayout.inflate(getBaseContext(), R.layout.layout_mulitselect_listview, null);
+			}
+			CheckBox ckBox = (CheckBox) convertView.findViewById(R.id.X_checkbox);
+			//每次都根据 bl[]来更新checkbox
+			if (bl[position] == true) {
+				ckBox.setChecked(true);
+			} else if (bl[position] == false) {
+				ckBox.setChecked(false);
+			}
+			return super.getView(position, convertView, parent);
+		}
 	}
 }
