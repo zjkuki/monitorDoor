@@ -80,6 +80,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private List<MainItemDescription> mainItems;
 
     private List<SearchResult> mBleDevices = new ArrayList<SearchResult>();
+    private List<WifiRemoter> mWifiRemoters = new ArrayList<WifiRemoter>();
 
     private Handler mHandler = new Handler();
 
@@ -116,6 +117,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.jbase_recycle_layout, null);
 
         thSearchDevice = new Thread(searchDevices);
+
+        mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
 
         mTopBar = rootView.findViewById(R.id.topbar);
         bnve = rootView.findViewById(R.id.bnve);
@@ -565,6 +568,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             public void run(){
                 DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
                 DataManager.getInstance().mBleDevices = mBleDevices;
+                DataManager.getInstance().mWifiRemoters = mWifiRemoters;
+
                 mainItems = DataManager.getInstance().getDescriptions();
                 mItemAdapter.setData(mainItems);
                 mItemAdapter.notifyDataSetChanged();
@@ -723,9 +728,24 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             MyApplication.liteOrm.save(cams);
 
+            if(mWifiRemoters!=null && mWifiRemoters.size()>0){
+                for(WifiRemoter w:mWifiRemoters){
+                    for(Camera c:w.cameras){
+                        if(c.sn.equals(sn)){
+                            if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
+                                c.isOnline = true;
+                            }else {
+                                c.isOnline = false;
+                            }
+                        }
+                    }
+                }
+
+                MyApplication.liteOrm.cascade().save(mWifiRemoters);
+            }
+
             refreshDataSet();
         }
-
     }
 
     @Override

@@ -261,12 +261,18 @@ public class WifiRemoterBoardActivity
 
 	private Context mContext;
 
-	private Camera getCamera(int index){
-        if(cams.size()>0 && index>=0 && index<cams.size()){
-            return cams.get(index);
+	private int getOnlineCameraIndexInAll(List<Camera> cams){
+        if(cams!=null && cams.size()>0){
+        	for(int i=0;i<cams.size();i++) {
+        		if(cams.get(i).isOnline) {
+					return i;
+				}
+			}
         }else{
-            return null;
+            return -1;
         }
+
+        return -1;
     }
 	private void initCamera(int devId, String sn, String mac){
         //cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, sn));
@@ -290,6 +296,7 @@ public class WifiRemoterBoardActivity
 						currIndex = i;
 					}
 				}
+
 			}
 		}
 
@@ -637,7 +644,17 @@ public class WifiRemoterBoardActivity
 			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
 			currIndex = mWifiRemoter.defaultCameraIdx;
 			if(mWifiRemoter.cameras!=null) {
-				showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+				if(mWifiRemoter.cameras.get(currIndex).isOnline) {
+					showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+				}else {
+					currIndex = getOnlineCameraIndexInAll(mWifiRemoter.cameras);
+
+					if(currIndex>=0) {
+						showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+					}else{
+						showCamera(0,"","");
+					}
+				}
 			}else{
 				showCamera(0,"","");
 			}
@@ -737,7 +754,7 @@ public class WifiRemoterBoardActivity
 			destroyTalk();
 			//closeVoiceChannel(0);
 			closeVoiceChannel1(0);
-			mFunVideoView.setMediaSound(false);
+			if(mFunVideoView!=null){mFunVideoView.setMediaSound(false);};
 			isMute = true;
 			mLayoutVideoWnd.setVisibility(View.GONE);
 			mLayoutFunctionButtons.setVisibility(View.GONE);
@@ -805,7 +822,17 @@ public class WifiRemoterBoardActivity
                                     mWifiRemoter.cameras.add(c);
                                 }
 
-								showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
+							    if(mWifiRemoter.cameras.get(0).isOnline) {
+									showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
+								}else{
+									currIndex = getOnlineCameraIndexInAll(selectedCameras);
+
+									if(currIndex>=0) {
+										showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+									}else{
+										showCamera(0,"","");
+									}
+								}
 							}else{
 								showCamera(0,"","");
 							}
@@ -1292,45 +1319,12 @@ public class WifiRemoterBoardActivity
 			break;
         case R.id.btnDevPre:
             {
-                currIndex --;
-                if(currIndex<0){
-					showToast("已是第一个摄像机！");
-					currIndex=0;
-					return;
-				}
-
-                if(selectedCameras.get(currIndex)!=null){
-                    camera = selectedCameras.get(currIndex);
-                    mWifiRemoter.defaultCameraIdx = currIndex;
-                    MyApplication.liteOrm.cascade().save(mWifiRemoter);
-
-                    initCamera(camera.devId, camera.sn, camera.mac);
-                }else{
-                	currIndex++;
-                	Log.d("---DCA----","切换摄像机失败");
-				}
+            	changePrevCamera();
             }
             break;
         case R.id.btnDevNext:
             {
-                currIndex ++;
-				//if(currIndex > cams.size()-1){
-                if(currIndex > mWifiRemoter.cameras.size()-1){
-					showToast("已是最后一个摄像机！");
-					//currIndex =cams.size()-1;
-                    currIndex = mWifiRemoter.cameras.size()-1;
-					return;
-				}
-                if(selectedCameras.get(currIndex)!=null){
-                    //camera=getCamera(currIndex);
-                    camera = selectedCameras.get(currIndex);
-                    mWifiRemoter.defaultCameraIdx = currIndex;
-                    MyApplication.liteOrm.cascade().save(mWifiRemoter);
-                    initCamera(camera.devId, camera.sn,camera.mac);
-                }else{
-					currIndex --;
-					Log.d("---DCA----","切换摄像机失败");
-                }
+            	changeNextCamera();
             }
             break;
 			case R.id.btnOpenCamear:
@@ -1410,6 +1404,53 @@ public class WifiRemoterBoardActivity
 		}
 	}
 
+	private void changePrevCamera(){
+		currIndex --;
+		if(currIndex<0){
+			showToast("已是第一个摄像机！");
+			currIndex=0;
+			return;
+		}
+
+		if(selectedCameras.get(currIndex)!=null){
+			camera = selectedCameras.get(currIndex);
+			if(camera.isOnline) {
+				mWifiRemoter.defaultCameraIdx = currIndex;
+				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+				initCamera(camera.devId, camera.sn, camera.mac);
+			}else{
+				changePrevCamera();
+			}
+		}else{
+			currIndex++;
+			Log.d("---DCA----","切换摄像机失败");
+		}
+	}
+	private void changeNextCamera(){
+		currIndex ++;
+		//if(currIndex > cams.size()-1){
+		if(currIndex > mWifiRemoter.cameras.size()-1){
+			showToast("已是最后一个摄像机！");
+			//currIndex =cams.size()-1;
+			currIndex = mWifiRemoter.cameras.size()-1;
+			return;
+		}
+
+		if(selectedCameras.get(currIndex)!=null){
+			//camera=getCamera(currIndex);
+			camera = selectedCameras.get(currIndex);
+			if(camera.isOnline) {
+				mWifiRemoter.defaultCameraIdx = currIndex;
+				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+				initCamera(camera.devId, camera.sn, camera.mac);
+			}else{
+				changeNextCamera();
+			}
+		}else{
+			currIndex --;
+			Log.d("---DCA----","切换摄像机失败");
+		}
+	}
 	private void AddDoor(){
 		final String[] doorName = {""};
 
@@ -2664,6 +2705,8 @@ public class WifiRemoterBoardActivity
 
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
+			List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
+
 			CheckBox cBox = (CheckBox) view.findViewById(R.id.X_checkbox);
 			if (cBox.isChecked()) {
 				cBox.setChecked(false);

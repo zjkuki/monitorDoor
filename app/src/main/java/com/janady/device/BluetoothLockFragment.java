@@ -62,8 +62,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     @Override
     protected View onCreateView() {
         View root = LayoutInflater.from(getActivity()).inflate(R.layout.jbluetooth_lock_layout, null);
-        //mTopBar = root.findViewById(R.id.topbar);
-        //initTopBar();
+        mTopBar = root.findViewById(R.id.topbar);
+        initTopBar();
 //        bleLocker = new BleLocker(MAC, false, BleService,
 //                BleNotifitesCharacter, BleWriteCharacter, "123123",800, iBleLockerCallBack);
 
@@ -114,6 +114,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
         mTextTitle = root.findViewById(R.id.textViewInTopLayout);
         mTextTitle.setText(title + " - 等待连接");
+
+        mTopBar.setTitle(title + " - 等待连接");
         return root;
     }
 
@@ -276,12 +278,15 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onClosed(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onClose：" + status.getmStatusMsg());}
             mTextTitle.setText(title + " - 关门");
+            mTopBar.setTitle(title + " - 关门");
+
         }
 
         @Override
         public void onStoped(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onStop：" + status.getmStatusMsg());}
             mTextTitle.setText(title + " - 停止");
+            mTopBar.setTitle(title + " - 停止");
         }
 
         @Override
@@ -291,6 +296,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                 imgLockStat.setImageResource(R.drawable.ic_locked);
                 tvLockStat.setText("有锁");
                 mTextTitle.setText(title + " - 有锁");
+                mTopBar.setTitle(title + " - 有锁");
             }else{
                 imgLockStat.setImageResource(R.drawable.ic_unlocked);
                 tvLockStat.setText("无锁");
@@ -305,6 +311,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onOpened(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "..\n   onOpen：" + status.getmStatusMsg());}
             mTextTitle.setText(title + " - 开门操作");
+            mTopBar.setTitle(title + " - 开门操作");
         }
 
         @Override
@@ -325,12 +332,14 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
             if(status == BleLockerStatus.REDAY){
                 mTextTitle.setText(title + " - 已连接");
+                mTopBar.setTitle(title + " - 已连接");
             }
         }
 
         @Override
         public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
             mTextTitle.setText(title+" - 正在连接");
+            mTopBar.setTitle(title + " - 正在连接");
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onConnected：" + status.getmStatusMsg());}
             if(status==BleLockerStatus.CONNECTED && needCheckSTA) {
                 bleLocker.sta();

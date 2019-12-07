@@ -909,37 +909,12 @@ public class DeviceCameraActivity
             break;
         case R.id.btnDevPre:
             {
-                currIndex --;
-                if(currIndex<0){
-					showToast("已是第一个摄像机！");
-					currIndex=0;
-					return;
-				}
-
-                if(getCamera(currIndex)!=null){
-                    camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn, camera.mac);
-                }else{
-                	currIndex++;
-                	Log.d("---DCA----","切换摄像机失败");
-				}
+                changePrevCamera();
             }
             break;
         case R.id.btnDevNext:
             {
-                currIndex ++;
-				if(currIndex > cams.size()-1){
-					showToast("已是最后一个摄像机！");
-					currIndex =cams.size()-1;
-					return;
-				}
-                if(getCamera(currIndex)!=null){
-                    camera=getCamera(currIndex);
-                    initCamera(camera.devId, camera.sn, camera.mac);
-                }else{
-					currIndex --;
-					Log.d("---DCA----","切换摄像机失败");
-                }
+            	changeNextCamera();
             }
             break;
         default:
@@ -947,6 +922,48 @@ public class DeviceCameraActivity
 		}
 	}
 
+	private void changePrevCamera(){
+		currIndex --;
+		if(currIndex<0){
+			showToast("已是第一个摄像机！");
+			currIndex=0;
+			return;
+		}
+
+		if(getCamera(currIndex)!=null){
+			camera=getCamera(currIndex);
+			initCamera(camera.devId, camera.sn, camera.mac);
+			if(camera.isOnline) {
+				initCamera(camera.devId, camera.sn, camera.mac);
+			}else{
+				changePrevCamera();
+			}
+		}else{
+			currIndex++;
+			Log.d("---DCA----","切换摄像机失败");
+		}
+	}
+	private void changeNextCamera(){
+		currIndex ++;
+		if(currIndex > cams.size()-1){
+			showToast("已是最后一个摄像机！");
+			currIndex =cams.size()-1;
+			return;
+		}
+
+		if(getCamera(currIndex)!=null){
+			camera=getCamera(currIndex);
+			initCamera(camera.devId, camera.sn, camera.mac);
+			if(camera.isOnline) {
+				initCamera(camera.devId, camera.sn, camera.mac);
+			}else{
+				changeNextCamera();
+			}
+		}else{
+			currIndex --;
+			Log.d("---DCA----","切换摄像机失败");
+		}
+	}
 	private void tryToRecord() {
 
 		if (!mFunVideoView.isPlaying() || mFunVideoView.isPaused()) {

@@ -44,14 +44,18 @@ public class WifiRemoterBoard {
 
     @Getter private MqttUtil mqttUtil = null;
 
+    private String MQSysTopic = "$SYS/brokers/+/clients/+/+";
+
+    private String[] subscribeTopics = new String[2];
+
     public WifiRemoterBoard(Context context){
         this.mcontext = context;
-
     }
 
     public WifiRemoterBoard(Context context, WifiRemoter wifiRemoter){
         this.mcontext = context;
         this.mWifiRemoter = wifiRemoter;
+
         initMqttService(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
                 , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false);
 
@@ -61,6 +65,9 @@ public class WifiRemoterBoard {
         mcontext = context;
         mPublicTopic = PubTopic;
         mSubscribeTopic = SubTopic;
+
+        this.subscribeTopics[0] = MQSysTopic;
+        this.subscribeTopics[1] = mSubscribeTopic;
 
         mqttUtil = new MqttUtil(context,host,username,password,clientid,0,mPublicTopic,mPublicTopic,iMqttActionListener,mqttCallback);
     }
@@ -108,8 +115,10 @@ public class WifiRemoterBoard {
         public void onSuccess(IMqttToken arg0) {
             Log.i(TAG, "连接成功 ");
             mqttUtil.isConnectSuccess = true;
+            int[] qoss = {0,0};
             try {
-                mqttUtil.getMqttAndroidClient().subscribe(mSubscribeTopic, 0);//订阅主题，参数：主题、服务质量
+                //mqttUtil.getMqttAndroidClient().subscribe(mSubscribeTopic, 0);//订阅主题，参数：主题、服务质量
+                mqttUtil.getMqttAndroidClient().subscribe(subscribeTopics, qoss);
             } catch (MqttException e) {
                 e.printStackTrace();
             }

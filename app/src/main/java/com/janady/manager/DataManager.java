@@ -34,6 +34,7 @@ import java.util.List;
 public class DataManager {
     public List<SearchResult> mBleDevices;
     public List<FunDevice> mFunDevices;
+    public List<WifiRemoter> mWifiRemoters;
 
     private static DataManager _sInstance;
     public static DataManager getInstance() {
