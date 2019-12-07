@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
@@ -23,6 +24,7 @@ import android.support.design.widget.TabLayout;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -90,6 +92,8 @@ import com.lib.funsdk.support.widget.FunVideoView;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -144,6 +148,7 @@ public class WifiRemoterBoardActivity
 	private Button mBtnFishEyeInfo = null;
 	private Button mBtnGetPreset = null;
 	private Button mBtnSetPreset = null;
+    private Button mBtnDevPreview = null;
 
 	private View mSplitView = null;
 	private CheckBox mCbDoubleTalk = null;
@@ -271,15 +276,17 @@ public class WifiRemoterBoardActivity
 		mBtnSkipNext.setEnabled(true);
 
 		cams = MyApplication.liteOrm.query(Camera.class);
-		if(cams.size()>0){
+
+		selectedCameras = mWifiRemoter.cameras;
+		if(selectedCameras.size()>0){
 			currIndex = 0;
-			for(int i=0;i<cams.size();i++){
+			for(int i=0;i<selectedCameras.size();i++){
 				if(cams.get(i).sn.equals(sn)) {
-					camera = cams.get(i);
+					camera = selectedCameras.get(i);
 					currIndex = i;
 				}else{
-					if(cams.get(i).mac.equals(mac)) {
-						camera = cams.get(i);
+					if(selectedCameras.get(i).mac.equals(mac)) {
+						camera = selectedCameras.get(i);
 						currIndex = i;
 					}
 				}
@@ -496,6 +503,7 @@ public class WifiRemoterBoardActivity
 		mBtnRecord = (Button) findViewById(R.id.btnRecord);
 		mBtnScreenRatio = (Button) findViewById(R.id.btnScreenRatio);
 		mBtnFishEyeInfo = (Button) findViewById(R.id.btnFishEyeInfo);
+        mBtnDevPreview = (Button) findViewById(R.id.btnDevPreview);
         mBtnSkipNext = (ImageButton) findViewById(R.id.btnDevNext);
         mBtnSkipPrevious = (ImageButton) findViewById(R.id.btnDevPre);
 		mBtnDevSound = (ImageButton) findViewById(R.id.btnDevSound_jdp);
@@ -508,6 +516,7 @@ public class WifiRemoterBoardActivity
 		mBtnRecord.setOnClickListener(this);
 		mBtnScreenRatio.setOnClickListener(this);
 		mBtnFishEyeInfo.setOnClickListener(this);
+        mBtnDevPreview.setOnClickListener(this);
 		mBtnSkipNext.setOnClickListener(this);
 		mBtnSkipPrevious.setOnClickListener(this);
 		mBtnDevSound.setOnClickListener(this);
@@ -626,8 +635,9 @@ public class WifiRemoterBoardActivity
 		if(wifiRemoters.size()>0) {
 			mWifiRemoter = wifiRemoters.get(0);
 			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
-			if(mWifiRemoter.camera!=null) {
-				showCamera(mWifiRemoter.camera.devId, mWifiRemoter.camera.sn, mWifiRemoter.camera.mac);
+			currIndex = mWifiRemoter.defaultCameraIdx;
+			if(mWifiRemoter.cameras!=null) {
+				showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
 			}else{
 				showCamera(0,"","");
 			}
@@ -702,12 +712,18 @@ public class WifiRemoterBoardActivity
 	private void showCamera(int devId, String sn, String mac){
 		RelativeLayout.LayoutParams lp =  (RelativeLayout.LayoutParams) mLayoutControls.getLayoutParams();
 
-		if(devId!=0) {
+		if(mulitScreenNow){
+            mulitScreenNow=false;
+            gridview.setVisibility(GONE);
+        }
 
+		if(devId!=0) {
+		    mLayoutVideoScreen.setVisibility(VISIBLE);
 			mLayoutVideoWnd.setVisibility(View.VISIBLE);
 			mLayoutFunctionButtons.setVisibility(View.VISIBLE);
 			//mLayoutCameraButtons.setVisibility(View.VISIBLE);
-			lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
+			//lp.addRule(RelativeLayout.BELOW, R.id.layoutPlayWnd);
+            lp.addRule(RelativeLayout.BELOW, R.id.rl_VideoScreen);
 			lp.topMargin=0;
 			mLayoutControls.setLayoutParams(lp);
 			initCamera(devId, sn, mac);
@@ -745,7 +761,7 @@ public class WifiRemoterBoardActivity
 		final List<Camera> cams = MyApplication.liteOrm.query(Camera.class);
 		if(cams.size()>0) {
 			String[] s=new String[cams.size()+1];
-			Boolean[] bl = new Boolean[cams.size()+1];
+			bl = new Boolean[cams.size()+1];
 
 			//s[0] = "不绑定";
 			s[0] = "全选";
@@ -760,49 +776,52 @@ public class WifiRemoterBoardActivity
 
 
 				if(wrb_cams!=null && wrb_cams.size()>0){
+                    bl[i + 1] = false;
 					for(Camera c:wrb_cams) {
+                        if(c.sceneName.equals(cams.get(i).sceneName)){
+                            defaultIndex[0] = i+1;
+                        }else{
+                            defaultIndex[0] = 0;
+                        }
+
 						if (c.sn.equals(cams.get(i).sn) || c.mac.equals(cams.get(i).mac) || c.devId == cams.get(i).devId) {
 							bl[i + 1] = true;
 							selectedCameras.add(c);
-						} else {
-							bl[i + 1] = false;
+							break;
 						}
 					}
 				}else{
 					bl[i+1] = false;
 				}
 
-
-				if(mWifiRemoter.camera!=null){
-					if(mWifiRemoter.camera.sceneName.equals(cams.get(i).sceneName)){
-						defaultIndex[0] = i+1;
-					}else{
-						defaultIndex[0] = 0;
-					}
-				}
 			}
 
 			CreateDialog(mContext, "请选择摄像机", s, bl, R.drawable.xmjp_camera, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if(selectedCameras!=null && selectedCameras.size()>0) {
-								mWifiRemoter.cameras = selectedCameras;
-								mWifiRemoter.camera = selectedCameras.get(0);
+							    mWifiRemoter.cameras.clear();
+							    for(Camera c:selectedCameras) {
+                                    mWifiRemoter.cameras.add(c);
+                                }
+
 								showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
 							}else{
 								showCamera(0,"","");
-								mWifiRemoter.camera = null;
 							}
+                            mWifiRemoter.defaultCameraIdx = 0;
 							wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
 							MyApplication.liteOrm.cascade().save(mWifiRemoter);
-							selectedCameras.clear();
-							selectedCameras = null;
+
+							if(mulitScreenNow) {
+                                Message message = new Message();
+                                message.what = MESSAGE_STOP_MEDIA_MULIT;
+                                mHandler.sendMessageDelayed(message, 100);
+                            }
 						}
 					}, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							selectedCameras.clear();
-							selectedCameras = null;
 							dialog.dismiss();
 						}
 					});
@@ -957,7 +976,7 @@ public class WifiRemoterBoardActivity
 	}
 
 	public void playrealvideoMuilt(){
-		int cam_count = cams.size();
+		int cam_count = selectedCameras.size();
 		mFunVideoView.stopPlayback();
 		mFunVideoView.stopRecordVideo();
 		mFunVideoView.invalidate();
@@ -999,16 +1018,17 @@ public class WifiRemoterBoardActivity
 			textvlist.add(textStart);
 
 			//cadapter.notifyDataSetInvalidated();
-			if(cams.get(i).isOnline) {
-				fundev = FunSupport.getInstance().findDeviceById(cams.get(i).devId);
+			//if(cams.get(i).isOnline) {
+            if(selectedCameras.get(i).isOnline) {
+				fundev = FunSupport.getInstance().findDeviceById(selectedCameras.get(i).devId);
 				if (null == fundev) {
-					fundev = FunSupport.getInstance().findLanDevice(cams.get(i).sn);
+					fundev = FunSupport.getInstance().findLanDevice(selectedCameras.get(i).sn);
 					if (fundev == null) {
-						fundev = FunSupport.getInstance().findLanDevice(cams.get(i).name);
+						fundev = FunSupport.getInstance().findLanDevice(selectedCameras.get(i).name);
 						if (fundev== null) {
-							fundev = FunSupport.getInstance().findDeviceBySn(cams.get(i).sn);
+							fundev = FunSupport.getInstance().findDeviceBySn(selectedCameras.get(i).sn);
 							if (fundev == null) {
-								fundev = FunSupport.getInstance().findTempDevice(cams.get(i).mac);
+								fundev = FunSupport.getInstance().findTempDevice(selectedCameras.get(i).mac);
 								if (fundev == null) {
 									//finish();
 									return;
@@ -1057,8 +1077,8 @@ public class WifiRemoterBoardActivity
 				}
 			}
 
-			funvideovlist = null;
-			textvlist = null;
+			funvideovlist.clear();
+			textvlist.clear();
 		}
 
 		if(funVideoView != null) {
@@ -1267,7 +1287,7 @@ public class WifiRemoterBoardActivity
 			break;
 		case R.id.btnDevPreview:
 			{
-				showMuiltPreview(cams.size());
+				showMuiltPreview(selectedCameras.size());
 			}
 			break;
         case R.id.btnDevPre:
@@ -1279,8 +1299,11 @@ public class WifiRemoterBoardActivity
 					return;
 				}
 
-                if(getCamera(currIndex)!=null){
-                    camera=getCamera(currIndex);
+                if(selectedCameras.get(currIndex)!=null){
+                    camera = selectedCameras.get(currIndex);
+                    mWifiRemoter.defaultCameraIdx = currIndex;
+                    MyApplication.liteOrm.cascade().save(mWifiRemoter);
+
                     initCamera(camera.devId, camera.sn, camera.mac);
                 }else{
                 	currIndex++;
@@ -1291,13 +1314,18 @@ public class WifiRemoterBoardActivity
         case R.id.btnDevNext:
             {
                 currIndex ++;
-				if(currIndex > cams.size()-1){
+				//if(currIndex > cams.size()-1){
+                if(currIndex > mWifiRemoter.cameras.size()-1){
 					showToast("已是最后一个摄像机！");
-					currIndex =cams.size()-1;
+					//currIndex =cams.size()-1;
+                    currIndex = mWifiRemoter.cameras.size()-1;
 					return;
 				}
-                if(getCamera(currIndex)!=null){
-                    camera=getCamera(currIndex);
+                if(selectedCameras.get(currIndex)!=null){
+                    //camera=getCamera(currIndex);
+                    camera = selectedCameras.get(currIndex);
+                    mWifiRemoter.defaultCameraIdx = currIndex;
+                    MyApplication.liteOrm.cascade().save(mWifiRemoter);
                     initCamera(camera.devId, camera.sn,camera.mac);
                 }else{
 					currIndex --;
@@ -1309,9 +1337,9 @@ public class WifiRemoterBoardActivity
 			{
 
 				if(wifiRemoterBoard!=null && wifiRemoterBoard.getMWifiRemoter()!=null){
-					if(wifiRemoterBoard.getMWifiRemoter().camera!=null){
+					if(wifiRemoterBoard.getMWifiRemoter().cameras.get(currIndex)!=null){
 						if(!mIsCameraOpend) {
-							showCamera(wifiRemoterBoard.getMWifiRemoter().camera.devId, wifiRemoterBoard.getMWifiRemoter().camera.sn, camera.mac);
+							showCamera(wifiRemoterBoard.getMWifiRemoter().cameras.get(currIndex).devId, wifiRemoterBoard.getMWifiRemoter().cameras.get(currIndex).sn, wifiRemoterBoard.getMWifiRemoter().cameras.get(currIndex).mac);
 						}else{
 							showCamera(0,"","");
 						}
@@ -1996,7 +2024,11 @@ public class WifiRemoterBoardActivity
 					mFunVideoView.clearVideo();
 					mFunVideoView = null;
 					mHandler.sendEmptyMessageDelayed(MESSAGE_PLAY_MEDIA, 1000);
-					initCamera(cams.get(currFunDeviceIdx).devId, cams.get(currFunDeviceIdx).sn, cams.get(currFunDeviceIdx).mac);
+					if(mulitScreenNow) {
+                        initCamera(cams.get(currFunDeviceIdx).devId, cams.get(currFunDeviceIdx).sn, cams.get(currFunDeviceIdx).mac);
+                    }else{
+                        initCamera(selectedCameras.get(currIndex).devId, selectedCameras.get(currIndex).sn, selectedCameras.get(currIndex).mac);
+                    }
 				}
 				break;
 				case MESSAGE_PLAY_MEDIA_MULIT:
@@ -2644,16 +2676,23 @@ public class WifiRemoterBoardActivity
 				//如果是选中 全选  就把所有的都选上 然后更新
 				for (int i = 0; i < bl.length; i++) {
 					bl[i] = true;
-					selectedCameras.add(cams.get(i+1));
+					if(i>0) { selectedCameras.add(cams.get(i - 1)); }
 				}
 				adapter.notifyDataSetChanged();
 			} else if (position == 0 && (!cBox.isChecked())) {
 				//如果是取消全选 就把所有的都取消 然后更新
 				for (int i = 0; i < bl.length; i++) {
 					bl[i] = false;
-					if(selectedCameras !=null && selectedCameras.size()>0) {
-						selectedCameras.remove(cams.get(i+1));
-					}
+                    if(i>0) {
+                        if (selectedCameras != null && selectedCameras.size() > 0) {
+                            for(int c=0;c<selectedCameras.size();c++) {
+                                if(selectedCameras.get(c).sn.equals(cams.get(i-1).sn) ||
+                                        selectedCameras.get(c).mac.equals(cams.get(i-1).mac)){
+                                    selectedCameras.remove(c);
+                                }
+                            }
+                        }
+                    }
 				}
 				adapter.notifyDataSetChanged();
 			}
@@ -2661,15 +2700,21 @@ public class WifiRemoterBoardActivity
 				// 如果把其它的选项取消   把全选取消
 				bl[0] = false;
 				bl[position]=false;
-				if(selectedCameras !=null && selectedCameras.size()>0) {
-					selectedCameras.remove(cams.get(position+1));
-				}
+                if (selectedCameras != null && selectedCameras.size() > 0) {
+                    for(int c=0;c<selectedCameras.size();c++) {
+                        if(selectedCameras.get(c).sn.equals(cams.get(position-1).sn) ||
+                                selectedCameras.get(c).mac.equals(cams.get(position-1).mac)){
+                            selectedCameras.remove(c);
+                        }
+                    }
+                }
+
 				adapter.notifyDataSetChanged();
 			} else if (position != 0 && (cBox.isChecked())) {
 				//如果选择其它的选项，看是否全部选择
 				//先把该选项选中 设置为true
 				bl[position]=true;
-				selectedCameras.add(cams.get(position+1));
+				selectedCameras.add(cams.get(position - 1));
 
 				int a = 0;
 				for (int i = 1; i < bl.length; i++) {
@@ -2754,9 +2799,18 @@ public class WifiRemoterBoardActivity
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if (convertView == null) {
-				convertView = LinearLayout.inflate(getBaseContext(), R.layout.layout_mulitselect_listview, null);
+				convertView = LinearLayout.inflate(getBaseContext(), R.layout.layout_mulitselect_listview_item, null);
 			}
+            TextView tvItem = (TextView) convertView.findViewById(R.id.X_item_text);
 			CheckBox ckBox = (CheckBox) convertView.findViewById(R.id.X_checkbox);
+			if(position==0){
+			    tvItem.setTextColor(Color.BLUE);
+			    tvItem.setGravity(Gravity.RIGHT);
+            }else{
+                tvItem.setTextColor(Color.GRAY);
+                tvItem.setGravity(Gravity.RIGHT);
+            }
+
 			//每次都根据 bl[]来更新checkbox
 			if (bl[position] == true) {
 				ckBox.setChecked(true);

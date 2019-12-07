@@ -53,8 +53,7 @@ public class WifiRemoter {// 指定一对多关系
 
     public int defaultDoorId = 0;
 
-    @Mapping(Relation.OneToOne)
-    public Camera camera;
+    public int defaultCameraIdx = 0;
 
     @Mapping(Relation.OneToMany)
     public ArrayList<Camera> cameras;
@@ -68,7 +67,7 @@ public class WifiRemoter {// 指定一对多关系
     @Override public String toString() {
         return "Classes{"
                 + super.toString() +
-                " Camera= " + camera +
+                " Camera index= " + defaultCameraIdx +
                 "} ";
     }
 

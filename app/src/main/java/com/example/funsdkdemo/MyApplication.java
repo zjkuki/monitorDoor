@@ -19,7 +19,7 @@ import java.util.Date;
 
 public class MyApplication extends Application {
 
-	public static boolean noToatsShow = true;
+	public static boolean noToatsShow = false;
 	public static LiteOrm liteOrm;
 	//public static LiteOrm liteOrmCascade;
 	public static Context context;
@@ -35,7 +35,7 @@ public class MyApplication extends Application {
 		if (liteOrm == null) {
 			liteOrm = LiteOrm.newSingleInstance(this, "liteorm.db");
 		}
-		liteOrm.setDebugged(false);
+		liteOrm.setDebugged(true);
 		/**
 		 * 以下是FunSDK初始化
 		 */

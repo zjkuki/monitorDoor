@@ -85,6 +85,12 @@
                 android:background="#6c000000"
 
                 android:orientation="horizontal" >
+                <Button
+                    android:id="@+id/btnDevPreview"
+                    style="@style/video_control_button"
+                    android:background="@drawable/video_control_button_selector"
+                    android:text="@string/device_camera_channels_preview_title"
+                    android:textColor="@drawable/common_text_selector" />
 
                 <Button
                     android:id="@+id/btnPlay"
