@@ -25,6 +25,7 @@ public class WifiRemoter {// 指定一对多关系
     public static final String COL_NAME = "name";
     public static final String COL_SN = "devName";
     public static final String COL_MAC = "mac";
+    public static final String COL_DEVCLIENTID = "clientid";
 
     @Column(COL_NAME)
     @Unique
@@ -37,19 +38,26 @@ public class WifiRemoter {// 指定一对多关系
     @Column(COL_MAC) // 指定列名
     @Unique
     public String mac;
+
+    @Column(COL_DEVCLIENTID)
+    @Unique
+    public String devClientid; //设备自身的clientid
+    public String clientid; //APP连接服务器的clientid
+
     public int devTypeId=FunDevType.EE_DEV_OW_REMOTER.getDevIndex();
     public String loginPsw;
     public String hostUrl;
     public String hostPort;
     public String hostUsername;
     public String hostPassword;
-    public String clientid;
     public String devIpAddr;
     public String devPort;
     public String publictopic;
     public String subscribetopic;
     public String sceneName;
     public String devType = "One_Way_Smart_Lock";
+
+    public boolean isOnline = true;
 
     public int defaultDoorId = 0;
 

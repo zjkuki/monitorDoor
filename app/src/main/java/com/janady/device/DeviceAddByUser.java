@@ -347,7 +347,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
 				//mWifiRemoterBoard = wifiRemoterBoard;
 				mWifiRemoter = wifiRemoterBoard.getMWifiRemoter();
-				List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+				List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
 						mWifiRemoter.mac));
 				if (wr != null && wr.size() > 0) {
 					mTextTitle.setText("修改设备");
@@ -586,8 +586,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
 							sendBroadcast(intent);
 						}else {
-							List<WifiRemoter> wr = MyApplication.liteOrm.query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_NAME, mEditDevSN.getText().toString()));
+							List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+									mWifiRemoter.mac));
 							if (wr != null && wr.size() > 0) {
+								wr.get(0).devClientid = mWifiRemoter.devClientid;
+								wr.get(0).clientid = mWifiRemoter.clientid;
 								mWifiRemoter = wr.get(0);
 								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
 								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
@@ -595,12 +598,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
 								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
 							}
-							MyApplication.liteOrm.save(mWifiRemoter);
+							MyApplication.liteOrm.cascade().save(mWifiRemoter);
 
-							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "remoter_list_refresh");
 							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-							sendBroadcast(intent);
+							sendBroadcast(intent);*/
 						}
 					}
 
@@ -667,6 +670,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								wr.hostUrl = MqttUtil.getHOST();
 								wr.hostPort = "1883";
 								wr.clientid = MqttUtil.getCLIENTID();
+								wr.devClientid = wr.devType+":"+tmp.getString("MAC").replace(":","");
 								wr.publictopic = "hardware/from/server/" + tmp.getString("MAC").replace(":","");
 								wr.subscribetopic = "hardware/from/client/" + tmp.getString("MAC").replace(":","");
 								wr.hostUsername = MqttUtil.getUSERNAME();
@@ -677,7 +681,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								wr.devPort = tmp.getString("Port");
 								wr.mac = tmp.getString("MAC");
 
-								WifiRemoterBoard wrb = new WifiRemoterBoard(mcontext, wr);
+								WifiRemoterBoard wrb = new WifiRemoterBoard(mcontext, wr, false);
 
 								if(matchWifiRemoterInList(wr.mac)){
 									Log.d("DeviceAddByUser", "Found Device in List");

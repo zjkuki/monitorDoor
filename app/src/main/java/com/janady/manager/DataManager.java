@@ -52,7 +52,7 @@ public class DataManager {
         // ArrayList<Camera> clists = MyApplication.liteOrm.query(Camera.class);
         List<FunDevice> funDevices = FunSupport.getInstance().getDeviceList();
         ArrayList<Bluetooth> blists = MyApplication.liteOrm.query(Bluetooth.class);
-        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
+        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
         ArrayList<Door> dlists = MyApplication.liteOrm.query(Door.class);
         CategoryItemDescription camera = new CategoryItemDescription(CameraListFragment.class, "摄像机", R.drawable.ic_camera, funDevices.size());
         //CategoryItemDescription bluetooth = new CategoryItemDescription(BluetoothListFragment.class, "蓝牙门禁", R.drawable.ic_bluetooth, blists.size());
@@ -131,12 +131,12 @@ public class DataManager {
         list.add(bleDescription);
 
         MainItemDescription remoteDescription = new MainItemDescription(RemoteListFragment.class, "WIFI远程控制器", R.drawable.ic_remote_3, MainItemDescription.DeviceType.REMOTE);
-        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.query(WifiRemoter.class);
+        ArrayList<WifiRemoter> rlists = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
         List<Object> ritems = new ArrayList<>();
         for (WifiRemoter remote : rlists) {
             //remoteDescription.setDevice(remote);
             ItemDescription itemDescription = new ItemDescription(WifiRemoterBoardFragment.class, remote.sceneName, R.drawable.icon_check);
-            itemDescription.setEnable(true);
+            itemDescription.setEnable(remote.isOnline);
             itemDescription.setItem(remote);
 /*            if (remote.doorList != null) {
                 List<Object> ritems = new ArrayList<>();

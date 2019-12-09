@@ -83,6 +83,9 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             }
         });
 
+        mWifiDevice = 0;
+        rbWifiCam.setChecked(true);
+
         tvWifiReadMe = root.findViewById(R.id.tvWifiReadMe);
 
         tvTips = root.findViewById(R.id.tvTips);
@@ -145,6 +148,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
     private void startQuickSetting() {
 
         try {
+            if(countDownTimer!=null ){countDownTimer.cancel();}
+
             WifiManager wifiManage = (WifiManager)getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             WifiInfo wifiInfo = wifiManage.getConnectionInfo();
             DhcpInfo wifiDhcp = wifiManage.getDhcpInfo();

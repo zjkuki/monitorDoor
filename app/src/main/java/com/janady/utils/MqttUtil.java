@@ -226,7 +226,7 @@ public class MqttUtil {
     /**
      * 连接MQTT服务器
      */
-    private void doClientConnection() {
+    public void doClientConnection() {
         BluetoothLog.d("是否链接成功：" + mqttAndroidClient.isConnected());
         //if (!mqttAndroidClient.isConnected() && Tools.isInternetConnect(context)) {
         if (!mqttAndroidClient.isConnected()) {

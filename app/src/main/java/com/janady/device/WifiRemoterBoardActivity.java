@@ -641,7 +641,7 @@ public class WifiRemoterBoardActivity
 		List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
 		if(wifiRemoters.size()>0) {
 			mWifiRemoter = wifiRemoters.get(0);
-			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter);
+			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter,true);
 			currIndex = mWifiRemoter.defaultCameraIdx;
 			if(mWifiRemoter.cameras!=null) {
 				if(mWifiRemoter.cameras.get(currIndex).isOnline) {

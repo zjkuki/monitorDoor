@@ -94,6 +94,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private Thread thSearchDevice;
 
     private MqttUtil mqttUtil = null;
+    private boolean mqttAutoConnect = true;
+
+
 
     private String fromMsgClientId = "";
     private String toMsgClientId = "";
@@ -104,6 +107,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private String clientShareDevicePublishTopic = "";
     private String clientShareDeviceResponseTopic = "";
+    private String[] subscribeTopics = null;
+    private int[] subscribeTopicsQos = null;
 
     private String mqttclientid =MqttUtil.getCLIENTID();
 
@@ -177,7 +182,30 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
         shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
+
+        //if(mWifiRemoters!=null) {
+            /*subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
+            subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];*/
+            subscribeTopics = new String[3];
+            subscribeTopicsQos = new int[3];            subscribeTopics[0] = shareDevicePublishTopic;
+            subscribeTopicsQos[0] = 0;
+            subscribeTopics[1] = "$SYS/brokers/+/clients/+/connected";
+            subscribeTopicsQos[1] = 0;
+            subscribeTopics[2] = "$SYS/brokers/+/clients/+/disconnected";
+            subscribeTopicsQos[2] = 0;
+            /*int i = 1;
+            for(WifiRemoter wr:mWifiRemoters){
+                subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/connected";
+                subscribeTopicsQos[i] = 0;
+                i++;
+                subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/disconnected";
+                subscribeTopicsQos[i] = 0;
+                i++;
+            }*/
+        //}
+
         if(mqttUtil==null) {
+            mqttAutoConnect=true;
             mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
         }
 
@@ -203,6 +231,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mqttAutoConnect=false;
+                mqttUtil.disconnect();
                 ClientManager.getClient().stopSearch();
                 mHandler.removeCallbacksAndMessages(null);
                 startFragment(new JTabSegmentFragment());
@@ -471,6 +501,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     public void onResume() {
         //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
         //new Thread(searchDevices).start();
+        if(mqttUtil.isConnectionLost){
+            mqttUtil.doClientConnection();
+        }
         thSearchDevice = new Thread(searchDevices);
         thSearchDevice.start();
 
@@ -798,11 +831,34 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            Log.i("TF", "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
+            Log.i("TF", "收到消息： \ntopic："+topic+"\n payload：" + new String(message.getPayload()) + "\tToString:" + message.toString());
             //Dialogs.alertMessage(getContext(), "mqtt reciver", message.toString());
+            String clientid="";
             try{
                 JSONObject json = JSONObject.parseObject(message.toString());
                 JSONObject data = new JSONObject();
+
+                if(topic.contains("disconnected") || topic.contains("connected")){
+                    clientid = json.getString("clientid");
+                    List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_DEVCLIENTID,
+                            clientid));
+                    if(wr.size()>0){
+                        if(topic.contains("disconnected")) {
+                            wr.get(0).isOnline = false;
+                            Log.i("TF", "设备client id【" + clientid + "】离线");
+                        }else{
+                            wr.get(0).isOnline = true;
+                            Log.i("TF", "设备client id【" + clientid + "】在线");
+                        }
+                    }
+
+                    MyApplication.liteOrm.cascade().save(wr);
+
+                    refreshDataSet();
+                    return;
+                }
+
+
 
                 fromMsgClientId = json.getString("from");
                 toMsgClientId = json.getString("to");
@@ -917,11 +973,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         public void connectionLost(Throwable arg0) {
             try {
                 Log.i("TF", "连接断开");
-                mqttUtil.disconnect();//连接断开，重连
-                if (mqttclientid == null && shareDevicePublishTopic == null && shareDeviceResponseTopic == null) {
-                    return;
+                if(mqttAutoConnect) {
+                    mqttUtil.disconnect();//连接断开，重连
+                    if (mqttclientid == null && shareDevicePublishTopic == null && shareDeviceResponseTopic == null) {
+                        return;
+                    }
+                    mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
                 }
-                mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -936,7 +994,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             mqttUtil.isConnectSuccess = true;
             try {
                 if(mqttaction==null && toMsgClientId == null && fromMsgClientId==null){return;}
-                mqttUtil.getMqttAndroidClient().subscribe(mqttUtil.getPUBLISH_TOPIC(), 0);//订阅主题，参数：主题、服务质量
+                //mqttUtil.getMqttAndroidClient().subscribe(mqttUtil.getPUBLISH_TOPIC(), 0);//订阅主题，参数：主题、服务质量
+                mqttUtil.getMqttAndroidClient().subscribe(subscribeTopics, subscribeTopicsQos);//订阅主题，参数：主题、服务质量
                 JSONObject json = new JSONObject();
                 if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("sharealldevices")){
                     json.put("from", fromMsgClientId);

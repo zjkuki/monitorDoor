@@ -42,6 +42,8 @@ public class WifiRemoterBoard {
     @Getter @Setter private String mPublicTopic;
     @Getter @Setter private String mSubscribeTopic;
 
+    @Getter @Setter private boolean mIsAutoConnect = true;
+
     @Getter private MqttUtil mqttUtil = null;
 
     private String MQSysTopic = "$SYS/brokers/+/clients/+/+";
@@ -52,9 +54,10 @@ public class WifiRemoterBoard {
         this.mcontext = context;
     }
 
-    public WifiRemoterBoard(Context context, WifiRemoter wifiRemoter){
+    public WifiRemoterBoard(Context context, WifiRemoter wifiRemoter, boolean isAutoConnect){
         this.mcontext = context;
         this.mWifiRemoter = wifiRemoter;
+        this.mIsAutoConnect = isAutoConnect;
 
         initMqttService(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
                 , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false);
@@ -69,7 +72,18 @@ public class WifiRemoterBoard {
         this.subscribeTopics[0] = MQSysTopic;
         this.subscribeTopics[1] = mSubscribeTopic;
 
-        mqttUtil = new MqttUtil(context,host,username,password,clientid,0,mPublicTopic,mPublicTopic,iMqttActionListener,mqttCallback);
+        if(this.mIsAutoConnect) {
+            mqttUtil = new MqttUtil(context, host, username, password, clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
+        }
+    }
+
+    public void doMqttConnection(){
+        if(mqttUtil == null && mWifiRemoter!=null) {
+            mqttUtil = new MqttUtil(this.mcontext, mWifiRemoter.hostUrl, mWifiRemoter.hostUsername,
+                    mWifiRemoter.hostPassword, mWifiRemoter.clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
+        }else{
+            mqttUtil.doClientConnection();
+        }
     }
 
     public boolean addWifiRemoteLocker(WifiRemoteLocker wifiRemoteLocker){

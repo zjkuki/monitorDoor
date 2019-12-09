@@ -76,7 +76,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
                     @SuppressLint("WrongConstant")
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MyApplication.liteOrm.delete(mCurrWifiRemoter);
+                        MyApplication.liteOrm.cascade().delete(mCurrWifiRemoter);
                         WifiRemoterDeviceAdapter.super.notifyItemRemoved(position);
                         mDevs = MyApplication.liteOrm.query(WifiRemoter.class);
                         WifiRemoterDeviceAdapter.super.setData(mDevs);
