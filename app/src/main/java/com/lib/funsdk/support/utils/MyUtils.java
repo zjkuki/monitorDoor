@@ -1,9 +1,12 @@
 package com.lib.funsdk.support.utils;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.view.View;
 
@@ -14,6 +17,8 @@ import com.lib.sdk.struct.H264_DVR_FINDINFO;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import static android.content.Context.TELEPHONY_SERVICE;
 
 
 public class MyUtils {
@@ -89,8 +94,19 @@ public class MyUtils {
 	}
 
 	public static String getMpsPushToken(Context context) {
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+			// TODO: Consider calling
+			//    ActivityCompat#requestPermissions
+			// here to request the missing permissions, and then overriding
+			//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+			//                                          int[] grantResults)
+			// to handle the case where the user grants the permission. See the documentation
+			// for ActivityCompat#requestPermissions for more details.
+			return null;
+		}
+
 		String imei = ((TelephonyManager) context.getSystemService(
-				Context.TELEPHONY_SERVICE)).getDeviceId();
+				TELEPHONY_SERVICE)).getDeviceId();
 		if ( null == imei ) {
 			return null;
 		}
@@ -118,7 +134,7 @@ public class MyUtils {
 	/**
 	 * 判断字符串是否为空
 	 * 
-	 * @param s
+	 * @param str
 	 * @return
 	 */
 	public static boolean isStringNULL(String str) {

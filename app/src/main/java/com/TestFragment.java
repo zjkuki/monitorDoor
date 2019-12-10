@@ -208,7 +208,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ClientManager.getClient().stopSearch();
                 mHandler.removeCallbacksAndMessages(null);
                 startFragment(new JTabSegmentFragment());
-
             }
         });
 
@@ -371,14 +370,14 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
         //}
 
-        //if(mqttUtil==null) {
-        mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
-        //}else{
-            /*if (mqttUtil.isConnectionLost) {
+        if(mqttUtil==null) {
+            mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+        }else{
+            if (mqttUtil.isConnectionLost) {
                 mqttUtil.doClientConnection();
             }
 
-        }*/
+        }
     }
 
 
@@ -787,12 +786,14 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             if(mWifiRemoters!=null && mWifiRemoters.size()>0){
                 for(WifiRemoter w:mWifiRemoters){
-                    for(Camera c:w.cameras){
-                        if(c.sn.equals(sn)){
-                            if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
-                                c.isOnline = true;
-                            }else {
-                                c.isOnline = false;
+                    if(w.cameras!=null && w.cameras.size()>0) {
+                        for (Camera c : w.cameras) {
+                            if (c.sn.equals(sn)) {
+                                if (funDevice.devStatus == FunDevStatus.STATUS_ONLINE) {
+                                    c.isOnline = true;
+                                } else {
+                                    c.isOnline = false;
+                                }
                             }
                         }
                     }

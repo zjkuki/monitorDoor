@@ -546,10 +546,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 							MyApplication.liteOrm.save(mBluetooth);
 
-							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "ble_list_refresh");
 							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-							sendBroadcast(intent);
+							sendBroadcast(intent);*/
 						}
 					} else {
 						if (mCurrDevType == FunDevType.EE_DEV_NORMAL_MONITOR) {
@@ -581,10 +581,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 							FunSupport.getInstance().requestDeviceSetConfig(mFunDevice, modifyPasswd);
 
-							Intent intent = new Intent("android.intent.action.CART_BROADCAST");
+							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "cam_list_refresh");
 							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
-							sendBroadcast(intent);
+							sendBroadcast(intent);*/
 						}else {
 							List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
 									mWifiRemoter.mac));
@@ -607,9 +607,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					}
 
-					//replaceFragment(android.R.id.content, new TestFragment());
-					//finish();
-					onBackPressed();
+					HomeActivity h = (HomeActivity)AppManager.getAppManager().getActivity(HomeActivity.class);
+					h.setIntent(new Intent().putExtra("action","recreate"));
+					h.recreate();
+					finish();
+					//onBackPressed();
 				}
 			}
 			break;

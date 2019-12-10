@@ -168,6 +168,7 @@ public class JTabSegmentFragment extends JBaseFragment {
                             intent.setClass(getContext(), DeviceAddByUser.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
+                            getFragmentManager().beginTransaction().remove(new JTabSegmentFragment()).commit();
                             /*}else {
                                 JBaseFragment fragment = null;
                                 try {
