@@ -228,7 +228,7 @@ public class MqttUtil {
             }
         }
         if (doConnect) {
-            BluetoothLog.d("mMqttConnectOptions.setWill Success");
+            Log.i("MqttUtil","mMqttConnectOptions.setWill Success");
             doClientConnection();
         }
     }
@@ -237,17 +237,20 @@ public class MqttUtil {
     /**
      * 连接MQTT服务器
      */
-    public void doClientConnection() {
-        BluetoothLog.d("是否链接成功：" + mqttAndroidClient.isConnected());
-        //if (!mqttAndroidClient.isConnected() && Tools.isInternetConnect(context)) {
-        if (!mqttAndroidClient.isConnected()) {
-            try {
-                mqttAndroidClient.connect(mqttConnectOptions, null, iMqttActionListener);
-            } catch (MqttException e) {
-                BluetoothLog.d("doClientConnection:" + e.getMessage());
-                e.printStackTrace();
+    public boolean doClientConnection() {
+        try {
+            Log.i("MqttUtil","是否链接成功：" + mqttAndroidClient.isConnected());
+            //if (!mqttAndroidClient.isConnected() && Tools.isInternetConnect(context)) {
+            if (!mqttAndroidClient.isConnected()) {
+                    mqttAndroidClient.connect(mqttConnectOptions, null, iMqttActionListener);
+                    return true;
             }
+        } catch (MqttException e) {
+            Log.i("MqttUtil","doClientConnection:" + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
+        return false;
     }
 
     /**
@@ -264,10 +267,10 @@ public class MqttUtil {
                 //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
                 mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
             } else {
-                BluetoothLog.d("mqttAndroidClient is Null");
+                Log.i("MqttUtil","mqttAndroidClient is Null");
             }
         } catch (MqttException e) {
-            BluetoothLog.d("publish MqttException:" + e.getMessage());
+            Log.i("MqttUtil","publish MqttException:" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -286,10 +289,10 @@ public class MqttUtil {
                 //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
                 mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
             } else {
-                BluetoothLog.d("mqttAndroidClient is Null");
+                Log.i("MqttUtil","mqttAndroidClient is Null");
             }
         } catch (MqttException e) {
-            BluetoothLog.d("publish MqttException:" + e.getMessage());
+            Log.i("MqttUtil","publish MqttException:" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -302,7 +305,7 @@ public class MqttUtil {
             //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
             mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
         } catch (MqttException e) {
-            BluetoothLog.d("publish:" + e.getMessage());
+            Log.i("MqttUtil","publish:" + e.getMessage());
             e.printStackTrace();
         }
     }

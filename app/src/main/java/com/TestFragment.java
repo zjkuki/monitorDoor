@@ -123,8 +123,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         thSearchDevice = new Thread(searchDevices);
 
-        mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
-
         mTopBar = rootView.findViewById(R.id.topbar);
         bnve = rootView.findViewById(R.id.bnve);
         fabScanQrCode = rootView.findViewById(R.id.fabScanQRCode);
@@ -180,39 +178,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         }.start();*/
 
-        shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
-        shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
-
-        //if(mWifiRemoters!=null) {
-            subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
-            subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];
-            /*subscribeTopics = new String[3];
-            subscribeTopicsQos = new int[3];
-            subscribeTopics[0] = shareDevicePublishTopic;
-            subscribeTopicsQos[0] = 0;
-            subscribeTopics[1] = "$SYS/brokers/+/clients/+/connected";
-            subscribeTopicsQos[1] = 0;
-            subscribeTopics[2] = "$SYS/brokers/+/clients/+/disconnected";
-            subscribeTopicsQos[2] = 0;*/
-
-            subscribeTopics[0] = shareDevicePublishTopic;
-            subscribeTopicsQos[0] = 0;
-
-            int i = 1;
-            for(WifiRemoter wr:mWifiRemoters){
-                subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/connected";
-                subscribeTopicsQos[i] = 0;
-                i++;
-                subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/disconnected";
-                subscribeTopicsQos[i] = 0;
-                i++;
-            }
-        //}
-
-        if(mqttUtil==null) {
-            mqttAutoConnect=true;
-            mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
-        }
+        mqttSetup();
 
         initTopBar();
         initRecyclerView();
@@ -238,6 +204,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             public void onClick(View view) {
                 mqttAutoConnect=false;
                 mqttUtil.disconnect();
+                mqttUtil = null;
                 ClientManager.getClient().stopSearch();
                 mHandler.removeCallbacksAndMessages(null);
                 startFragment(new JTabSegmentFragment());
@@ -370,6 +337,50 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });
     }
+
+    private void mqttSetup(){
+
+        mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
+
+        shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
+        shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
+
+        //if(mWifiRemoters!=null) {
+        subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
+        subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];
+            /*subscribeTopics = new String[3];
+            subscribeTopicsQos = new int[3];
+            subscribeTopics[0] = shareDevicePublishTopic;
+            subscribeTopicsQos[0] = 0;
+            subscribeTopics[1] = "$SYS/brokers/+/clients/+/connected";
+            subscribeTopicsQos[1] = 0;
+            subscribeTopics[2] = "$SYS/brokers/+/clients/+/disconnected";
+            subscribeTopicsQos[2] = 0;*/
+
+        subscribeTopics[0] = shareDevicePublishTopic;
+        subscribeTopicsQos[0] = 0;
+
+        int i = 1;
+        for(WifiRemoter wr:mWifiRemoters){
+            subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/connected";
+            subscribeTopicsQos[i] = 0;
+            i++;
+            subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/disconnected";
+            subscribeTopicsQos[i] = 0;
+            i++;
+        }
+        //}
+
+        //if(mqttUtil==null) {
+        mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+        //}else{
+            /*if (mqttUtil.isConnectionLost) {
+                mqttUtil.doClientConnection();
+            }
+
+        }*/
+    }
+
 
     private void startBluetooth(){
         if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
@@ -506,9 +517,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     public void onResume() {
         //mHandler.postDelayed(searchDevices, 0);//每n秒执行一次runnable.
         //new Thread(searchDevices).start();
-        if(mqttUtil.isConnectionLost){
-            mqttUtil.doClientConnection();
-        }
+        mqttSetup();
+
         thSearchDevice = new Thread(searchDevices);
         thSearchDevice.start();
 
@@ -719,6 +729,15 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             for(Camera cam : cams) {
                 //FunSupport.getInstance().requestDeviceStatus(BuildFunDevice(cam));
                 FunSupport.getInstance().requestDeviceStatus(FunDevType.getType(cam.type), cam.sn);
+            }
+
+
+            if(mqttUtil!=null){
+                if (mqttUtil.isConnectionLost) {
+                    mqttUtil.doClientConnection();
+                }else{
+                    Log.i("TF", "QMTT服务已断开连接，正等待重连");
+                }
             }
 
             refreshDataSet();

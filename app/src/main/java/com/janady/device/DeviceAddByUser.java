@@ -952,7 +952,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				mEditPassword.setVisibility(View.GONE);
 			}*/
 
-			searchDevice();
+			if(mCurrDevType==EE_DEV_BLUETOOTH) {
+				searchDevice();
+			}else{
+				ClientManager.getClient().stopSearch();
+			}
 		}
 	}
 	
@@ -1186,7 +1190,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
             mTextTip.setText("停止扫描设备....");
             isBleScanning = true;
             mRefreshLayout.showState(AppConstants.LIST);
-            BluetoothLog.w("正在搜索设备");
+			Log.i("DeviceAddByUser","正在搜索设备");
             //toolbar.setTitle(R.string.string_refreshing);
         }
 
@@ -1201,12 +1205,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				}
 
 				if (mBleDevices.size() > 0) {
-					BluetoothLog.w("DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
+					Log.i("DeviceAddByUser","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
 					mListViewDev.onRefreshComplete(true);
 					mRefreshLayout.showState(AppConstants.LIST);
 				}
 			}else{
-				BluetoothLog.w("Dorp device!");
+				Log.i("DeviceAddByUser","Dorp device!");
 			}
         }
 
@@ -1214,7 +1218,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
         public void onSearchStopped() {
             isBleScanning = false;
             mTextTip.setText("扫描设备");
-            BluetoothLog.w("DeviceAddByUser.onSearchStopped");
+			Log.i("DeviceAddByUser","DeviceAddByUser.onSearchStopped");
             mRefreshLayout.showState(AppConstants.LIST);
             //mTextTip.setText("扫描设备");
             //toolbar.setTitle(R.string.devices);
@@ -1225,7 +1229,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
             isBleScanning = false;
 			mListViewDev.onRefreshComplete(true);
 			mRefreshLayout.showState(AppConstants.LIST);
-            BluetoothLog.w("DeviceAddByUser.onSearchCanceled");
+            Log.i("DeviceAddByUser","DeviceAddByUser.onSearchCanceled");
 
             mTextTip.setText("扫描设备");
             //toolbar.setTitle(R.string.devices);
@@ -1270,7 +1274,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onBleReadResponse(Bluetooth bluetooth, byte[] data, BleLockerStatus status) {
-			BluetoothLog.i(" 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg()
+			Log.i("DeviceAddByUser"," 读取返回信息 onReadResponse：code="+ status.getSatusId() +" message=" + status.getmStatusMsg()
 					+" bodycontent"+String.format("read: %s", ByteUtils.byteToString(data))+"\n");
 		}
 
@@ -1281,12 +1285,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onBleNotifyResponse(Bluetooth bluetooth, String NotifyValue, BleLockerStatus status) {
-			BluetoothLog.i(" 设备消息 onBleNotifyResponse：code="+ status.getSatusId() +"\n message=" + NotifyValue + "\n  status:" + status.getmStatusMsg() +"\n");
+			Log.i("DeviceAddByUser"," 设备消息 onBleNotifyResponse：code="+ status.getSatusId() +"\n message=" + NotifyValue + "\n  status:" + status.getmStatusMsg() +"\n");
 		}
 
 		@Override
 		public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
-			BluetoothLog.i(" 连接设备，onConnected：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
+			Log.i("DeviceAddByUser"," 连接设备，onConnected：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			if(status==BleLockerStatus.CONNECTED && needCheckSTA) {
 				bleLocker.sta();
 			}
@@ -1304,7 +1308,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		@Override
 		public void onReday(Bluetooth bluetooth, BleLockerStatus status) {
-			BluetoothLog.i(" 设备已准备，onReday：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
+			Log.i("DeviceAddByUser"," 设备已准备，onReday：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			hideWaitDialog();
 
 		}
@@ -1315,7 +1319,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		}
 		@Override
 		public void onPasswdError(Bluetooth bluetooth, BleLockerStatus status) {
-			BluetoothLog.i(" 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
+			Log.i("DeviceAddByUser"," 密码错误，onPasswdError：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
 			hideWaitDialog();
 
 			if (step == 1) {
@@ -1356,7 +1360,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		public void onResetted(Bluetooth bluetooth, int Resetted, BleLockerStatus status) {
 			needCheckSTA=false;
 			if(Resetted ==1 ) {
-				BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+				Log.i("DeviceAddByUser"," 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
 				Dialogs.alertMessage(mcontext, "提示","设备已重置为出厂状态，输入新密码可重新激活本设备");
 				mTextTitle.setText("添加设备");
 				mBtnDevAdd.setText("添加");
@@ -1368,7 +1372,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				bleLocker.setmNoRssi(true);
 				bleLocker.connect();
 			}else{
-				BluetoothLog.i(" 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
+				Log.i("DeviceAddByUser"," 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
 				mTextTitle.setText("修改设备");
 				mBtnDevAdd.setText("修改");
 				showInputPasswordDialog(EE_DEV_BLUETOOTH);
