@@ -615,6 +615,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             public void run(){
                 DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
                 DataManager.getInstance().mBleDevices = mBleDevices;
+                mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
                 DataManager.getInstance().mWifiRemoters = mWifiRemoters;
 
                 mainItems = DataManager.getInstance().getDescriptions();
