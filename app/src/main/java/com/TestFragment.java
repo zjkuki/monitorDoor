@@ -184,16 +184,21 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
 
         //if(mWifiRemoters!=null) {
-            /*subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
-            subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];*/
-            subscribeTopics = new String[3];
-            subscribeTopicsQos = new int[3];            subscribeTopics[0] = shareDevicePublishTopic;
+            subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
+            subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];
+            /*subscribeTopics = new String[3];
+            subscribeTopicsQos = new int[3];
+            subscribeTopics[0] = shareDevicePublishTopic;
             subscribeTopicsQos[0] = 0;
             subscribeTopics[1] = "$SYS/brokers/+/clients/+/connected";
             subscribeTopicsQos[1] = 0;
             subscribeTopics[2] = "$SYS/brokers/+/clients/+/disconnected";
-            subscribeTopicsQos[2] = 0;
-            /*int i = 1;
+            subscribeTopicsQos[2] = 0;*/
+
+            subscribeTopics[0] = shareDevicePublishTopic;
+            subscribeTopicsQos[0] = 0;
+
+            int i = 1;
             for(WifiRemoter wr:mWifiRemoters){
                 subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/connected";
                 subscribeTopicsQos[i] = 0;
@@ -201,7 +206,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/disconnected";
                 subscribeTopicsQos[i] = 0;
                 i++;
-            }*/
+            }
         //}
 
         if(mqttUtil==null) {
@@ -619,7 +624,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             //if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
-                  .searchBluetoothLeDevice(2000, 1).build();
+                  .searchBluetoothLeDevice(10000, 2).build();
 
             ClientManager.getClient().search(request, mSearchResponse);
 
@@ -628,7 +633,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             for (Bluetooth bluetooth : blists) {
                 matchBleLockerOnline(bluetooth);
             }*/
-        Log.i("DataManager","停止扫描设备....");
+        //Log.i("DataManager","停止扫描设备....");
     }
 
     /**
@@ -674,7 +679,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         refreshDataSet();
                     }*/
 
-                    Log.i("TestFragment","DeviceAddByUser.Bluetooth founds count: " + mBleDevices.size());
+                    Log.i("TestFragment","Bluetooth founds count: " + mBleDevices.size());
                     //refreshDataSet();
                 }
             } else {

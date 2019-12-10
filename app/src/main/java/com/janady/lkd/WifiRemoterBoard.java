@@ -4,10 +4,12 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.example.funsdkdemo.MyApplication;
 import com.janady.utils.DateUtils;
 import com.janady.utils.MqttUtil;
 import com.janady.database.model.WifiRemoteLocker;
 import com.janady.database.model.WifiRemoter;
+import com.litesuits.orm.db.assit.QueryBuilder;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -18,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.fogcloud.fog_mqtt.helper.ListenDeviceCallBack;
 import lombok.Data;
@@ -47,8 +50,10 @@ public class WifiRemoterBoard {
     @Getter private MqttUtil mqttUtil = null;
 
     private String MQSysTopic = "$SYS/brokers/+/clients/+/+";
+    private String DevConnectedTopic = "";
+    private String DevDisconnectedTopic = "";
 
-    private String[] subscribeTopics = new String[2];
+    private String[] subscribeTopics = new String[3];
 
     public WifiRemoterBoard(Context context){
         this.mcontext = context;
@@ -69,16 +74,19 @@ public class WifiRemoterBoard {
         mPublicTopic = PubTopic;
         mSubscribeTopic = SubTopic;
 
-        this.subscribeTopics[0] = MQSysTopic;
-        this.subscribeTopics[1] = mSubscribeTopic;
+        this.subscribeTopics[0] = "$SYS/brokers/+/clients/"+this.mWifiRemoter.devClientid+"/connected";
+        this.subscribeTopics[1] = "$SYS/brokers/+/clients/"+this.mWifiRemoter.devClientid+"/disconnected";
+        this.subscribeTopics[2] = mSubscribeTopic;
 
         if(this.mIsAutoConnect) {
+            //if(context==null){return;}
             mqttUtil = new MqttUtil(context, host, username, password, clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
         }
     }
 
     public void doMqttConnection(){
         if(mqttUtil == null && mWifiRemoter!=null) {
+            //if(mcontext==null){return;}
             mqttUtil = new MqttUtil(this.mcontext, mWifiRemoter.hostUrl, mWifiRemoter.hostUsername,
                     mWifiRemoter.hostPassword, mWifiRemoter.clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
         }else{
@@ -152,13 +160,30 @@ public class WifiRemoterBoard {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
-            Log.i(TAG, "收到消息： " + new String(message.getPayload()) + "\tToString:" + message.toString());
+            Log.i(TAG, "收到消息： \ntopic："+topic+"\n payload：" + new String(message.getPayload()) + "\tToString:" + message.toString());
             //Dialogs.alertMessage(mcontext, "收到消息：",new String(message.getPayload()) + "\tToString:" + message.toString());
             //收到其他客户端的消息后，响应给对方告知消息已到达或者消息有问题等
             //response("message arrived:"+message);
             try {
                 com.alibaba.fastjson.JSONObject json = com.alibaba.fastjson.JSONObject.parseObject(message.toString());
                 com.alibaba.fastjson.JSONObject data = new com.alibaba.fastjson.JSONObject();
+                if(topic.contains("disconnected") || topic.contains("connected")) {
+                    String clientid = json.getString("clientid");
+                    if (clientid.equals(mWifiRemoter.devClientid)) {
+                        if (topic.contains("disconnected")) {
+                            mWifiRemoter.isOnline = false;
+                            Log.i("WifiRemoterBoard", "设备client id【" + clientid + "】离线");
+                        } else {
+                            mWifiRemoter.isOnline = true;
+                            Log.i("WifiRemoterBoard", "设备client id【" + clientid + "】在线");
+                        }
+                    }
+
+                    MyApplication.liteOrm.cascade().save(mWifiRemoter);
+
+                    return;
+                }
+
                 data = json.getJSONObject("data");
                 String msg="";
                 switch(data.getIntValue("operation_result")){

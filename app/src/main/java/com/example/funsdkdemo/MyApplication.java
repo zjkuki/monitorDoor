@@ -35,7 +35,7 @@ public class MyApplication extends Application {
 		if (liteOrm == null) {
 			liteOrm = LiteOrm.newSingleInstance(this, "liteorm.db");
 		}
-		liteOrm.setDebugged(true);
+		liteOrm.setDebugged(false);
 		/**
 		 * 以下是FunSDK初始化
 		 */

@@ -17,9 +17,20 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * CreateTime 2019/8/8 16:11
@@ -306,5 +317,41 @@ public class MqttUtil {
         }
     }
 
+
+    public void pullDevicesListFromMQTTServer(){
+                Map<String,String> map = new HashMap<>();
+                map.put("appkey", FunSupport.APP_KEY);
+                map.put("uname", "123123");
+                map.put("password", "123123");
+
+                OkHttpClient client=new OkHttpClient();
+
+                FormBody.Builder Body = new FormBody.Builder();
+                for(Map.Entry<String,String> entry:map.entrySet()){
+                    Body.add(entry.getKey(),entry.getValue());
+                }
+
+                RequestBody requestBody = Body.build();
+
+                Request request = new Request.Builder()
+                        .url("http://mqtt.lkd.365yiding.com/api/v3nodes/emqx@127.0.0.1/connections/")//请求的url
+                        .post(requestBody)
+                        .build();
+
+                Call call = client.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        final String res = response.body().string();
+                        Log.v("Main.ID=", res);
+                    }
+
+                });
+    }
 
 }
