@@ -607,10 +607,16 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 					}
 
-					HomeActivity h = (HomeActivity)AppManager.getAppManager().getActivity(HomeActivity.class);
-					h.setIntent(new Intent().putExtra("action","recreate"));
-					h.recreate();
-					finish();
+					this.finish();
+
+					Intent intent = new Intent();
+					intent.putExtra("action","recreate");
+					intent.setClass(mcontext, HomeActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					startActivity(intent);
+					//HomeActivity h = (HomeActivity)AppManager.getAppManager().getActivity(HomeActivity.class);
+					//h.setIntent(new Intent().putExtra("action","recreate"));
+					//finish();
 					//onBackPressed();
 				}
 			}

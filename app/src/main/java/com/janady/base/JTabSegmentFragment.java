@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
@@ -75,7 +76,7 @@ public class JTabSegmentFragment extends JBaseFragment {
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popBackStack();
+                onBackPressed();
             }
         });
 
@@ -91,6 +92,18 @@ public class JTabSegmentFragment extends JBaseFragment {
         initTabAndPager();
 
         return rootView;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+
+        Intent intent = new Intent();
+        intent.putExtra("action","recreate");
+        intent.setClass(getContext(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void initTabAndPager() {
@@ -168,7 +181,8 @@ public class JTabSegmentFragment extends JBaseFragment {
                             intent.setClass(getContext(), DeviceAddByUser.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
-                            getFragmentManager().beginTransaction().remove(new JTabSegmentFragment()).commit();
+
+                            popBackStack();
                             /*}else {
                                 JBaseFragment fragment = null;
                                 try {

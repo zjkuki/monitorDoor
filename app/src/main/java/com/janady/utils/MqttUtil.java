@@ -320,6 +320,17 @@ public class MqttUtil {
         }
     }
 
+    public void closeMqtt() {
+        try{
+            if (mqttAndroidClient != null){
+                mqttAndroidClient.unregisterResources();
+                mqttAndroidClient.close();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     public void pullDevicesListFromMQTTServer(){
                 Map<String,String> map = new HashMap<>();
@@ -356,5 +367,4 @@ public class MqttUtil {
 
                 });
     }
-
 }

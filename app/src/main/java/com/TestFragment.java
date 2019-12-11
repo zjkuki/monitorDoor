@@ -203,7 +203,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             @Override
             public void onClick(View view) {
                 mqttAutoConnect=false;
-                mqttUtil.disconnect();
+                mqttUtil.closeMqtt();
                 mqttUtil = null;
                 ClientManager.getClient().stopSearch();
                 mHandler.removeCallbacksAndMessages(null);

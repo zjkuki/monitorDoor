@@ -334,6 +334,8 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
+            countDownTimer.cancel();
+
             popBackStack();
         }
     }

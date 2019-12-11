@@ -1,6 +1,7 @@
 package com.janady.device;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,6 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.funsdkdemo.MyApplication;
+import com.janady.database.model.Camera;
+import com.litesuits.orm.db.assit.QueryBuilder;
 import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
@@ -131,9 +135,20 @@ public class DeviceLanFragment extends JBaseFragment implements OnFunDeviceListe
     }
     protected void onItemClicked(int pos) {
         FunDevice funDevice = mLanDeviceList.get(pos);
-        DeviceCameraFragment deviceCameraFragment = new DeviceCameraFragment();
+        /*DeviceCameraFragment deviceCameraFragment = new DeviceCameraFragment();
         deviceCameraFragment.setFunDevice(funDevice);
-        startFragment(deviceCameraFragment);
+        startFragment(deviceCameraFragment);*/
+
+        Intent intent = new Intent();
+        intent.setClass(getContext(), DeviceCameraActivity.class);
+        intent.putExtra("FUN_DEVICE_ID", funDevice.getId());
+        intent.putExtra("FUN_DEVICE_SCENE", funDevice.devName);
+        intent.putExtra("FUN_DEVICE_SN", funDevice.devSn);
+        intent.putExtra("FUN_DEVICE_MAC", funDevice.devMac);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+        //popBackStack();
     }
 
     protected RecyclerView.LayoutManager getLayoutManager() {
