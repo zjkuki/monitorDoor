@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.DeviceAddByUser;
@@ -64,6 +65,12 @@ public abstract class JBaseSegmentFragment extends JBaseFragment {
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("action","recreate");
+                intent.setClass(getContext(), HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                
                 popBackStack();
             }
         });

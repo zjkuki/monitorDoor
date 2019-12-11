@@ -2,6 +2,7 @@ package com.janady.device;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -140,6 +142,17 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         super.onStop();
     }
 
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+
+        Intent intent = new Intent();
+        intent.putExtra("action","recreate");
+        intent.setClass(getContext(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
     private void initTopBar() {
         mTopBar.setTitle(title);
         /*mTopBar.addRightImageButton(R.drawable.scan_capture, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
@@ -154,7 +167,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                 if(bleLocker!=null){
                     bleLocker.disconnect();
                 }
-                popBackStack();
+
+                onBackPressed();
             }
         });
     }

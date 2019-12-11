@@ -527,6 +527,12 @@ public class DeviceCameraActivity
 		}
 
 		finish();
+
+		Intent intent = new Intent();
+		intent.putExtra("action","recreate");
+		intent.setClass(mContext, HomeActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
 	}
 
 

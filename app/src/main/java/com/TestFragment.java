@@ -82,6 +82,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private List<SearchResult> mBleDevices = new ArrayList<SearchResult>();
     private List<WifiRemoter> mWifiRemoters = new ArrayList<WifiRemoter>();
 
+    private List<JSONObject> mMqttDevices = new ArrayList<JSONObject>();
+
     private Handler mHandler = new Handler();
 
     private boolean isScanning = false;
@@ -337,6 +339,52 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         });
     }
 
+    private void getMqttDevices(){
+        if(mWifiRemoters!=null && mWifiRemoters.size()>0) {
+            for (WifiRemoter w : mWifiRemoters) {
+                w.isOnline = false;
+            }
+
+            String resp = mqttUtil.getMqttDeviceList();
+            if (resp != "") {
+                try {
+                    JSONArray data = null;
+                    String code = "";
+                    JSONObject json = JSON.parseObject(resp);
+                    if (json != null) {
+                        code = json.getString("code");
+                        data = json.getJSONArray("data");
+                        if (data != null && data.size() > 0) {
+                            mMqttDevices = new ArrayList<JSONObject>();
+                            for (int i = 0; i < data.size(); i++) {
+                                mMqttDevices.add((JSONObject) data.get(i));
+                                if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
+                                    for (WifiRemoter w : mWifiRemoters) {
+                                        if (w.devClientid.equals(((JSONObject) data.get(i)).getString("client_id"))) {
+                                            w.isOnline = true;
+                                        } else {
+                                            w.isOnline = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
+                    for (WifiRemoter w : mWifiRemoters) {
+                        w.isOnline = false;
+                    }
+                }
+            }
+        }
+
+        MyApplication.liteOrm.cascade().save(mWifiRemoters);
+    }
+
     private void mqttSetup(){
 
         mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
@@ -378,6 +426,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
 
         }
+
+        getMqttDevices();
     }
 
 
@@ -411,6 +461,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
      */
     @Override
     public void onItemClick(ItemDescription itemDescription) {
+        mqttAutoConnect=false;
+        mqttUtil.closeMqtt();
+        mqttUtil = null;
         ClientManager.getClient().stopSearch();
         thSearchDevice.interrupt();
         mHandler.removeCallbacksAndMessages(null);
@@ -489,6 +542,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {
+        mqttAutoConnect=false;
+        mqttUtil.closeMqtt();
+        mqttUtil = null;
         ClientManager.getClient().stopSearch();
         thSearchDevice.interrupt();
         mHandler.removeCallbacksAndMessages(null);
@@ -738,6 +794,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }else{
                     Log.i("TF", "QMTT服务已断开连接，正等待重连");
                 }
+
             }
 
             refreshDataSet();

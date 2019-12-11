@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.janady.adapter.CameraDeviceAdapter;
 import com.janady.adapter.FunDeviceAdapter;
@@ -78,11 +79,19 @@ public class CameraListFragment extends JBaseFragment {
     }
     private void initTopBar() {
         mTopBar.setTitle("我的摄像机");
+        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //startFragment(new JTabSegmentFragment());
                 //startFragment(new JTabSegmentFragment());
+                popBackStack();
                 Intent intent = new Intent();
                 intent.putExtra("DeviceTypsSpinnerNo", 0);
                 intent.setClass(getContext(), DeviceAddByUser.class);
@@ -91,6 +100,7 @@ public class CameraListFragment extends JBaseFragment {
             }
         });
 
+        popBackStack();
         //FunSupport.getInstance().registerOnFunDeviceOptListener(this);
     }
     private void initRecyclerView() {
@@ -133,6 +143,16 @@ public class CameraListFragment extends JBaseFragment {
         mRecyclerView.setAdapter(mItemAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
+    }
+
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+        Intent intent = new Intent();
+        intent.putExtra("action","recreate");
+        intent.setClass(getContext(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

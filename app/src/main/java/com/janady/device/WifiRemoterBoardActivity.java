@@ -58,6 +58,7 @@ import com.example.funsdkdemo.MyApplication;
 import com.example.funsdkdemo.adapter.GridCameraChannelsPreviewsAdapter;
 import com.hb.dialog.myDialog.MyAlertDialog;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
+import com.janady.HomeActivity;
 import com.janady.database.model.Door;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
@@ -817,10 +818,11 @@ public class WifiRemoterBoardActivity
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if(selectedCameras!=null && selectedCameras.size()>0) {
-							    mWifiRemoter.cameras.clear();
-							    for(Camera c:selectedCameras) {
+							    if(mWifiRemoter.cameras!=null) {mWifiRemoter.cameras.clear();}
+							    /*for(Camera c:selectedCameras) {
                                     mWifiRemoter.cameras.add(c);
-                                }
+                                }*/
+							    mWifiRemoter.cameras = selectedCameras;
 
 							    if(mWifiRemoter.cameras.get(0).isOnline) {
 									showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
@@ -935,8 +937,13 @@ public class WifiRemoterBoardActivity
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 			return;
 		}
-
 		finish();
+
+		Intent intent = new Intent();
+		intent.putExtra("action","recreate");
+		intent.setClass(mContext, HomeActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
 	}
 
 

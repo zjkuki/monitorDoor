@@ -1057,12 +1057,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	@Override
 	public void onBackPressed() {
-		//AppManager.getAppManager().getActivity(HomeActivity.class);
-		/*Intent intent = new Intent();
-		intent.setClass(mcontext, HomeActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		startActivity(intent);*/
 		finish();
+
+		Intent intent = new Intent();
+		intent.putExtra("action","recreate");
+		intent.setClass(this, HomeActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
 	}
 
 	@Override

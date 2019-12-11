@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
@@ -78,17 +79,23 @@ public class BluetoothListFragment extends JBaseFragment {
     }
     private void initTopBar() {
         mTopBar.setTitle("我的蓝牙设备");
+        mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startFragment(new JTabSegmentFragment());
+                popBackStack();
+
                 Intent intent = new Intent();
                 intent.putExtra("DeviceTypsSpinnerNo", 1);
                 intent.setClass(getContext(), DeviceAddByUser.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-
-                popBackStack();
             }
         });
 
@@ -115,6 +122,17 @@ public class BluetoothListFragment extends JBaseFragment {
         mRecyclerView.setAdapter(mItemAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
+    }
+
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+
+        Intent intent = new Intent();
+        intent.putExtra("action","recreate");
+        intent.setClass(getContext(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.HomeActivity;
 import com.janady.adapter.WifiRemoterDeviceAdapter;
 import com.janady.database.model.WifiRemoter;
 import com.lkd.smartlocker.R;
@@ -77,7 +78,7 @@ public class RemoteListFragment extends JBaseFragment {
             public void onClick(View view) {
                 //startFragment(new JTabSegmentFragment());
                 Intent intent = new Intent();
-                intent.putExtra("DeviceTypsSpinnerNo", 1);
+                intent.putExtra("DeviceTypsSpinnerNo", 2);
                 intent.setClass(getContext(), DeviceAddByUser.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -108,6 +109,17 @@ public class RemoteListFragment extends JBaseFragment {
         mRecyclerView.setAdapter(mItemAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        popBackStack();
+        Intent intent = new Intent();
+        intent.putExtra("action","recreate");
+        intent.setClass(getContext(), HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     @Override

@@ -26,7 +26,9 @@ import lombok.Getter;
 import lombok.Setter;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Credentials;
 import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -41,28 +43,55 @@ import okhttp3.Response;
 public class MqttUtil {
     private final String TAG = "------------->mqtt";
     private static MqttUtil mqttUtil;
-    @Getter @Setter private Context context;
+    @Getter
+    @Setter
+    private Context context;
 
-    @Getter private MqttAndroidClient mqttAndroidClient;
+    @Getter
+    private MqttAndroidClient mqttAndroidClient;
 
-    @Getter @Setter private MqttConnectOptions mqttConnectOptions;
+    @Getter
+    @Setter
+    private MqttConnectOptions mqttConnectOptions;
 
-    @Getter @Setter public boolean isConnectSuccess = false;
-    @Getter @Setter public boolean isConnectionLost = true;
+    @Getter
+    @Setter
+    public boolean isConnectSuccess = false;
+    @Getter
+    @Setter
+    public boolean isConnectionLost = true;
 
     //MQTT相关配置
     private final static long cid = System.currentTimeMillis();
-    @Getter @Setter public static String CLIENTID = FunSupport.getInstance().getUserName()+"@"+cid;
+    @Getter
+    @Setter
+    public static String CLIENTID = FunSupport.getInstance().getUserName() + "@" + cid;
 
     //@Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
-    @Getter @Setter public static String HOST = "tcp://mqtt.lkd.365yiding.com:1883";//服务器地址（协议+地址+端口号）
-    @Getter @Setter public static String USERNAME = "lkd";//用户名
-    @Getter @Setter public static String PASSWORD = "lkd123!@#";//密码
-    @Getter @Setter public static String PUBLISH_TOPIC = "lkd_smart_locker_app/message";//发布主题
-    @Getter @Setter public static String RESPONSE_TOPIC = "lkd_smart_locker_app/message";//订阅主题
-    @Getter @Setter public static String[] PUBLISH_TOPICS = {""};//发布主题
-    @Getter @Setter public static String[] RESPONSE_TOPICS = {""};//订阅主题
-    @Getter @Setter public static int[] QUALITY_OF_SERVICES = {0};//订阅主题
+    @Getter
+    @Setter
+    public static String HOST = "tcp://mqtt.lkd.365yiding.com:1883";//服务器地址（协议+地址+端口号）
+    @Getter
+    @Setter
+    public static String USERNAME = "lkd";//用户名
+    @Getter
+    @Setter
+    public static String PASSWORD = "lkd123!@#";//密码
+    @Getter
+    @Setter
+    public static String PUBLISH_TOPIC = "lkd_smart_locker_app/message";//发布主题
+    @Getter
+    @Setter
+    public static String RESPONSE_TOPIC = "lkd_smart_locker_app/message";//订阅主题
+    @Getter
+    @Setter
+    public static String[] PUBLISH_TOPICS = {""};//发布主题
+    @Getter
+    @Setter
+    public static String[] RESPONSE_TOPICS = {""};//订阅主题
+    @Getter
+    @Setter
+    public static int[] QUALITY_OF_SERVICES = {0};//订阅主题
 
     /**
      * QUALITY_OF_SERVICE
@@ -70,12 +99,17 @@ public class MqttUtil {
      * 至少一次，确保消息到达，但消息重复可能会发生。
      * 只有一次，确保消息到达一次。这一级别可用于如下情况，在计费系统中，消息重复或丢失会导致不正确的结果
      */
-    @Getter @Setter public static int QUALITY_OF_SERVICE = 0;//服务质量,0最多一次，1最少一次，2只一次
+    @Getter
+    @Setter
+    public static int QUALITY_OF_SERVICE = 0;//服务质量,0最多一次，1最少一次，2只一次
 
 
-    @Getter private final int HAND_RECONNECT = 1;//重连hand
-    @Getter private final int RECONNECT_TIME_CONFIG = 10 * 1000;//重连时间间隔为10秒
-    @Getter private Handler handler = new Handler() {
+    @Getter
+    private final int HAND_RECONNECT = 1;//重连hand
+    @Getter
+    private final int RECONNECT_TIME_CONFIG = 10 * 1000;//重连时间间隔为10秒
+    @Getter
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -113,7 +147,9 @@ public class MqttUtil {
     };
 
     //订阅主题的回调
-    @Getter @Setter private MqttCallback mqttCallback = new MqttCallback() {
+    @Getter
+    @Setter
+    private MqttCallback mqttCallback = new MqttCallback() {
 
         @Override
         public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -142,7 +178,7 @@ public class MqttUtil {
         return mqttUtil;
     }
 
-    public MqttUtil(Context context, String host, String username, String password, String clientid, int Qos, String publishTopic, String reponseTopic, IMqttActionListener iMqttActionListener,MqttCallback mqttCallback){
+    public MqttUtil(Context context, String host, String username, String password, String clientid, int Qos, String publishTopic, String reponseTopic, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback) {
         this.context = context;
         this.HOST = host;
         this.USERNAME = username;
@@ -160,7 +196,7 @@ public class MqttUtil {
     }
 
 
-    public MqttUtil(Context context, String clientid, int Qos, String publishTopic, String reponseTopic, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback){
+    public MqttUtil(Context context, String clientid, int Qos, String publishTopic, String reponseTopic, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback) {
         this.context = context;
         this.CLIENTID = clientid;
         this.PUBLISH_TOPIC = publishTopic;
@@ -174,7 +210,7 @@ public class MqttUtil {
 
     }
 
-    public MqttUtil(Context context, int[] Qos, String[] publishTopic, String[] reponseTopic, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback){
+    public MqttUtil(Context context, int[] Qos, String[] publishTopic, String[] reponseTopic, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback) {
         this.context = context;
         this.PUBLISH_TOPICS = publishTopic;
         this.RESPONSE_TOPICS = reponseTopic;
@@ -187,7 +223,7 @@ public class MqttUtil {
 
     }
 
-    public MqttUtil(Context context, IMqttActionListener iMqttActionListener,MqttCallback mqttCallback){
+    public MqttUtil(Context context, IMqttActionListener iMqttActionListener, MqttCallback mqttCallback) {
         this.context = context;
         this.setIMqttActionListener(iMqttActionListener);
         this.setMqttCallback(mqttCallback);
@@ -228,7 +264,7 @@ public class MqttUtil {
             }
         }
         if (doConnect) {
-            Log.i("MqttUtil","mMqttConnectOptions.setWill Success");
+            Log.i("MqttUtil", "mMqttConnectOptions.setWill Success");
             doClientConnection();
         }
     }
@@ -239,14 +275,14 @@ public class MqttUtil {
      */
     public boolean doClientConnection() {
         try {
-            Log.i("MqttUtil","是否链接成功：" + mqttAndroidClient.isConnected());
+            Log.i("MqttUtil", "是否链接成功：" + mqttAndroidClient.isConnected());
             //if (!mqttAndroidClient.isConnected() && Tools.isInternetConnect(context)) {
             if (!mqttAndroidClient.isConnected()) {
-                    mqttAndroidClient.connect(mqttConnectOptions, null, iMqttActionListener);
-                    return true;
+                mqttAndroidClient.connect(mqttConnectOptions, null, iMqttActionListener);
+                return true;
             }
         } catch (MqttException e) {
-            Log.i("MqttUtil","doClientConnection:" + e.getMessage());
+            Log.i("MqttUtil", "doClientConnection:" + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -267,10 +303,10 @@ public class MqttUtil {
                 //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
                 mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
             } else {
-                Log.i("MqttUtil","mqttAndroidClient is Null");
+                Log.i("MqttUtil", "mqttAndroidClient is Null");
             }
         } catch (MqttException e) {
-            Log.i("MqttUtil","publish MqttException:" + e.getMessage());
+            Log.i("MqttUtil", "publish MqttException:" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -289,10 +325,10 @@ public class MqttUtil {
                 //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
                 mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
             } else {
-                Log.i("MqttUtil","mqttAndroidClient is Null");
+                Log.i("MqttUtil", "mqttAndroidClient is Null");
             }
         } catch (MqttException e) {
-            Log.i("MqttUtil","publish MqttException:" + e.getMessage());
+            Log.i("MqttUtil", "publish MqttException:" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -305,7 +341,7 @@ public class MqttUtil {
             //参数分别为：主题、消息的字节数组、服务质量、是否在服务器保留断开连接后的最后一条消息
             mqttAndroidClient.publish(topic, message.getBytes(), qos.intValue(), retained.booleanValue());
         } catch (MqttException e) {
-            Log.i("MqttUtil","publish:" + e.getMessage());
+            Log.i("MqttUtil", "publish:" + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -321,50 +357,41 @@ public class MqttUtil {
     }
 
     public void closeMqtt() {
-        try{
-            if (mqttAndroidClient != null){
+        try {
+            if (mqttAndroidClient != null) {
                 mqttAndroidClient.unregisterResources();
                 mqttAndroidClient.close();
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    public void pullDevicesListFromMQTTServer(){
-                Map<String,String> map = new HashMap<>();
-                map.put("appkey", FunSupport.APP_KEY);
-                map.put("uname", "123123");
-                map.put("password", "123123");
+    public String getMqttDeviceList() {
+        /*String resp = HttpUtils.EMQ_Get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections");
+        if (resp.equals("error")) {
+            return "";
+        } else {
+            return resp;
+        }*/
 
-                OkHttpClient client=new OkHttpClient();
-
-                FormBody.Builder Body = new FormBody.Builder();
-                for(Map.Entry<String,String> entry:map.entrySet()){
-                    Body.add(entry.getKey(),entry.getValue());
-                }
-
-                RequestBody requestBody = Body.build();
-
-                Request request = new Request.Builder()
-                        .url("http://mqtt.lkd.365yiding.com/api/v3nodes/emqx@127.0.0.1/connections/")//请求的url
-                        .post(requestBody)
-                        .build();
-
-                Call call = client.newCall(request);
-                call.enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        final String res = response.body().string();
-                        Log.v("Main.ID=", res);
-                    }
-
-                });
+        String resp = EMQ_GET("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", new HashMap<String, String>());
+        return resp;
     }
+
+    public static String EMQ_GET(String Url, Map<String,String> params) {
+        String result = "";
+        String api_key = "admin";
+        String api_secret = "public";
+        //认证信息
+        String[] baseauth = {api_key,api_secret};
+        //请求的URL的参数
+        HashMap<String, Object> get_data = new HashMap<>();
+        //get_data.put("page","1");       //page参数
+        //get_data.put("name","test");  //name参数
+        result = HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth);
+        return result;
+    }
+
 }
