@@ -491,18 +491,22 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
      */
     @Override
     public void onItemClick(ItemDescription itemDescription) {
-        mqttAutoConnect=false;
-        mqttUtil.closeMqtt();
-        mqttUtil = null;
-        ClientManager.getClient().stopSearch();
-        thSearchDevice.interrupt();
-        mHandler.removeCallbacksAndMessages(null);
         if(!itemDescription.getEnable()){
             return;
         }
 
-        Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
         try {
+
+            mqttAutoConnect=false;
+            mqttUtil.closeMqtt();
+            mqttUtil = null;
+            ClientManager.getClient().stopSearch();
+            thSearchDevice.interrupt();
+            mHandler.removeCallbacksAndMessages(null);
+
+            //Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
+            Log.i("TF","打开："+itemDescription.getName() + "-cliecked");
+
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
 
             if (fragment instanceof DeviceCameraFragment && itemDescription.getItem() instanceof Camera) {

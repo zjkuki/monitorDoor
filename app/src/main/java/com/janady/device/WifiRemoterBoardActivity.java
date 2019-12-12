@@ -818,11 +818,14 @@ public class WifiRemoterBoardActivity
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if(selectedCameras!=null && selectedCameras.size()>0) {
-							    if(mWifiRemoter.cameras!=null) {mWifiRemoter.cameras.clear();}
-							    /*for(Camera c:selectedCameras) {
+							    if(mWifiRemoter.cameras!=null) {mWifiRemoter.cameras.clear();}else{
+							    	mWifiRemoter.cameras = new ArrayList<Camera>();
+								}
+
+							    for(Camera c:selectedCameras) {
                                     mWifiRemoter.cameras.add(c);
-                                }*/
-							    mWifiRemoter.cameras = selectedCameras;
+                                }
+							    //mWifiRemoter.cameras = selectedCameras;
 
 							    if(mWifiRemoter.cameras.get(0).isOnline) {
 									showCamera(selectedCameras.get(0).devId, selectedCameras.get(0).sn, selectedCameras.get(0).mac);
@@ -836,8 +839,13 @@ public class WifiRemoterBoardActivity
 									}
 								}
 							}else{
+								/*for(int i=0;i<mWifiRemoter.cameras.size();i++){
+									mWifiRemoter.cameras.remove(i);
+								}*/
+								mWifiRemoter.cameras = null;
 								showCamera(0,"","");
 							}
+
                             mWifiRemoter.defaultCameraIdx = 0;
 							wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
 							MyApplication.liteOrm.cascade().save(mWifiRemoter);
@@ -2726,7 +2734,23 @@ public class WifiRemoterBoardActivity
 				//如果是选中 全选  就把所有的都选上 然后更新
 				for (int i = 0; i < bl.length; i++) {
 					bl[i] = true;
-					if(i>0) { selectedCameras.add(cams.get(i - 1)); }
+					if(i>0) {
+						Camera cam=null;
+						if(selectedCameras!=null && selectedCameras.size()>0) {
+							for(int c=0;c<selectedCameras.size();c++) {
+								if(selectedCameras.get(c).sn.equals(cams.get(i-1).sn) ||
+										selectedCameras.get(c).mac.equals(cams.get(i-1).mac)) {
+									cam = selectedCameras.get(c);
+									break;
+								}
+							}
+							if(cam==null) {
+								selectedCameras.add(cams.get(i - 1));
+							}
+						}else{
+							selectedCameras.add(cams.get(i - 1));
+						}
+					}
 				}
 				adapter.notifyDataSetChanged();
 			} else if (position == 0 && (!cBox.isChecked())) {
@@ -2764,7 +2788,21 @@ public class WifiRemoterBoardActivity
 				//如果选择其它的选项，看是否全部选择
 				//先把该选项选中 设置为true
 				bl[position]=true;
-				selectedCameras.add(cams.get(position - 1));
+				Camera cam=null;
+				if(selectedCameras!=null && selectedCameras.size()>0) {
+					for(int c=0;c<selectedCameras.size();c++) {
+						if(selectedCameras.get(c).sn.equals(cams.get(position-1).sn) ||
+								selectedCameras.get(c).mac.equals(cams.get(position-1).mac)) {
+							cam = selectedCameras.get(c);
+							break;
+						}
+					}
+					if(cam==null) {
+						selectedCameras.add(cams.get(position - 1));
+					}
+				}else{
+					selectedCameras.add(cams.get(position - 1));
+				}
 
 				int a = 0;
 				for (int i = 1; i < bl.length; i++) {
