@@ -26,6 +26,7 @@ import com.example.funsdkdemo.MyApplication;
 import com.google.zxing.activity.CaptureActivity;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
+import com.janady.utils.HttpUtils;
 import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
 import com.janady.setup.FragmentUserLogin;
@@ -67,10 +68,17 @@ import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener, OnFunDeviceListener  {
     QMUITopBarLayout mTopBar;
@@ -345,44 +353,66 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 w.isOnline = false;
             }
 
-            String resp = mqttUtil.getMqttDeviceList();
-            if (resp != "") {
-                try {
-                    JSONArray data = null;
-                    String code = "";
-                    JSONObject json = JSON.parseObject(resp);
-                    if (json != null) {
-                        code = json.getString("code");
-                        data = json.getJSONArray("data");
-                        if (data != null && data.size() > 0) {
-                            mMqttDevices = new ArrayList<JSONObject>();
-                            for (int i = 0; i < data.size(); i++) {
-                                mMqttDevices.add((JSONObject) data.get(i));
-                                if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
-                                    for (WifiRemoter w : mWifiRemoters) {
-                                        if (w.devClientid.equals(((JSONObject) data.get(i)).getString("client_id"))) {
-                                            w.isOnline = true;
-                                        } else {
-                                            w.isOnline = false;
+            String result = "";
+            String api_key = "admin";
+            String api_secret = "public";
+            //认证信息
+            String[] baseauth = {api_key, api_secret};
+            //请求的URL的参数
+            HashMap<String, Object> get_data = new HashMap<>();
+            //get_data.put("page","1");       //page参数
+            //get_data.put("name","test");  //name参数
+            HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    final String resp = response.body().string();
+                    if (resp != "") {
+                        try {
+                            JSONArray data = null;
+                            String code = "";
+                            JSONObject json = JSON.parseObject(resp);
+                            if (json != null) {
+                                code = json.getString("code");
+                                data = json.getJSONArray("data");
+                                if (data != null && data.size() > 0) {
+                                    mMqttDevices = new ArrayList<JSONObject>();
+                                    for (int i = 0; i < data.size(); i++) {
+                                        mMqttDevices.add((JSONObject) data.get(i));
+                                        if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
+                                            for (WifiRemoter w : mWifiRemoters) {
+                                                if (w.devClientid.equals(((JSONObject) data.get(i)).getString("client_id"))) {
+                                                    w.isOnline = true;
+                                                } else {
+                                                    w.isOnline = false;
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
+                            for (WifiRemoter w : mWifiRemoters) {
+                                w.isOnline = false;
+                            }
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    MyApplication.liteOrm.cascade().save(mWifiRemoters);
                 }
-            } else {
-                if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
-                    for (WifiRemoter w : mWifiRemoters) {
-                        w.isOnline = false;
-                    }
-                }
-            }
-        }
+            });
 
-        MyApplication.liteOrm.cascade().save(mWifiRemoters);
+//            String resp = mqttUtil.getMqttDeviceList();
+        }else{
+            return;
+        }
     }
 
     private void mqttSetup(){

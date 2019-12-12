@@ -16,6 +16,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -390,7 +391,17 @@ public class MqttUtil {
         HashMap<String, Object> get_data = new HashMap<>();
         //get_data.put("page","1");       //page参数
         //get_data.put("name","test");  //name参数
-        result = HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth);
+        HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+            }
+        });
         return result;
     }
 

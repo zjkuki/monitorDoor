@@ -1,8 +1,12 @@
 package com.janady.utils;
 
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.janady.NameValuePair;
+import com.janady.device.DeviceAddByUser;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -257,7 +261,7 @@ public class HttpUtils {
      48
      */
 
-    public static String okhttp_get(String get_url, HashMap<String, Object> get_data, String[] auth_base){
+    public static void okhttp_get(String get_url, HashMap<String, Object> get_data, String[] auth_base, Callback callback){
 
         OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(10000L, TimeUnit.MILLISECONDS)
@@ -286,13 +290,13 @@ public class HttpUtils {
         Call call = client.newCall(request);
 
         try {
-            Response response = call.execute();
+            /*Response response = call.execute();
             //判断是否成功
             if (response.isSuccessful()){
                 result[0] = response.body().string();
             }else {
                 return "请求失败";
-            }
+            }*/
 
             /*call.enqueue(new Callback() {
                 @Override
@@ -316,6 +320,8 @@ public class HttpUtils {
 
             Log.d("HttpUtil", result[0]);*/
 
+            call.enqueue(callback);
+
 
 
         } catch (Exception e) {
@@ -324,7 +330,7 @@ public class HttpUtils {
 
         }
 
-        return result[0];
+        //return result[0];
 
     }
     /**
@@ -421,4 +427,17 @@ public class HttpUtils {
         return builder;
     }
 
+    Handler LHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (msg.what == 1) {
+
+            }
+            if (msg.what == 2) {
+
+            }
+            if (msg.what == 3) {
+
+            }
+        }
+    };
 }
