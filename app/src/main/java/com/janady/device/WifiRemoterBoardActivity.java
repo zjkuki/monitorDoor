@@ -246,6 +246,7 @@ public class WifiRemoterBoardActivity
     private WifiRemoter mWifiRemoter = null;
     private int currWifiRemoterDoorIndex = 0;
     private int maxDoorNo = 0;
+    private int maxDoorLimit = 5;
 
 
     private SelectorView selectorView;
@@ -1469,53 +1470,68 @@ public class WifiRemoterBoardActivity
 	private void AddDoor(){
 		final String[] doorName = {""};
 
-		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
-				.setTitle("请输入遥控器的名称")
-				.setEditText("");
-		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, myAlertInputDialog.getResult());
-        		doorName[0] = myAlertInputDialog.getResult();
-				if(mWifiRemoter!=null){
-					Door door = new Door();
-
-					if(mWifiRemoter.doorList==null){
-						mWifiRemoter.doorList = new ArrayList<>();
-					}
-
-					if(mWifiRemoter.doorList.size()>0){
-						maxDoorNo = MaxDoorNo(mWifiRemoter.doorList);
-						door.no = maxDoorNo+1;
-					}else {
-						door.no = 1;
-						mWifiRemoter.defaultDoorId = 0;
-					}
-					door.name = doorName[0];
-					door.remote=mWifiRemoter;
-					mWifiRemoter.doorList.add(door);
-					MyApplication.liteOrm.cascade().save(mWifiRemoter);
-
-					if(mTabDoors.getTabCount()<5){
-						mTabDoors.setTabMode(TabLayout.MODE_FIXED);
-						mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
-					}else{
-						mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
-						mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
-					}
-					//cbSelectedDoor.setText(mWifiRemoter.doorList.get(mWifiRemoter.defaultDoorId).name);
-					mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(mWifiRemoter.doorList.size()-1).name));
+		if(mWifiRemoter.doorList.size()==5){
+			Dialogs.alertDialogBtn(mContext, "失败", "当前遥控器已经" + maxDoorLimit + "个，达到最大数量，无法继续添加", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					return;
 				}
-                myAlertInputDialog.dismiss();
-            }
-        }).setNegativeButton("取消", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "取消");
-                myAlertInputDialog.dismiss();
-            }
-        });
-		myAlertInputDialog.show();
+			}, new DialogInterface.OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					return;
+				}
+			});
+		}else {
+
+			final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
+					.setTitle("请输入遥控器的名称")
+					.setEditText("");
+			myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Log.d(TAG, myAlertInputDialog.getResult());
+					doorName[0] = myAlertInputDialog.getResult();
+					if (mWifiRemoter != null) {
+						Door door = new Door();
+
+						if (mWifiRemoter.doorList == null) {
+							mWifiRemoter.doorList = new ArrayList<>();
+						}
+
+						if (mWifiRemoter.doorList.size() > 0) {
+							maxDoorNo = MaxDoorNo(mWifiRemoter.doorList);
+							door.no = maxDoorNo + 1;
+						} else {
+							door.no = 1;
+							mWifiRemoter.defaultDoorId = 0;
+						}
+						door.name = doorName[0];
+						door.remote = mWifiRemoter;
+						mWifiRemoter.doorList.add(door);
+						MyApplication.liteOrm.cascade().save(mWifiRemoter);
+
+						if (mTabDoors.getTabCount() < 5) {
+							mTabDoors.setTabMode(TabLayout.MODE_FIXED);
+							mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
+						} else {
+							mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
+							mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
+						}
+						//cbSelectedDoor.setText(mWifiRemoter.doorList.get(mWifiRemoter.defaultDoorId).name);
+						mTabDoors.addTab(mTabDoors.newTab().setText(mWifiRemoter.doorList.get(mWifiRemoter.doorList.size() - 1).name));
+					}
+					myAlertInputDialog.dismiss();
+				}
+			}).setNegativeButton("取消", new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Log.d(TAG, "取消");
+					myAlertInputDialog.dismiss();
+				}
+			});
+			myAlertInputDialog.show();
+		}
 	}
 
 	private void EditDoor(){
@@ -1561,6 +1577,14 @@ public class WifiRemoterBoardActivity
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
 				if(mTabDoors.getTabCount()>=0) {
 					currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
+					if(mWifiRemoter.defaultDoorId==currWifiRemoterDoorIndex){
+						//下发指令修改门号
+						try {
+							wifiRemoterBoard.sendCommand("802","", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		}).setNegativeButton("取消", new View.OnClickListener() {
