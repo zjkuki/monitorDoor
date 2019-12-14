@@ -211,7 +211,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
                 EasyLinkParams elp = new EasyLinkParams();
                 elp.ssid = ssid.trim();
                 elp.password = wifiPwd.trim();
-                elp.sleeptime = 50;
+                elp.sleeptime = 100;
                 elp.runSecond = 60000;
                 showWaitDialog();
                 el.startEasyLink(elp, new EasyLinkCallBack() {

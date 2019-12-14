@@ -1470,7 +1470,7 @@ public class WifiRemoterBoardActivity
 	private void AddDoor(){
 		final String[] doorName = {""};
 
-		if(mWifiRemoter.doorList.size()==5){
+		if(mWifiRemoter.doorList!=null && mWifiRemoter.doorList.size()==5){
 			Dialogs.alertDialogBtn(mContext, "失败", "当前遥控器已经" + maxDoorLimit + "个，达到最大数量，无法继续添加", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -1535,6 +1535,21 @@ public class WifiRemoterBoardActivity
 	}
 
 	private void EditDoor(){
+	    if(mTabDoors.getTabCount()<=0){
+            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AddDoor();
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    return;
+                }
+            });
+            return;
+        }
+
 		final String[] doorName = {mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name};
 
 		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
@@ -1564,6 +1579,21 @@ public class WifiRemoterBoardActivity
 	}
 
 	private void RemoveDoor(){
+        if(mTabDoors.getTabCount()<=0){
+            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AddDoor();
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    return;
+                }
+            });
+            return;
+        }
+
 		final Door door = mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition());
 
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
@@ -1597,6 +1627,21 @@ public class WifiRemoterBoardActivity
 	}
 
 	private void RemoveAllDoor(){
+        if(mTabDoors.getTabCount()<=0){
+            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AddDoor();
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    return;
+                }
+            });
+            return;
+        }
+
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
 				.setTitle("删除遥控器")
 				.setMsg("确定删除所有遥控器吗？");

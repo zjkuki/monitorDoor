@@ -414,7 +414,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
     private void mqttSetup(){
-
+                                         
         mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
 
         shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
