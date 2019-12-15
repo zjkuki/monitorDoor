@@ -571,6 +571,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             e.printStackTrace();
         }
     }
+    @Override
+    public void onItemLongClick(ItemDescription itemDescription) {
+        showToast("test onItemLongClick,current item:"+itemDescription.getName());
+    }
 
     @Override
     public void onMainClick(MainItemDescription mainItemDescription) {

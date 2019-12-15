@@ -53,9 +53,11 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<MainItemDescription> items;
     private Context context;
     private OnClickListener onClickListener;
+
     public void setOnItemClickListener(OnClickListener clickListener) {
         this.onClickListener = clickListener;
     }
+
     public ExpandAdapter(Context ctx, List<MainItemDescription> items) {
         context = ctx;
         this.items = items;
@@ -187,12 +189,20 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (onClickListener != null) onClickListener.onItemClick( items.get(pos) );
                 }
             });
+            itemAdapter.setOnItemLongClickListener(new BaseRecyclerAdapter.OnItemLongClickListener() {
+                @Override
+                public void onItemLongClick(View itemView, int pos) {
+                    if (onClickListener != null) onClickListener.onItemLongClick( items.get(pos) );
+                }
+
+            });
             layoutManager = new GridLayoutManager(context, 4);
             recyclerView.setLayoutManager(layoutManager);
         }
     }
     public interface OnClickListener {
         void onItemClick(ItemDescription itemDescription);
+        void onItemLongClick(ItemDescription itemDescription);
         void onMainClick(MainItemDescription mainItemDescription);
     }
 
