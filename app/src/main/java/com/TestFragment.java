@@ -573,7 +573,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
     @Override
     public void onItemLongClick(ItemDescription itemDescription) {
-        showToast("test onItemLongClick,current item:"+itemDescription.getName());
+
+        //showToast("test onItemLongClick,current item:"+itemDescription.getName());
     }
 
     @Override

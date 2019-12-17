@@ -192,7 +192,11 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             itemAdapter.setOnItemLongClickListener(new BaseRecyclerAdapter.OnItemLongClickListener() {
                 @Override
                 public void onItemLongClick(View itemView, int pos) {
-                    if (onClickListener != null) onClickListener.onItemLongClick( items.get(pos) );
+                    if (onClickListener != null) {
+                        onClickListener.onItemLongClick( items.get(pos) );
+                    }else{
+                        itemView.showContextMenu();
+                    }
                 }
 
             });
