@@ -16,6 +16,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -23,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -189,14 +192,18 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     if (onClickListener != null) onClickListener.onItemClick( items.get(pos) );
                 }
             });
+
+            final PopupMenu p = createItemPopMenu(itemView);
+
             itemAdapter.setOnItemLongClickListener(new BaseRecyclerAdapter.OnItemLongClickListener() {
                 @Override
                 public void onItemLongClick(View itemView, int pos) {
-                    if (onClickListener != null) {
+                    p.show();
+                    /*if (onClickListener != null) {
                         onClickListener.onItemLongClick( items.get(pos) );
-                    }else{
-                        itemView.showContextMenu();
-                    }
+                    }else{*/
+                        //itemView.showContextMenu();
+                    //}
                 }
 
             });
@@ -204,6 +211,37 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             recyclerView.setLayoutManager(layoutManager);
         }
     }
+
+    private PopupMenu createItemPopMenu(View itemView){
+        PopupMenu popupMenu = new PopupMenu(context, itemView);
+        Menu menu = popupMenu.getMenu();
+        menu.add(0,1,0,"修改名称");
+        menu.add(0,2,0,"删除设备");
+
+        // 监听事件
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case Menu.FIRST + 0:
+                        Toast.makeText(context,"复制",
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case Menu.FIRST + 1:
+                        Toast.makeText(context,"粘贴",
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        return popupMenu;
+    }
+
     public interface OnClickListener {
         void onItemClick(ItemDescription itemDescription);
         void onItemLongClick(ItemDescription itemDescription);

@@ -13,7 +13,10 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
@@ -118,12 +121,12 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
             holder.getImageView(R.id.img).setImageBitmap(photo);
         }
 
-        holder.itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+        /*holder.itemView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
                 menu.add(0,1,0,"修改名称");
             }
-        });
+        });*/
     }
 
 

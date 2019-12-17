@@ -110,4 +110,6 @@
 
     <color name="device_detail_service">#cccccc</color>
     <color name="device_detail_character">#ffffff</color>
+
+    <color name="drop_pop_menu_bg_color">#a0000000</color>
 </resources>

@@ -230,7 +230,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mRecyclerView.setAdapter(mItemAdapter);
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
         mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
-        mRecyclerView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+       /* mRecyclerView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
                 menu.setHeaderTitle("操作");
@@ -243,7 +243,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mRecyclerView.showContextMenu();
                 return true;
             }
-        });
+        });*/
     }
     private void initEvent() {
         bnve.enableAnimation(false);
