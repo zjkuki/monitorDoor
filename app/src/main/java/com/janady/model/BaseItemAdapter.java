@@ -16,10 +16,12 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.view.popmenu.DropPopMenu;
 import com.lkd.smartlocker.R;
 import com.janady.AppManager;
 import com.janady.RoundRect;
@@ -42,6 +44,7 @@ import com.lib.funsdk.support.models.FunDevice;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
@@ -126,9 +129,34 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
                 menu.add(0,1,0,"修改名称");
             }
+        });
+
+        /*final DropPopMenu mDropPopMenu = new DropPopMenu(context);
+        mDropPopMenu.setOnItemClickListener(new DropPopMenu.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id, com.janady.view.popmenu.MenuItem menuItem) {
+                Toast.makeText(context, "点击了 " + menuItem.getItemId(), Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
+        /*mDropPopMenu.setMenuList(getMenuList());
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDropPopMenu.show(v);
+                return false;
+            }
         });*/
     }
 
+    /*private List<com.janady.view.popmenu.MenuItem> getMenuList() {
+        List<com.janady.view.popmenu.MenuItem> list = new ArrayList<>();
+        list.add(new com.janady.view.popmenu.MenuItem(1, "修改名称"));
+        list.add(new com.janady.view.popmenu.MenuItem(2, "删除设备"));
+        return list;
+    }*/
 
     public Bitmap drawTextToBitmap(Context mContext,  int resourceId,  String mText) {
         try {

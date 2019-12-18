@@ -1,8 +1,11 @@
 package com;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,8 +17,10 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -24,12 +29,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.common.UIFactory;
 import com.example.funsdkdemo.MyApplication;
 import com.google.zxing.activity.CaptureActivity;
+import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
+import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.utils.HttpUtils;
 import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
 import com.janady.setup.FragmentUserLogin;
+import com.janady.view.popmenu.DropPopMenu;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -80,7 +88,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener, OnFunDeviceListener  {
+public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClickListener, OnFunDeviceListener {
     QMUITopBarLayout mTopBar;
     RecyclerView mRecyclerView;
     QMUIPullRefreshLayout mPullRefreshLayout;
@@ -107,7 +115,6 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private boolean mqttAutoConnect = true;
 
 
-
     private String fromMsgClientId = "";
     private String toMsgClientId = "";
 
@@ -120,11 +127,15 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     private String[] subscribeTopics = null;
     private int[] subscribeTopicsQos = null;
 
-    private String mqttclientid =MqttUtil.getCLIENTID();
+    private String mqttclientid = MqttUtil.getCLIENTID();
 
-    private String shareCamMac ="";
-    private String shareBleMac ="";
-    private String shareRemoterMac ="";
+    private String shareCamMac = "";
+    private String shareBleMac = "";
+    private String shareRemoterMac = "";
+
+    private View currPopMenuView = null;
+
+    private DropPopMenu dropPopMenu = null;
 
     @Override
     protected View onCreateView() {
@@ -198,11 +209,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     @Override
     protected void onFragmentResult(int requestCode, int resultCode, Intent data) {
         super.onFragmentResult(requestCode, resultCode, data);
-        if ( requestCode == 1
-                && resultCode == RESULT_OK ) {
+        if (requestCode == 1
+                && resultCode == RESULT_OK) {
             // Demo, 扫描二维码的结果
-            if ( null != data ) {
-                Dialogs.alertMessage(getContext(),"扫描结果",data.toString());
+            if (null != data) {
+                Dialogs.alertMessage(getContext(), "扫描结果", data.toString());
             }
         }
     }
@@ -212,7 +223,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mqttAutoConnect=false;
+                mqttAutoConnect = false;
                 mqttUtil.closeMqtt();
                 mqttUtil = null;
                 ClientManager.getClient().stopSearch();
@@ -223,6 +234,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         //FunSupport.getInstance().registerOnFunDeviceOptListener(this);
     }
+
     private void initRecyclerView() {
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter = new ExpandAdapter(getContext(), mainItems);
@@ -245,6 +257,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
         });*/
     }
+
     private void initEvent() {
         bnve.enableAnimation(false);
         bnve.enableShiftingMode(false);
@@ -258,7 +271,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 int position = 0;
                 switch (item.getItemId()) {
                     case R.id.menu_main:
-                        try{
+                        try {
                             Dialogs.alertDialog2Btn(getContext(), "分享提示", "本操作将分享您全部已添加的设备，您确定要继续吗？", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -347,82 +360,82 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         });
     }
 
-    private void getMqttDevices(){
-            String result = "";
-            String api_key = "admin";
-            String api_secret = "public";
-            //认证信息
-            String[] baseauth = {api_key, api_secret};
-            //请求的URL的参数
-            HashMap<String, Object> get_data = new HashMap<>();
-            //get_data.put("page","1");       //page参数
-            //get_data.put("name","test");  //name参数
-            HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+    private void getMqttDevices() {
+        String result = "";
+        String api_key = "admin";
+        String api_secret = "public";
+        //认证信息
+        String[] baseauth = {api_key, api_secret};
+        //请求的URL的参数
+        HashMap<String, Object> get_data = new HashMap<>();
+        //get_data.put("page","1");       //page参数
+        //get_data.put("name","test");  //name参数
+        HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
+                if (wr != null && wr.size() > 0) {
+                    for (WifiRemoter w : wr) {
+                        w.isOnline = false;
+                    }
                 }
 
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
-                    if(wr!=null && wr.size()>0) {
-                        for (WifiRemoter w : wr) {
-                            w.isOnline = false;
-                        }
-                    }
-
-                    final String resp = response.body().string();
-                    if (resp != "") {
-                        try {
-                            JSONArray data = null;
-                            String code = "";
-                            JSONObject json = JSON.parseObject(resp);
-                            if (json != null) {
-                                code = json.getString("code");
-                                data = json.getJSONArray("data");
-                                if (data != null && data.size() > 0) {
-                                    mMqttDevices = new ArrayList<JSONObject>();
-                                    for (int i = 0; i < data.size(); i++) {
-                                        mMqttDevices.add((JSONObject) data.get(i));
-                                        if (wr != null && wr.size() > 0) {
-                                            for (int w=0;w< wr.size();w++) {
-                                                if (wr.get(w).devClientid.equals(((JSONObject) data.get(i)).getString("client_id"))) {
-                                                    wr.get(w).isOnline = true;
-                                                }
+                final String resp = response.body().string();
+                if (resp != "") {
+                    try {
+                        JSONArray data = null;
+                        String code = "";
+                        JSONObject json = JSON.parseObject(resp);
+                        if (json != null) {
+                            code = json.getString("code");
+                            data = json.getJSONArray("data");
+                            if (data != null && data.size() > 0) {
+                                mMqttDevices = new ArrayList<JSONObject>();
+                                for (int i = 0; i < data.size(); i++) {
+                                    mMqttDevices.add((JSONObject) data.get(i));
+                                    if (wr != null && wr.size() > 0) {
+                                        for (int w = 0; w < wr.size(); w++) {
+                                            if (wr.get(w).devClientid.equals(((JSONObject) data.get(i)).getString("client_id"))) {
+                                                wr.get(w).isOnline = true;
                                             }
                                         }
                                     }
                                 }
                             }
-                            MyApplication.liteOrm.cascade().save(wr);
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    } else {
-                        if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
-                            for (WifiRemoter w : mWifiRemoters) {
-                                w.isOnline = false;
-                            }
-                        }
-                        MyApplication.liteOrm.cascade().save(mWifiRemoters);
+                        MyApplication.liteOrm.cascade().save(wr);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                } else {
+                    if (mWifiRemoters != null && mWifiRemoters.size() > 0) {
+                        for (WifiRemoter w : mWifiRemoters) {
+                            w.isOnline = false;
+                        }
+                    }
+                    MyApplication.liteOrm.cascade().save(mWifiRemoters);
                 }
-            });
+            }
+        });
 
-            return;
+        return;
     }
 
-    private void mqttSetup(){
-                                         
+    private void mqttSetup() {
+
         mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
 
-        shareDevicePublishTopic = "lkd_app/"+mqttclientid+"/message";
-        shareDeviceResponseTopic = "lkd_app/"+mqttclientid+"/response";
+        shareDevicePublishTopic = "lkd_app/" + mqttclientid + "/message";
+        shareDeviceResponseTopic = "lkd_app/" + mqttclientid + "/response";
 
         //if(mWifiRemoters!=null) {
-        subscribeTopics = new String[mWifiRemoters.size()*2 + 1];
-        subscribeTopicsQos = new int[mWifiRemoters.size()*2 + 1];
+        subscribeTopics = new String[mWifiRemoters.size() * 2 + 1];
+        subscribeTopicsQos = new int[mWifiRemoters.size() * 2 + 1];
             /*subscribeTopics = new String[3];
             subscribeTopicsQos = new int[3];
             subscribeTopics[0] = shareDevicePublishTopic;
@@ -436,19 +449,19 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         subscribeTopicsQos[0] = 0;
 
         int i = 1;
-        for(WifiRemoter wr:mWifiRemoters){
-            subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/connected";
+        for (WifiRemoter wr : mWifiRemoters) {
+            subscribeTopics[i] = "$SYS/brokers/+/clients/" + wr.devClientid + "/connected";
             subscribeTopicsQos[i] = 0;
             i++;
-            subscribeTopics[i] = "$SYS/brokers/+/clients/"+wr.devClientid+"/disconnected";
+            subscribeTopics[i] = "$SYS/brokers/+/clients/" + wr.devClientid + "/disconnected";
             subscribeTopicsQos[i] = 0;
             i++;
         }
         //}
 
-        if(mqttUtil==null) {
+        if (mqttUtil == null) {
             mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
-        }else{
+        } else {
             if (mqttUtil.isConnectionLost) {
                 mqttUtil.doClientConnection();
             }
@@ -459,7 +472,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
 
-    private void startBluetooth(){
+    private void startBluetooth() {
         if (!ClientManager.getClient().isBluetoothOpened()) { // 蓝牙未开启，则开启蓝牙
             ClientManager.getClient().openBluetooth();
         }
@@ -485,17 +498,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     /**
      * ExpandAdapter里的onItemClick重写，针对DataManager传入的ItemDescription响应点击事件
+     *
      * @param itemDescription
      */
     @Override
-    public void onItemClick(ItemDescription itemDescription) {
-        if(!itemDescription.getEnable()){
+    public void onItemClick(View item, ItemDescription itemDescription) {
+        if (!itemDescription.getEnable()) {
             return;
         }
 
         try {
 
-            mqttAutoConnect=false;
+            mqttAutoConnect = false;
             mqttUtil.closeMqtt();
             mqttUtil = null;
             ClientManager.getClient().stopSearch();
@@ -503,12 +517,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             mHandler.removeCallbacksAndMessages(null);
 
             //Toast.makeText(getContext(), itemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();
-            Log.i("TF","打开："+itemDescription.getName() + "-cliecked");
+            Log.i("TF", "打开：" + itemDescription.getName() + "-cliecked");
 
             JBaseFragment fragment = itemDescription.getDemoClass().newInstance();
 
             if (fragment instanceof DeviceCameraFragment && itemDescription.getItem() instanceof Camera) {
-                Camera citem = (Camera)itemDescription.getItem();
+                Camera citem = (Camera) itemDescription.getItem();
                 FunDevice mFunDevice = null;
 
                 // 虚拟一个设备, 只需要序列号和设备类型即可添加
@@ -526,7 +540,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 // 添加设备之前都必须先登录一下,以防设备密码错误,也是校验其合法性
                 //FunSupport.getInstance().requestDeviceLogin(citem.camDevice);
 
-                ((DeviceCameraFragment)fragment).setFunDevice(mFunDevice);
+                ((DeviceCameraFragment) fragment).setFunDevice(mFunDevice);
 
                 Intent intent = new Intent();
                 intent.setClass(getContext(), DeviceCameraActivity.class);
@@ -540,15 +554,15 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             //if (fragment instanceof BluetoothOperatorFragment && itemDescription.getItem() instanceof Bluetooth) {
             if (fragment instanceof BluetoothLockFragment && itemDescription.getItem() instanceof Bluetooth) {
-                Bluetooth citem = (Bluetooth)itemDescription.getItem();
-                BleLocker bleLocker = new BleLocker(citem,false,800, new BleLockerCallBack(this.getContext(), false));
+                Bluetooth citem = (Bluetooth) itemDescription.getItem();
+                BleLocker bleLocker = new BleLocker(citem, false, 800, new BleLockerCallBack(this.getContext(), false));
                 bleLocker.setmNoRssi(true);
 
 
                 //((BluetoothOperatorFragment)fragment).setBleLocker(bleLocker);
-                ((BluetoothLockFragment)fragment).title = citem.sceneName;
-                ((BluetoothLockFragment)fragment).bleLocker = bleLocker;
-                ((BluetoothLockFragment)fragment).isDebugViewOpen = false;
+                ((BluetoothLockFragment) fragment).title = citem.sceneName;
+                ((BluetoothLockFragment) fragment).bleLocker = bleLocker;
+                ((BluetoothLockFragment) fragment).isDebugViewOpen = false;
 
                 startFragment(fragment);
             }
@@ -571,14 +585,151 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             e.printStackTrace();
         }
     }
-    @Override
-    public void onItemLongClick(ItemDescription itemDescription) {
 
+    @Override
+    public void onItemLongClick(View itemView, final ItemDescription itemDescription) {
+        //dropPopMenu.show(itemView);
         //showToast("test onItemLongClick,current item:"+itemDescription.getName());
+        if(dropPopMenu!=null){dropPopMenu.dismiss();}
+        dropPopMenu = new DropPopMenu(getContext());
+        dropPopMenu.setTriangleIndicatorViewColor(Color.WHITE);
+        dropPopMenu.setBackgroundResource(R.drawable.bg_drop_pop_menu_white_shap);
+        dropPopMenu.setItemTextColor(Color.BLACK);
+
+        dropPopMenu.setOnItemClickListener(new DropPopMenu.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id, com.janady.view.popmenu.MenuItem menuItem, int currentDeviceItemsId) {
+                //Toast.makeText(getContext(), "点击了 " + menuItem.getItemId(), Toast.LENGTH_SHORT).show();
+
+                final Camera cam;
+                final Bluetooth ble;
+                final WifiRemoter wr;
+
+                String sceneName = "";
+
+                if (itemDescription.getItem() instanceof Camera) {
+                    cam = (Camera)itemDescription.getItem();
+                    sceneName = cam.sceneName;
+                }else{
+                    cam=null;
+                }
+
+                if (itemDescription.getItem() instanceof Bluetooth) {
+                    ble = (Bluetooth) itemDescription.getItem();
+                    sceneName = ble.sceneName;
+                }else{
+                    ble=null;
+                }
+
+                if (itemDescription.getItem() instanceof WifiRemoter) {
+                    wr = (WifiRemoter)itemDescription.getItem();
+                    sceneName = wr.sceneName;
+                }else{
+                    wr=null;
+                }
+
+                switch (menuItem.getItemId()) {
+                    case Menu.FIRST + 0:
+                        Toast.makeText(getContext(), itemDescription.getName(), Toast.LENGTH_SHORT).show();
+                        final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(getContext()).builder()
+                                .setTitle("请输入新的名称")
+                                .setEditText(sceneName);
+                        myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.d("TF", myAlertInputDialog.getResult());
+                                String s = myAlertInputDialog.getResult();
+                                if (itemDescription.getItem() instanceof Camera) {
+                                    if(cam!=null) {
+                                        cam.sceneName = s;
+                                        MyApplication.liteOrm.save(cam);
+                                    }
+                                }
+
+                                if (itemDescription.getItem() instanceof Bluetooth) {
+                                    if(ble!=null) {
+                                        ble.sceneName = s;
+                                        MyApplication.liteOrm.save(ble);
+                                    }
+                                }
+
+                                if (itemDescription.getItem() instanceof WifiRemoter) {
+                                    if(wr!=null) {
+                                        wr.sceneName = s;
+                                        MyApplication.liteOrm.cascade().save(wr);
+                                    }
+                                }
+
+                                myAlertInputDialog.dismiss();
+                            }
+                        }).setNegativeButton("取消", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.d("TF", "取消");
+                                myAlertInputDialog.dismiss();
+                            }
+                        });
+
+                        myAlertInputDialog.show();
+                        break;
+                    case Menu.FIRST + 1:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());//内部类
+                        builder.setTitle("温馨提示");
+                        builder.setMessage("您确定要删除此蓝牙设备吗?");
+                        //确定按钮
+                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
+                            @SuppressLint("WrongConstant")
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                if (itemDescription.getItem() instanceof Camera) {
+                                    if(cam!=null) {
+                                        MyApplication.liteOrm.delete(cam);
+                                    }
+                                }
+
+                                if (itemDescription.getItem() instanceof Bluetooth) {
+                                    if(ble!=null) {
+                                        MyApplication.liteOrm.delete(ble);
+                                    }
+                                }
+
+                                if (itemDescription.getItem() instanceof WifiRemoter) {
+                                    if(wr!=null) {
+                                        MyApplication.liteOrm.cascade().delete(wr);
+                                    }
+                                }
+
+                                //确定删除的代码
+                               // Toast.makeText(getContext(), "删除成功", 0).show();
+                            }
+                        });
+                        //点取消按钮
+                        builder.setNegativeButton("取消", null);
+                        builder.show();
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        });
+        dropPopMenu.setMenuList(getMenuList());
+
+        dropPopMenu.show(itemView,0);
+    }
+
+    private List<com.janady.view.popmenu.MenuItem> getMenuList() {
+        List<com.janady.view.popmenu.MenuItem> list = new ArrayList<>();
+        list.add(new com.janady.view.popmenu.MenuItem(1, "修改名称"));
+        list.add(new com.janady.view.popmenu.MenuItem(2, "删除设备"));
+        return list;
     }
 
     @Override
-    public void onMainClick(MainItemDescription mainItemDescription) {
+    public void onMainClick(View itemView, MainItemDescription mainItemDescription) {
         mqttAutoConnect=false;
         mqttUtil.closeMqtt();
         mqttUtil = null;
@@ -706,6 +857,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }*/
         mHandler.post(new Runnable(){
             public void run(){
+                if(dropPopMenu!=null){dropPopMenu.dismiss();}
+
                 DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
                 DataManager.getInstance().mBleDevices = mBleDevices;
                 mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
@@ -727,7 +880,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             //if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
-                  .searchBluetoothLeDevice(10000, 2).build();
+                  .searchBluetoothLeDevice(10000, 1).build();
 
             ClientManager.getClient().search(request, mSearchResponse);
 
@@ -837,7 +990,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             refreshDataSet();
             //}
-            mHandler.postDelayed(searchDevices, 5000);//每n秒执行一次runnable.
+            mHandler.postDelayed(searchDevices, 10000);//每n秒执行一次runnable.
         }
     };
 

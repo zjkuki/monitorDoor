@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.janady.model.ItemDescription;
 import com.lkd.smartlocker.R;
 
 import java.util.ArrayList;
@@ -46,6 +47,9 @@ public class DropPopMenu {
     private OnItemClickListener mOnItemClickListener;
 
     private List<MenuItem> mMenuItemList;
+    private List<ItemDescription> deviceItems;
+    private int currDeviceItemsId;
+
     /**
      * 指示器与菜单布局两侧的最小间距
      */
@@ -115,6 +119,10 @@ public class DropPopMenu {
         });
     }
 
+    public void dismiss(){
+        if(mPopupWindow!=null){mPopupWindow.dismiss();}
+    }
+
     private void initListView() {
         mListView = new ListView(mContext);
         mListView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT
@@ -128,7 +136,7 @@ public class DropPopMenu {
                     if (mMenuItemList != null) {
                         menuItem = mMenuItemList.get(position);
                     }
-                    mOnItemClickListener.onItemClick(adapterView, view, position, id, menuItem);
+                    mOnItemClickListener.onItemClick(adapterView, view, position, id, menuItem, currDeviceItemsId);
                 }
                 mPopupWindow.dismiss();
             }
@@ -151,7 +159,20 @@ public class DropPopMenu {
         mIsShowIcon = isShowIcon;
     }
 
+    private void setDeviceItems(List<ItemDescription> devitems){
+        if(deviceItems !=null){
+            devitems.clear();
+        }else{
+            devitems = new ArrayList<>();
+        }
+
+        devitems.addAll(devitems);
+    }
+
     public void setMenuList(List<MenuItem> menuList) {
+
+        //setDeviceItems(devItems);
+
         if (mMenuItemList != null) {
             mMenuItemList.clear();
         } else {
@@ -210,7 +231,9 @@ public class DropPopMenu {
         mTotalHeight = size * mItemHeight;
     }
 
-    public void show(final View parent) {
+    public void show(final View parent, int devItemsId) {
+        currDeviceItemsId = devItemsId;
+
         mBtnView = parent;
         setBackgroundAlpha(50f);
         mDropPopLayout.requestFocus();
@@ -446,7 +469,7 @@ public class DropPopMenu {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(AdapterView<?> adapterView, View view, int position, long id, MenuItem menuItem);
+        void onItemClick(AdapterView<?> adapterView, View view, int position, long id, MenuItem menuItem, int currItemsId);
     }
 
 }

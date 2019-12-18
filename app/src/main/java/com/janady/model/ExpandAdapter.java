@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -12,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v7.view.menu.MenuView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;
+import com.janady.view.popmenu.DropPopMenu;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
@@ -56,7 +60,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<MainItemDescription> items;
     private Context context;
     private OnClickListener onClickListener;
-
+    public DropPopMenu dropPopMenu;
     public void setOnItemClickListener(OnClickListener clickListener) {
         this.onClickListener = clickListener;
     }
@@ -133,12 +137,12 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         mainViewHolder.imgView.setImageResource(mainItemDescription.getIconRes());
 
         mainViewHolder.nameTv.setText(mainItemDescription.getName());
-        mainViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        /*mainViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onClickListener != null) onClickListener.onMainClick(mainItemDescription);
+                if (onClickListener != null) onClickListener.onMainClick(itemView, mainItemDescription);
             }
-        });
+        });*/
 
     }
 
@@ -164,7 +168,7 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             itemAdapter.setData(cItems);
             recyclerView.setAdapter(itemAdapter);
         }
-        public MainViewHolder(final Context context, View itemView) {
+        public MainViewHolder(final Context context, final View itemView) {
             super(itemView);
             nameTv = itemView.findViewById(R.id.name);
             imgView = itemView.findViewById(R.id.img);
@@ -189,21 +193,49 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             itemAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View itemView, int pos) {
-                    if (onClickListener != null) onClickListener.onItemClick( items.get(pos) );
+                    if (onClickListener != null) onClickListener.onItemClick(itemView, items.get(pos) );
                 }
             });
 
-            final PopupMenu p = createItemPopMenu(itemView);
+            /*if(dropPopMenu!=null){dropPopMenu.dismiss();}
+            dropPopMenu = new DropPopMenu(context);
+            dropPopMenu.setTriangleIndicatorViewColor(Color.WHITE);
+            dropPopMenu.setBackgroundResource(R.drawable.bg_drop_pop_menu_white_shap);
+            dropPopMenu.setItemTextColor(Color.BLACK);
+
+            dropPopMenu.setOnItemClickListener(new DropPopMenu.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id, com.janady.view.popmenu.MenuItem menuItem, int currentDeviceItemsId) {
+                    Toast.makeText(context, "点击了 " + menuItem.getItemId(), Toast.LENGTH_SHORT).show();
+                    switch (menuItem.getItemId()) {
+                        case Menu.FIRST + 0:
+                            Toast.makeText(context, items.get(currentDeviceItemsId).getName(), Toast.LENGTH_SHORT).show();
+                            break;
+                        case Menu.FIRST + 1:
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+            });
+            dropPopMenu.setMenuList(getMenuList());*/
 
             itemAdapter.setOnItemLongClickListener(new BaseRecyclerAdapter.OnItemLongClickListener() {
                 @Override
                 public void onItemLongClick(View itemView, int pos) {
-                    p.show();
-                    /*if (onClickListener != null) {
-                        onClickListener.onItemLongClick( items.get(pos) );
-                    }else{*/
-                        //itemView.showContextMenu();
-                    //}
+                    //final PopupMenu p = createItemPopMenu(itemView);
+                    //p.show();
+
+                    if (onClickListener != null) {
+                        onClickListener.onItemLongClick(itemView, items.get(pos) );
+                    }else{
+                     //   itemView.showContextMenu();
+                    }
+                    //dropPopMenu.show(itemView, pos);
+
                 }
 
             });
@@ -211,7 +243,13 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             recyclerView.setLayoutManager(layoutManager);
         }
     }
-
+    private List<com.janady.view.popmenu.MenuItem> getMenuList() {
+        List<com.janady.view.popmenu.MenuItem> list = new ArrayList<>();
+        list.add(new com.janady.view.popmenu.MenuItem(1, "修改名称"));
+        list.add(new com.janady.view.popmenu.MenuItem(2, "删除设备"));
+        return list;
+    }
+    //----------------原生弹窗
     private PopupMenu createItemPopMenu(View itemView){
         PopupMenu popupMenu = new PopupMenu(context, itemView);
         Menu menu = popupMenu.getMenu();
@@ -243,9 +281,9 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public interface OnClickListener {
-        void onItemClick(ItemDescription itemDescription);
-        void onItemLongClick(ItemDescription itemDescription);
-        void onMainClick(MainItemDescription mainItemDescription);
+        void onItemClick(View itemView, ItemDescription itemDescription);
+        void onItemLongClick(View itemView,ItemDescription itemDescription);
+        void onMainClick(View itemView,MainItemDescription mainItemDescription);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
