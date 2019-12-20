@@ -409,7 +409,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             }
                         }
                         MyApplication.liteOrm.cascade().save(wr);
-                        sleep(300);
+                        //sleep(300);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -420,7 +420,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         }
                     }
                     MyApplication.liteOrm.cascade().save(mWifiRemoters);
-                    sleep(300);
+                    //sleep(300);
                 }
             }
         });
@@ -1037,7 +1037,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
 
             MyApplication.liteOrm.save(cams);
-            sleep(300);
+            //sleep(300);
 
             if(mWifiRemoters!=null && mWifiRemoters.size()>0){
                 for(WifiRemoter w:mWifiRemoters){
@@ -1055,7 +1055,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
 
                 MyApplication.liteOrm.cascade().save(mWifiRemoters);
-                sleep(300);
+                //sleep(300);
             }
 
             refreshDataSet();
