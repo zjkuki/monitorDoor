@@ -68,7 +68,14 @@ public abstract class JBaseFragment extends QMUIFragment {
     }
 
 
-
+    public static void sleep(int mills){
+        try {
+            Thread.sleep(mills);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     /**
      *  判断某个字符串是否存在于数组中

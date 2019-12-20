@@ -1624,6 +1624,7 @@ public class DeviceCameraActivity
 
 				camera.loginPsw = newPsd;
 				MyApplication.liteOrm.save(camera);
+				sleep(300);
 
 				// 登录成功后立刻获取SystemInfo
 				// 如果不需要获取SystemInfo,在这里播放视频也可以:playRealMedia();

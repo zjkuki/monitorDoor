@@ -442,6 +442,7 @@ public class WifiRemoterBoardActivity
 				if(cbSelectedDoor.isChecked()){
 					mWifiRemoter.defaultDoorId = mTabDoors.getSelectedTabPosition();
 					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+					sleep(300);
 					//下发指令修改门号
 					try {
 						wifiRemoterBoard.sendCommand("802","", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
@@ -850,6 +851,7 @@ public class WifiRemoterBoardActivity
                             mWifiRemoter.defaultCameraIdx = 0;
 							wifiRemoterBoard.setMWifiRemoter(mWifiRemoter);
 							MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                            sleep(300);
 
 							if(mulitScreenNow) {
                                 Message message = new Message();
@@ -1433,6 +1435,7 @@ public class WifiRemoterBoardActivity
 			if(camera.isOnline) {
 				mWifiRemoter.defaultCameraIdx = currIndex;
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                sleep(300);
 				initCamera(camera.devId, camera.sn, camera.mac);
 			}else{
 				changePrevCamera();
@@ -1458,6 +1461,7 @@ public class WifiRemoterBoardActivity
 			if(camera.isOnline) {
 				mWifiRemoter.defaultCameraIdx = currIndex;
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                sleep(300);
 				initCamera(camera.devId, camera.sn, camera.mac);
 			}else{
 				changeNextCamera();
@@ -1510,7 +1514,7 @@ public class WifiRemoterBoardActivity
 						door.remote = mWifiRemoter;
 						mWifiRemoter.doorList.add(door);
 						MyApplication.liteOrm.cascade().save(mWifiRemoter);
-
+                        sleep(300);
 						if (mTabDoors.getTabCount() < 5) {
 							mTabDoors.setTabMode(TabLayout.MODE_FIXED);
 							mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -1563,6 +1567,7 @@ public class WifiRemoterBoardActivity
 				if(mWifiRemoter!=null){
 					mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name = doorName[0];
 					MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                    sleep(300);
 
 					mTabDoors.getTabAt(mTabDoors.getSelectedTabPosition()).setText(doorName[0]);
 				}
@@ -1605,6 +1610,7 @@ public class WifiRemoterBoardActivity
 				mWifiRemoter.doorList.remove(mTabDoors.getSelectedTabPosition());
 				mTabDoors.removeTabAt(mTabDoors.getSelectedTabPosition());
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                sleep(300);
 				if(mTabDoors.getTabCount()>=0) {
 					currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
 					if(mWifiRemoter.defaultDoorId==currWifiRemoterDoorIndex){
@@ -1658,6 +1664,7 @@ public class WifiRemoterBoardActivity
 				currWifiRemoterDoorIndex = 0;
 				mWifiRemoter.defaultDoorId = 0;
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                sleep(300);
 			}
 		}).setNegativeButton("取消", new View.OnClickListener() {
 			@Override

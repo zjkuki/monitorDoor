@@ -409,6 +409,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             }
                         }
                         MyApplication.liteOrm.cascade().save(wr);
+                        sleep(300);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -419,6 +420,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         }
                     }
                     MyApplication.liteOrm.cascade().save(mWifiRemoters);
+                    sleep(300);
                 }
             }
         });
@@ -644,6 +646,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                     if(cam!=null) {
                                         cam.sceneName = s;
                                         MyApplication.liteOrm.save(cam);
+                                        sleep(300);
                                     }
                                 }
 
@@ -651,6 +654,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                     if(ble!=null) {
                                         ble.sceneName = s;
                                         MyApplication.liteOrm.save(ble);
+                                        sleep(300);
                                     }
                                 }
 
@@ -658,6 +662,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                     if(wr!=null) {
                                         wr.sceneName = s;
                                         MyApplication.liteOrm.cascade().save(wr);
+                                        sleep(300);
                                     }
                                 }
 
@@ -880,7 +885,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
             //if(mBleDevices.size()>0){mBleDevices.clear();}
             SearchRequest request = new SearchRequest.Builder()
-                  .searchBluetoothLeDevice(10000, 1).build();
+                  .searchBluetoothLeDevice(6000, 1).build();
 
             ClientManager.getClient().search(request, mSearchResponse);
 
@@ -1032,6 +1037,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             }
 
             MyApplication.liteOrm.save(cams);
+            sleep(300);
 
             if(mWifiRemoters!=null && mWifiRemoters.size()>0){
                 for(WifiRemoter w:mWifiRemoters){
@@ -1049,6 +1055,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 }
 
                 MyApplication.liteOrm.cascade().save(mWifiRemoters);
+                sleep(300);
             }
 
             refreshDataSet();
@@ -1127,6 +1134,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     }
 
                     MyApplication.liteOrm.cascade().save(wr);
+                    sleep(300);
 
                     refreshDataSet();
                     return;
@@ -1184,18 +1192,21 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                         JSONArray cameras = data.getJSONArray("cameras");
                                         List<Camera> cams = JSON.parseArray(cameras.toJSONString(), Camera.class);
                                         MyApplication.liteOrm.cascade().save(cams);
+                                        sleep(300);
                                     }
 
                                     if (data.toJSONString().contains("bluetooths")) {
                                         JSONArray bluetooths = data.getJSONArray("bluetooths");
                                         List<Bluetooth> bles = JSON.parseArray(bluetooths.toJSONString(), Bluetooth.class);
                                         MyApplication.liteOrm.cascade().save(bles);
+                                        sleep(300);
                                     }
 
                                     if (data.toJSONString().contains("wifiremoters")) {
                                         JSONArray wifiremoters = data.getJSONArray("wifiremoters");
                                         List<WifiRemoter> wifiRemoters = JSON.parseArray(wifiremoters.toJSONString(), WifiRemoter.class);
                                         MyApplication.liteOrm.cascade().save(wifiRemoters);
+                                        sleep(300);
                                     }
 
                                     //refreshDataSet();
@@ -1206,6 +1217,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                         List<WifiRemoter> wr =  JSON.parseArray("["+data.toJSONString()+"]", WifiRemoter.class);
                                         if(wr.size()>0) {
                                             MyApplication.liteOrm.cascade().save(wr.get(0));
+                                            sleep(300);
                                         }else{
                                             return;
                                         }
@@ -1214,11 +1226,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                             data = json.getJSONObject("data");
                                             Camera cam = (Camera) JSON.parseObject(data.toJSONString(), Camera.class);
                                             MyApplication.liteOrm.cascade().save(cam);
+                                            sleep(300);
                                         } else {
                                             if (toMsgClientId.equals(mqttclientid) && mqttaction.equals("responsedBluetoothDeviceData")) {
                                                 data = json.getJSONObject("data");
                                                 Bluetooth ble = (Bluetooth) JSON.parseObject(data.toJSONString(), Bluetooth.class);
                                                 MyApplication.liteOrm.cascade().save(ble);
+                                                sleep(300);
                                             }
                                         }
                                     }

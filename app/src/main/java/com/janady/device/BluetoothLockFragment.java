@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -60,6 +62,9 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     private boolean needCheckSTA = false;
 
     private int step = 0; //0-正常   1-输入密码
+
+    private CountDownTimer countDownTimer;
+
     QMUITopBarLayout mTopBar;
     @Override
     protected View onCreateView() {
@@ -118,6 +123,39 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         mTextTitle.setText(title + " - 等待连接");
 
         mTopBar.setTitle(title + " - 等待连接");
+
+        showWaitDialog();
+        countDownTimer = new CountDownTimer(10000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                Log.i("BleLockFragment", "seconds remaining: " + millisUntilFinished / 1000);
+                //setMsgText("正在连接蓝牙设备，请稍等..." + String.valueOf(millisUntilFinished / 1000) + "秒");
+
+            }
+
+            public void onFinish() {
+                Dialogs.alertDialog2Btn(getContext(), "蓝牙连接失败", "设备无法连接，是否要重新连接呢？", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showWaitDialog();
+                        if (bleLocker != null) {
+                            needCheckSTA = true;
+                            bleLocker.connect();
+                        }
+                        countDownTimer.start();
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        hideWaitDialog();
+                        onBackPressed();
+                    }
+                });
+
+                Log.i("BleLockFragment", "连接失败");
+            }
+        }.start();
+
         return root;
     }
 
@@ -187,16 +225,24 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 /*                if(isLocked){
                     Dialogs.alertMessage(this.getContext(),"提示", "操作失败，请先开锁！");
                 }*/
-                bleLocker.open();
+                if(bleLocker!=null && bleLocker.getIsReday()) {
+                    bleLocker.open();
+                }
                 break;
             case R.id.close:
-                bleLocker.close();
+                if(bleLocker!=null && bleLocker.getIsReday()) {
+                    bleLocker.close();
+                }
                 break;
             case R.id.lock:
-                bleLocker.lock();
+                if(bleLocker!=null && bleLocker.getIsReday()) {
+                    bleLocker.lock();
+                }
                 break;
             case R.id.unlock:
-                bleLocker.stop();
+                if(bleLocker!=null && bleLocker.getIsReday()) {
+                    bleLocker.stop();
+                }
                 break;
             case R.id.scan:
                 if(!isScanning) {
@@ -345,8 +391,11 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                     +"\n  Status: " + status.getmStatusMsg());}
 
             if(status == BleLockerStatus.REDAY){
+                hideWaitDialog();
                 mTextTitle.setText(title + " - 已连接");
                 mTopBar.setTitle(title + " - 已连接");
+
+                if(countDownTimer!=null){countDownTimer.cancel();}
             }
         }
 

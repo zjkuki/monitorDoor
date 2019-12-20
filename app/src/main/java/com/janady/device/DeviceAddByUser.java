@@ -545,6 +545,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							}
 
 							MyApplication.liteOrm.save(mBluetooth);
+							sleep(300);
 
 							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "ble_list_refresh");
@@ -572,6 +573,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							}
 
 							MyApplication.liteOrm.save(mCamera);
+							sleep(300);
 
 							// 修改密码,设置ModifyPassword参数
 							// 注意,如果是直接调用FunSDK.DevSetConfigByJson()接口,需要对密码做MD5加密,参考ModifyPassword.java的处理
@@ -599,6 +601,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
 							}
 							MyApplication.liteOrm.cascade().save(mWifiRemoter);
+							sleep(300);
 
 							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "remoter_list_refresh");
