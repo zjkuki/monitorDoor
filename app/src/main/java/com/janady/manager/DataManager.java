@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.funsdkdemo.MyApplication;
+import com.janady.database.model.TestFragmentState;
 import com.lkd.smartlocker.R;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.janady.database.model.Bluetooth;
@@ -35,6 +36,8 @@ public class DataManager {
     public List<SearchResult> mBleDevices;
     public List<FunDevice> mFunDevices;
     public List<WifiRemoter> mWifiRemoters;
+
+    public TestFragmentState testFragmentState;
 
     private static DataManager _sInstance;
     public static DataManager getInstance() {
@@ -118,7 +121,15 @@ public class DataManager {
             //ItemDescription itemDescription = new ItemDescription(BluetoothOperatorFragment.class, bluetooth.sceneName, R.drawable.icon_check);
             ItemDescription itemDescription = new ItemDescription(BluetoothLockFragment.class, bluetooth.sceneName, R.drawable.icon_check);
 
-            itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
+            if(testFragmentState!=null){
+                if(testFragmentState.bluetooths!=null && testFragmentState.bluetooths.size()>0) {
+                    for (Bluetooth b:testFragmentState.bluetooths){
+                        itemDescription.setEnable(matchBleDevOnline(b.mac));
+                    }
+                }
+            }else {
+                itemDescription.setEnable(matchBleDevOnline(bluetooth.mac));
+            }
 
             //默认online为true，在BaseItemAdapter里进行连接检测后保存
             //itemDescription.setEnable(bluetooth.isOnline);

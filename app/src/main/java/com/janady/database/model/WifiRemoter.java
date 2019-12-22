@@ -63,7 +63,7 @@ public class WifiRemoter {// 指定一对多关系
 
     public int defaultCameraIdx = 0;
 
-    @Mapping(Relation.OneToMany)
+    @Mapping(Relation.ManyToMany)
     public ArrayList<Camera> cameras;
 
     @Mapping(Relation.OneToMany)

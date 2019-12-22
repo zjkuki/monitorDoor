@@ -6,6 +6,7 @@ import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.PrimaryKey;
 import com.litesuits.orm.db.annotation.Table;
 import com.litesuits.orm.db.annotation.Unique;
+import com.litesuits.orm.db.annotation.UniqueCombine;
 import com.litesuits.orm.db.enums.AssignType;
 import com.litesuits.orm.db.enums.Relation;
 
@@ -16,9 +17,11 @@ public class Door {
     @PrimaryKey(AssignType.AUTO_INCREMENT)
     @Column("_id") // 指定列名
     private int id;
-    @Unique
+
+    @Column("_no")
     public int no; //最小0-最大255
-    @Unique
+
+    @Column("_name")
     public String name;
 
     @Mapping(Relation.ManyToMany)

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -33,6 +34,7 @@ import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
 import com.janady.adapter.BluetoothDeviceAdapter;
+import com.janady.database.model.TestFragmentState;
 import com.janady.utils.HttpUtils;
 import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
@@ -137,6 +139,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private DropPopMenu dropPopMenu = null;
 
+    private TestFragmentState testFragmentState = null;
+
     @Override
     protected View onCreateView() {
         startBluetooth();
@@ -223,6 +227,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                testFragmentState = new TestFragmentState();
+                testFragmentState.searchResults = mBleDevices;
+                MyApplication.liteOrm.save(testFragmentState);
+                sleep(300);
+
                 mqttAutoConnect = false;
                 mqttUtil.closeMqtt();
                 mqttUtil = null;
@@ -236,6 +245,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     }
 
     private void initRecyclerView() {
+        List<TestFragmentState> tfs = MyApplication.liteOrm.query(new QueryBuilder<TestFragmentState>(TestFragmentState.class).whereEquals(TestFragmentState.COL_USERNAME, FunSupport.getInstance().getUserName()));
+        if(tfs.size()>0){
+            testFragmentState = tfs.get(0);
+        }else{
+            testFragmentState = null;
+        }
+
+        if(testFragmentState!=null){
+            DataManager.getInstance().testFragmentState = testFragmentState;
+            MyApplication.liteOrm.delete(testFragmentState);
+            testFragmentState = null;
+        }
         mainItems = DataManager.getInstance().getDescriptions();
         mItemAdapter = new ExpandAdapter(getContext(), mainItems);
         mItemAdapter.setOnItemClickListener(this);
@@ -510,6 +531,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
 
         try {
+            testFragmentState = new TestFragmentState();
+            testFragmentState.searchResults = mBleDevices;
+            MyApplication.liteOrm.save(testFragmentState);
+            sleep(300);
 
             mqttAutoConnect = false;
             mqttUtil.closeMqtt();
@@ -626,7 +651,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
                 if (itemDescription.getItem() instanceof WifiRemoter) {
                     wr = (WifiRemoter)itemDescription.getItem();
-                    sceneName = wr.sceneName;
+                    if(wr!=null) {
+                        sceneName = wr.sceneName;
+                    }
                 }else{
                     wr=null;
                 }
@@ -681,7 +708,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     case Menu.FIRST + 1:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());//内部类
                         builder.setTitle("温馨提示");
-                        builder.setMessage("您确定要删除此蓝牙设备吗?");
+                        builder.setMessage("您确定要删除此设备吗?");
                         //确定按钮
                         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 
@@ -702,6 +729,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
                                 if (itemDescription.getItem() instanceof WifiRemoter) {
                                     if(wr!=null) {
+                                        wr.cameras.clear();//如果不清楚，则会把所有关联对象一起删除！
                                         MyApplication.liteOrm.cascade().delete(wr);
                                     }
                                 }
@@ -735,6 +763,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     @Override
     public void onMainClick(View itemView, MainItemDescription mainItemDescription) {
+        testFragmentState = new TestFragmentState();
+        testFragmentState.searchResults = mBleDevices;
+        MyApplication.liteOrm.save(testFragmentState);
+        sleep(300);
+
         mqttAutoConnect=false;
         mqttUtil.closeMqtt();
         mqttUtil = null;
@@ -849,6 +882,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
     public void onHiddenChanged(boolean hidden){
         super.onHiddenChanged(hidden);
         if(hidden) {
+            testFragmentState = new TestFragmentState();
+            testFragmentState.searchResults = mBleDevices;
+            MyApplication.liteOrm.save(testFragmentState);
+            sleep(300);
+
             ClientManager.getClient().stopSearch();
             mHandler.removeCallbacksAndMessages(null);
             thSearchDevice.interrupt();
