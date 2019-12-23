@@ -728,8 +728,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                 }
 
                                 if (itemDescription.getItem() instanceof WifiRemoter) {
-                                    if(wr!=null) {
-                                        wr.cameras.clear();//如果不清楚，则会把所有关联对象一起删除！
+                                    if(wr!=null ) {
+                                        if(wr.cameras!=null && wr.cameras.size()>0) {
+                                            wr.cameras.clear();//如果不清楚，则会把所有关联对象一起删除！
+                                        }
                                         MyApplication.liteOrm.cascade().delete(wr);
                                     }
                                 }

@@ -1932,11 +1932,25 @@ public class WifiRemoterBoardActivity
 					}
 					break;
 					case R.id.action_setup: {
-						Intent intent = new Intent();
-						intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
-						intent.setClass(mContext, ActivityGuideDeviceSetup.class);
-						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						startActivity(intent);
+						if(mFunDevice!=null) {
+							Intent intent = new Intent();
+							intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
+							intent.setClass(mContext, ActivityGuideDeviceSetup.class);
+							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intent);
+						}else{
+							Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									AddDoor();
+								}
+							}, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+
+								}
+							});
+						}
 					}
 					break;
 				}

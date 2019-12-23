@@ -213,6 +213,16 @@ public class WifiRemoterBoard {
                         break;
                     case 208:
                         msg="更改默认门号为:"+data.getString("door_no")+"成功";
+                    case 209:
+                        msg="更改默认门号失败";
+                    case 210:
+                        msg="密码正确";
+                    case 211:
+                        msg="密码错误";
+                    case 212:
+                        msg="密码修改成功";
+                    case 213:
+                        msg="密码设置失败";
                         break;
                 }
 
