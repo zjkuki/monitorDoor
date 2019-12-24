@@ -118,6 +118,8 @@ public class WifiRemoterBoard {
         json.put("funtion_code", Integer.parseInt(funCode));
 
         JSONObject data_json = new JSONObject();
+
+
         data_json.put("door_no", doorNo);
         if(funCode!="802") {
             data_json.put("button_value", buttonValue);
