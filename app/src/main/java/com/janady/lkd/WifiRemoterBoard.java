@@ -20,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.fogcloud.fog_mqtt.helper.ListenDeviceCallBack;
@@ -33,7 +34,7 @@ public class WifiRemoterBoard {
     private final int _EL_S = 1;
     private final int _EL_F = 2;
 
-
+    @Getter @Setter private IWifiRemoterListener iWifiRemoterListener;
     @Getter @Setter public ListenDeviceCallBack setListenDeviceCallBack;
 
     @Getter @Setter private Context mcontext;
@@ -67,6 +68,15 @@ public class WifiRemoterBoard {
         initMqttService(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
                 , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false);
 
+    }
+
+    public void initMqttService(Context context, WifiRemoter wifiRemoter, boolean isAutoConnect){
+        this.mcontext = context;
+        this.mWifiRemoter = wifiRemoter;
+        this.mIsAutoConnect = isAutoConnect;
+
+        initMqttService(context, wifiRemoter.hostUrl, wifiRemoter.hostPort, wifiRemoter.hostUsername, wifiRemoter.hostPassword
+                , wifiRemoter.publictopic, wifiRemoter.subscribetopic, wifiRemoter.clientid,false);
     }
 
     public void initMqttService(Context context, String host, String port, String username, String password, String PubTopic, String SubTopic, String clientid, boolean isencrypt){
@@ -110,7 +120,7 @@ public class WifiRemoterBoard {
     }
 
 
-    public void sendCommand(String funCode, String buttonValue, int doorNo) throws Exception{
+    public void sendCommand(String funCode, String password, String buttonValue, int doorNo) throws Exception{
 
         JSONObject json = new JSONObject();
         json.put("device_type", mWifiRemoter.devType);
@@ -120,11 +130,18 @@ public class WifiRemoterBoard {
         JSONObject data_json = new JSONObject();
 
 
-        data_json.put("door_no", doorNo);
-        if(funCode!="802") {
+        if(funCode!="802 " &&  funCode!="806" && funCode!="807" && funCode!="808") {
+            data_json.put("door_no", doorNo);
             data_json.put("button_value", buttonValue);
+        }else{
+            data_json.put("password", password);
+            if(funCode == "802"){
+                data_json.put("door_no", doorNo);
+            }
         }
+
         data_json.put("time", DateUtils.getNowTimeStamp());
+        //data_json.put("time", new Date().getTime());
         data_json.put("version", "1.0");
         json.put("data",data_json);
 
@@ -138,6 +155,7 @@ public class WifiRemoterBoard {
         @Override
         public void onSuccess(IMqttToken arg0) {
             Log.i(TAG, "连接成功 ");
+            if(iWifiRemoterListener!=null){iWifiRemoterListener.onConnected(mWifiRemoter, WifiRemoterStatus.SERVER_CONNECGED);}
             mqttUtil.isConnectSuccess = true;
             int[] qoss = {0,0};
             try {
@@ -145,6 +163,7 @@ public class WifiRemoterBoard {
                 mqttUtil.getMqttAndroidClient().subscribe(subscribeTopics, qoss);
             } catch (MqttException e) {
                 e.printStackTrace();
+                if(iWifiRemoterListener!=null){iWifiRemoterListener.onDisconnected(mWifiRemoter, WifiRemoterStatus.SERVER_DISCONNECTED);}
             }
         }
 
@@ -152,6 +171,7 @@ public class WifiRemoterBoard {
         public void onFailure(IMqttToken arg0, Throwable arg1) {
             arg1.printStackTrace();
             Log.i(TAG, "onFailure 连接失败:" + arg1.getMessage());
+            if(iWifiRemoterListener!=null){iWifiRemoterListener.onDisconnected(mWifiRemoter, WifiRemoterStatus.SERVER_DISCONNECTED);}
             mqttUtil.isConnectSuccess = false;
             mqttUtil.getHandler().sendEmptyMessageDelayed(mqttUtil.getHAND_RECONNECT(), mqttUtil.getRECONNECT_TIME_CONFIG());
         }
@@ -174,9 +194,11 @@ public class WifiRemoterBoard {
                     if (clientid.equals(mWifiRemoter.devClientid)) {
                         if (topic.contains("disconnected")) {
                             mWifiRemoter.isOnline = false;
+                            if(iWifiRemoterListener!=null){iWifiRemoterListener.onDeviceOffline(mWifiRemoter, WifiRemoterStatus.DEVICE_OFFLINE);}
                             Log.i("WifiRemoterBoard", "设备client id【" + clientid + "】离线");
                         } else {
                             mWifiRemoter.isOnline = true;
+                            if(iWifiRemoterListener!=null){iWifiRemoterListener.onDeviceOnline(mWifiRemoter, WifiRemoterStatus.DEVICE_ONLINE);}
                             Log.i("WifiRemoterBoard", "设备client id【" + clientid + "】在线");
                         }
                     }
@@ -191,40 +213,58 @@ public class WifiRemoterBoard {
                 switch(data.getIntValue("operation_result")){
                     case 200:
                         msg="开门成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onOpened(mWifiRemoter, WifiRemoterStatus.SET_OPEN_SUCCESS);}
                         break;
                     case 201:
                         msg="开门失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onOpened(mWifiRemoter, WifiRemoterStatus.SET_OPEN_FAILE);}
                         break;
                     case 202:
                         msg="关门成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onClosed(mWifiRemoter, WifiRemoterStatus.SET_CLOSE_SUCCESS);}
                         break;
                     case 203:
                         msg="关门失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onClosed(mWifiRemoter, WifiRemoterStatus.SET_CLOSE_FAILE);}
                         break;
                     case 204:
                         msg="锁成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onLock(mWifiRemoter, WifiRemoterStatus.SET_LOCK_SUCCESS);}
                         break;
                     case 205:
                         msg="锁失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onLock(mWifiRemoter, WifiRemoterStatus.SET_CLOSE_FAILE);}
                         break;
                     case 206:
                         msg="停成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onStoped(mWifiRemoter, WifiRemoterStatus.SET_STOP_SUCCESS);}
                         break;
                     case 207:
                         msg="停失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onStoped(mWifiRemoter, WifiRemoterStatus.SET_STOP_FAILE);}
                         break;
                     case 208:
                         msg="更改默认门号为:"+data.getString("door_no")+"成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onDoorNoChanged(mWifiRemoter, WifiRemoterStatus.SET_DOORNO_CHANGED_SUCCESS);}
                     case 209:
                         msg="更改默认门号失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onDoorNoChanged(mWifiRemoter, WifiRemoterStatus.SET_DOORNO_CHANGED_FAILE);}
+                        break;
                     case 210:
                         msg="密码正确";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswdVerify(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_CHECK_SUCCESS);}
+                        break;
                     case 211:
                         msg="密码错误";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswdVerify(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_CHECK_FAILE);}
+                        break;
                     case 212:
                         msg="密码修改成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
+                        break;
                     case 213:
                         msg="密码设置失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
                         break;
                 }
 
@@ -262,24 +302,26 @@ public class WifiRemoterBoard {
 
 
     public interface IWifiRemoterListener {
-        void onPasswordChanged(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onPasswordChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onClosed(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onClosed(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onStoped(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onStoped(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onLock(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onLock(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onOpened(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onOpened(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onConnected(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onConnected(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onDisconnected(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onDisconnected(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onReday(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onPasswdVerify(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onPasswdError(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onDoorNoChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
-        void onResetted(WifiRemoter bluetooth, WifiRemoterStatus status);
+        void onDeviceOnline(WifiRemoter wifiRemoter, WifiRemoterStatus status);
+        void onDeviceOffline(WifiRemoter wifiRemoter, WifiRemoterStatus status);
+
     }
 }

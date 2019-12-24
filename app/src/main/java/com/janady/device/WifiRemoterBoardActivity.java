@@ -104,6 +104,7 @@ import java.util.Map;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.lib.funsdk.support.models.FunDevType.EE_DEV_OW_REMOTER;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
 
@@ -255,6 +256,7 @@ public class WifiRemoterBoardActivity
     private CheckBox cbSelectedDoor;
 	private ImageView imgLockLockerStat;
 	private List<String> doorNo;
+	private boolean wifiIsLogined = false;
 
 	private String[] mlistText;
 	private Boolean[] bl;
@@ -445,7 +447,7 @@ public class WifiRemoterBoardActivity
 					sleep(300);
 					//下发指令修改门号
 					try {
-						wifiRemoterBoard.sendCommand("802","", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
+						wifiRemoterBoard.sendCommand("802",mWifiRemoter.loginPsw,"", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -635,79 +637,85 @@ public class WifiRemoterBoardActivity
 
 		initWifiDevice(wifiMac, wifiSceneName, wifiSn);
 
-		wifiRemoterBoard.mLdpMsg = mLdpMsg;
-
 		setStatusBar();
 	}
 
 	private void initWifiDevice(String mac, String sceneName, String sn){
-		List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
-		if(wifiRemoters.size()>0) {
-			mWifiRemoter = wifiRemoters.get(0);
-			wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter,true);
-			currIndex = mWifiRemoter.defaultCameraIdx;
-			if(mWifiRemoter.cameras!=null) {
-				if(mWifiRemoter.cameras.get(currIndex).isOnline) {
-					showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
-				}else {
-					currIndex = getOnlineCameraIndexInAll(mWifiRemoter.cameras);
+            List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
+            if (wifiRemoters.size() > 0) {
+                mWifiRemoter = wifiRemoters.get(0);
+                if (!wifiIsLogined) {
+                    showWifiInputPasswordDialog();
+                    return;
+                }
 
-					if(currIndex>=0) {
-						showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
-					}else{
-						showCamera(0,"","");
-					}
-				}
-			}else{
-				showCamera(0,"","");
-			}
-		}else{
-			mWifiRemoter = null;
-			wifiRemoterBoard = null;
-			showCamera(0, "", "");
-		}
+                wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter, true);
+                currIndex = mWifiRemoter.defaultCameraIdx;
+                if (mWifiRemoter.cameras != null) {
+                    if (mWifiRemoter.cameras.get(currIndex).isOnline) {
+                        showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+                    } else {
+                        currIndex = getOnlineCameraIndexInAll(mWifiRemoter.cameras);
 
-		mTextTitle.setText(sceneName);
+                        if (currIndex >= 0) {
+                            showCamera(mWifiRemoter.cameras.get(currIndex).devId, mWifiRemoter.cameras.get(currIndex).sn, mWifiRemoter.cameras.get(currIndex).mac);
+                        } else {
+                            showCamera(0, "", "");
+                        }
+                    }
+                } else {
+                    showCamera(0, "", "");
+                }
 
-		if(mWifiRemoter.doorList!=null && mWifiRemoter.doorList.size()>0) {
-			//mTabDoors.setTabGravity();
-			/*doorNo = new ArrayList<>();
-			for (int i = 0; i < 1; i++) {
-				doorNo.add(i + "号门");
-				mTabDoors.addTab(mTabDoors.newTab().setText(i + "号门"));
-			}*/
-			if(mTabDoors.getTabCount()<5){
-				mTabDoors.setTabMode(TabLayout.MODE_FIXED);
-				mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
-			}else{
-				mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
-				mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
-			}
+                wifiRemoterBoard.mLdpMsg = mLdpMsg;
 
-			for (int i = 0; i < mWifiRemoter.doorList.size(); i++) {
-				TabLayout.Tab tab = mTabDoors.newTab();
-				tab.setText(mWifiRemoter.doorList.get(i).name);
-				mTabDoors.addTab(tab);
-			}
-			if(mTabDoors.getTabCount()>0) {
-				mTabDoors.getTabAt(mWifiRemoter.defaultDoorId).select();
-				currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
-				//mTabDoors.getTabAt(0).select();
-			}
-			//cbSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
-		}else{
-			Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					AddDoor();
-				}
-			}, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
+            } else {
+                mWifiRemoter = null;
+                wifiRemoterBoard = null;
+                showCamera(0, "", "");
+            }
 
-				}
-			});
-		}
+            mTextTitle.setText(sceneName);
+
+            if (mWifiRemoter.doorList != null && mWifiRemoter.doorList.size() > 0) {
+                //mTabDoors.setTabGravity();
+            /*doorNo = new ArrayList<>();
+            for (int i = 0; i < 1; i++) {
+                doorNo.add(i + "号门");
+                mTabDoors.addTab(mTabDoors.newTab().setText(i + "号门"));
+            }*/
+                if (mTabDoors.getTabCount() < 5) {
+                    mTabDoors.setTabMode(TabLayout.MODE_FIXED);
+                    mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
+                } else {
+                    mTabDoors.setTabMode(TabLayout.MODE_SCROLLABLE);
+                    mTabDoors.setTabGravity(TabLayout.GRAVITY_CENTER);
+                }
+
+                for (int i = 0; i < mWifiRemoter.doorList.size(); i++) {
+                    TabLayout.Tab tab = mTabDoors.newTab();
+                    tab.setText(mWifiRemoter.doorList.get(i).name);
+                    mTabDoors.addTab(tab);
+                }
+                if (mTabDoors.getTabCount() > 0) {
+                    mTabDoors.getTabAt(mWifiRemoter.defaultDoorId).select();
+                    currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
+                    //mTabDoors.getTabAt(0).select();
+                }
+                //cbSelectedDoor.setText(mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).name);
+            } else {
+                Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AddDoor();
+                    }
+                }, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+            }
 
 
 		/*selectorView = (SelectorView) findViewById(R.id.selector);
@@ -1384,7 +1392,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnOpenDoor:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","open", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
+					wifiRemoterBoard.sendCommand("801", mWifiRemoter.loginPsw,"open", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1393,7 +1401,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnCloseDoor:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","close", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
+					wifiRemoterBoard.sendCommand("801",mWifiRemoter.loginPsw,"close", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1402,7 +1410,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnLockLocker:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","lock", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
+					wifiRemoterBoard.sendCommand("801",mWifiRemoter.loginPsw,"lock", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1411,7 +1419,7 @@ public class WifiRemoterBoardActivity
 			case R.id.btnLockStop:
 			{
 				try {
-					wifiRemoterBoard.sendCommand("801","stop", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
+					wifiRemoterBoard.sendCommand("801", mWifiRemoter.loginPsw, "stop", mWifiRemoter.doorList.get(currWifiRemoterDoorIndex).no);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1616,7 +1624,7 @@ public class WifiRemoterBoardActivity
 					if(mWifiRemoter.defaultDoorId==currWifiRemoterDoorIndex){
 						//下发指令修改门号
 						try {
-							wifiRemoterBoard.sendCommand("802","", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
+							wifiRemoterBoard.sendCommand("802", mWifiRemoter.loginPsw,"", mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).no);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -2366,6 +2374,54 @@ public class WifiRemoterBoardActivity
 		inputDialog.show();
 	}
 
+    private void showWifiInputPasswordDialog() {
+        DialogInputPasswd inputDialog = new DialogInputPasswd(this,
+                getResources().getString(R.string.device_login_input_password), "", R.string.common_confirm,
+                R.string.common_cancel) {
+
+            @Override
+            public boolean confirm(String editText) {
+                // 重新以新的密码登录
+                if (null != mWifiRemoter) {
+                    if(!mWifiRemoter.loginPsw.equals("") && mWifiRemoter.loginPsw.equals(editText)){
+                        wifiIsLogined = true;
+                        String wifiMac = getIntent().getStringExtra("WIFI_DEVICE_MAC");
+                        String wifiSceneName = getIntent().getStringExtra("WIFI_DEVICE_SCENE");
+                        String wifiSn = getIntent().getStringExtra("WIFI_DEVICE_SN");
+
+                        initWifiDevice(wifiMac, wifiSceneName, wifiSn);
+                        return super.confirm(editText);
+                    }
+                }
+
+                Dialogs.alertDialogBtn(mContext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        return;
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        return;
+                    }
+                });
+
+                wifiIsLogined = false;
+                return false;
+            }
+
+            @Override
+            public void cancel() {
+                super.cancel();
+
+                // 取消输入密码,直接退出
+                //finish();
+            }
+
+        };
+
+        inputDialog.show();
+    }
 	private void showFishEyeInfo() {
 		if ( null != mFunVideoView ) {
 			String fishEyeInfo = mFunVideoView.getFishEyeFrameJSONString();
