@@ -119,8 +119,10 @@ public class WifiRemoterBoard {
         }
     }
 
-
-    public void sendCommand(String funCode, String password, String buttonValue, int doorNo) throws Exception{
+    public void changePassword(String password, String newPassword) throws Exception {
+        sendCommand("808", password, newPassword,0);
+    }
+    public void sendCommand(String funCode, String password, String extraValue, int doorNo) throws Exception{
 
         JSONObject json = new JSONObject();
         json.put("device_type", mWifiRemoter.devType);
@@ -129,18 +131,22 @@ public class WifiRemoterBoard {
 
         JSONObject data_json = new JSONObject();
 
+        data_json.put("password", password);
+        data_json.put("time", DateUtils.getNowTimeStamp());
 
         if(funCode!="802 " &&  funCode!="806" && funCode!="807" && funCode!="808") {
             data_json.put("door_no", doorNo);
-            data_json.put("button_value", buttonValue);
+            data_json.put("button_value", extraValue);
         }else{
-            data_json.put("password", password);
-            if(funCode == "802"){
+            if(funCode == "802") {
                 data_json.put("door_no", doorNo);
+            }else{
+                if(funCode == "808") {
+                    data_json.put("new_password", extraValue);
+                }
             }
         }
 
-        data_json.put("time", DateUtils.getNowTimeStamp());
         //data_json.put("time", new Date().getTime());
         data_json.put("version", "1.0");
         json.put("data",data_json);
@@ -264,6 +270,14 @@ public class WifiRemoterBoard {
                         break;
                     case 213:
                         msg="密码设置失败";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
+                        break;
+                    case 214:
+                        msg="获取默认门号成功，当前默认门号为："+ data.getString("door_no");
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
+                        break;
+                    case 215:
+                        msg="获取默认门号失败";
                         if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
                         break;
                 }

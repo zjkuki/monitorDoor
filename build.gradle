@@ -33,6 +33,8 @@ allprojects {
         maven { url 'https://jitpack.io' }
         //maven { url "https://maven.aliyun.com"}
         maven { url "https://maven.google.com" }
+
+        maven {url "https://repo.eclipse.org/content/repositories/paho-snapshots/"}
         flatDir {
             dirs 'libs'
         }
