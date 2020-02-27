@@ -54,7 +54,10 @@ public class WifiRemoterBoard {
     private String DevConnectedTopic = "";
     private String DevDisconnectedTopic = "";
 
+    private String newpwd = "";
+
     private String[] subscribeTopics = new String[3];
+    private int[] subscribeTopicsQos = new int[3];
 
     public WifiRemoterBoard(Context context){
         this.mcontext = context;
@@ -88,9 +91,12 @@ public class WifiRemoterBoard {
         this.subscribeTopics[1] = "$SYS/brokers/+/clients/"+this.mWifiRemoter.devClientid+"/disconnected";
         this.subscribeTopics[2] = mSubscribeTopic;
 
+        this.subscribeTopicsQos = new int[]{0, 0, 0};
+
         if(this.mIsAutoConnect) {
             //if(context==null){return;}
-            mqttUtil = new MqttUtil(context, host, username, password, clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
+            //mqttUtil = new MqttUtil(context, host, username, password, clientid, 0, mPublicTopic, mSubscribeTopic, iMqttActionListener, mqttCallback);
+            mqttUtil = new MqttUtil(context, host, username, password, clientid, 0, mPublicTopic, mSubscribeTopic, iMqttActionListener, mqttCallback);
         }
     }
 
@@ -98,7 +104,7 @@ public class WifiRemoterBoard {
         if(mqttUtil == null && mWifiRemoter!=null) {
             //if(mcontext==null){return;}
             mqttUtil = new MqttUtil(this.mcontext, mWifiRemoter.hostUrl, mWifiRemoter.hostUsername,
-                    mWifiRemoter.hostPassword, mWifiRemoter.clientid, 0, mPublicTopic, mPublicTopic, iMqttActionListener, mqttCallback);
+                    mWifiRemoter.hostPassword, mWifiRemoter.clientid, 0, mPublicTopic, mSubscribeTopic, iMqttActionListener, mqttCallback);
         }else{
             mqttUtil.doClientConnection();
         }
@@ -120,6 +126,7 @@ public class WifiRemoterBoard {
     }
 
     public void changePassword(String password, String newPassword) throws Exception {
+        newpwd = newPassword;
         sendCommand("808", password, newPassword,0);
     }
     public void sendCommand(String funCode, String password, String extraValue, int doorNo) throws Exception{
@@ -163,7 +170,7 @@ public class WifiRemoterBoard {
             Log.i(TAG, "连接成功 ");
             if(iWifiRemoterListener!=null){iWifiRemoterListener.onConnected(mWifiRemoter, WifiRemoterStatus.SERVER_CONNECGED);}
             mqttUtil.isConnectSuccess = true;
-            int[] qoss = {0,0};
+            int[] qoss = {0,0,0};
             try {
                 //mqttUtil.getMqttAndroidClient().subscribe(mSubscribeTopic, 0);//订阅主题，参数：主题、服务质量
                 mqttUtil.getMqttAndroidClient().subscribe(subscribeTopics, qoss);
@@ -265,20 +272,20 @@ public class WifiRemoterBoard {
                         if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswdVerify(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_CHECK_FAILE);}
                         break;
                     case 212:
-                        msg="密码修改成功";
-                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
+                        msg="密码设置成功";
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, newpwd, WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
                         break;
                     case 213:
                         msg="密码设置失败";
-                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, "", WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
                         break;
                     case 214:
                         msg="获取默认门号成功，当前默认门号为："+ data.getString("door_no");
-                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onDefaultDoorNo(mWifiRemoter, data.getString("door_no"), WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS);}
                         break;
                     case 215:
                         msg="获取默认门号失败";
-                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onPasswordChanged(mWifiRemoter, WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
+                        if(iWifiRemoterListener!=null){iWifiRemoterListener.onDefaultDoorNo(mWifiRemoter, "", WifiRemoterStatus.SET_PASSWORD_SET_FAILE);}
                         break;
                 }
 
@@ -316,7 +323,7 @@ public class WifiRemoterBoard {
 
 
     public interface IWifiRemoterListener {
-        void onPasswordChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status);
+        void onPasswordChanged(WifiRemoter wifiRemoter, String newPasswd, WifiRemoterStatus status);
 
         void onClosed(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
@@ -333,6 +340,8 @@ public class WifiRemoterBoard {
         void onPasswdVerify(WifiRemoter wifiRemoter, WifiRemoterStatus status);
 
         void onDoorNoChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status);
+
+        void onDefaultDoorNo(WifiRemoter wifiRemoter, String doorNo, WifiRemoterStatus status);
 
         void onDeviceOnline(WifiRemoter wifiRemoter, WifiRemoterStatus status);
         void onDeviceOffline(WifiRemoter wifiRemoter, WifiRemoterStatus status);

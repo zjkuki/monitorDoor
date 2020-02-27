@@ -71,7 +71,8 @@ public class MqttUtil {
     //@Getter @Setter public static String HOST = "tcp://mqtt.xuanma.tech:1883";//服务器地址（协议+地址+端口号）
     @Getter
     @Setter
-    public static String HOST = "tcp://mqtt.lkd.365yiding.com:1883";//服务器地址（协议+地址+端口号）
+    //public static String HOST = "tcp://mqtt.lkd.365yiding.com:1883";//服务器地址（协议+地址+端口号）
+    public static String HOST = "tcp://mqtt.vsafe.lkd.cn:1883";//服务器地址（协议+地址+端口号）
     @Getter
     @Setter
     public static String USERNAME = "lkd";//用户名
@@ -377,7 +378,8 @@ public class MqttUtil {
             return resp;
         }*/
 
-        String resp = EMQ_GET("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", new HashMap<String, String>());
+        //String resp = EMQ_GET("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", new HashMap<String, String>());
+        String resp = EMQ_GET("http://mqtt.vsafe.lkd.cn/api/v3/nodes/emqx@127.0.0.1/connections", new HashMap<String, String>());
         return resp;
     }
 
@@ -391,7 +393,8 @@ public class MqttUtil {
         HashMap<String, Object> get_data = new HashMap<>();
         //get_data.put("page","1");       //page参数
         //get_data.put("name","test");  //name参数
-        HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
+        //HttpUtils.okhttp_get("http://mqtt.lkd.365yiding.com/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
+        HttpUtils.okhttp_get("http://mqtt.vsafe.lkd.cn/api/v3/nodes/emqx@127.0.0.1/connections", get_data, baseauth, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
 

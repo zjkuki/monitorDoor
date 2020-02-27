@@ -32,6 +32,7 @@ import com.janady.HomeActivity;
 import com.janady.lkd.WifiRemoterStatus;
 import com.janady.utils.MqttUtil;
 import com.janady.setup.FragmentUserLogin;
+import com.janady.utils.TimeMillisUtil;
 import com.lib.funsdk.support.config.ModifyPassword;
 import com.lkd.smartlocker.R;
 import com.google.zxing.activity.CaptureActivity;
@@ -112,6 +113,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
     private Camera mCamera;
 	private WifiRemoterBoard mWifiRemoterBoard;
     private WifiRemoter mWifiRemoter;
+    private WifiRemoterBoard.IWifiRemoterListener tmpIWRL = this;
+    private boolean wrConnected = false;
 
     private String camOldPsw;
     private String bleOldPsw;
@@ -127,11 +130,15 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
     private CountDownTimer countDownTimer = null;
 
-    private int step = 0;  //0-没事，1-密码输入
+    private int step = 0;  //蓝牙：0-没事，1-密码输入   WIFI：0-没事，1-准备密码校验，2-密码校验，3-原始密码校验
 
 	//private final int MESSAGE_DELAY_FINISH = 0x100;
 	private final int MESSAGE_REFRESH_DEVICE_STATUS = 0x100;
 	private final int MESSAGE_EASYLINK_DEVICE_FOUND = 0x101;
+    //--wifiremoter_actions
+	private final int MESSAGE_ACT_PASSWORD_VERIFY = 0x200;
+    private final int MESSAGE_ACT_PASSWORD_SET = 0x201;
+
 
 	// 定义当前支持通过序列号登录的设备类型 
 	// 如果是设备类型特定的话,固定一个就可以了
@@ -347,39 +354,12 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 			@Override
 			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
-				//mWifiRemoterBoard = wifiRemoterBoard;
-				mWifiRemoter = wifiRemoterBoard.getMWifiRemoter();
-				List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
-						mWifiRemoter.mac));
-				if (wr != null && wr.size() > 0) {
-					mTextTitle.setText("修改设备");
-					mBtnDevAdd.setText("修改");
-					isModifing = true;
-
-					mEditDevSN.setText(wr.get(0).name);
-					mEditSceneName.setText(wr.get(0).sceneName);
-					if(!wr.get(0).loginPsw.equals("LKD.CN")) {
-						showInputPasswordDialog(EE_DEV_OW_REMOTER);
-					}
-				}else{
-					wifiOldPsw = "LKD.CN";
-					mTextTitle.setText("添加设备");
-					mBtnDevAdd.setText("添加");
-					isModifing = false;
-					mEditSceneName.setText("");
-					mEditDevSN.setText(mWifiRemoter.name);
-				}
-
-				Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoterBoard.getMWifiRemoter().name
-						+"\ndevName:"+wifiRemoterBoard.getMWifiRemoter().devName
-						+"\nHost Url:"+wifiRemoterBoard.getMWifiRemoter().hostUrl
-						+"\nPublic Topics:"+wifiRemoterBoard.getMWifiRemoter().publictopic
-						+"\nSubscribe Topics:"+wifiRemoterBoard.getMWifiRemoter().subscribetopic
-						+"\nClient Id:"+wifiRemoterBoard.getMWifiRemoter().clientid
-						+"\nDevice Local IP:"+wifiRemoterBoard.getMWifiRemoter().devIpAddr
-						+"\nDevice Local Port:"+ wifiRemoterBoard.getMWifiRemoter().devPort
-						+"\nMac:"+wifiRemoterBoard.getMWifiRemoter().mac);
-			}
+                //mWifiRemoterBoard = wifiRemoterBoard;
+                mWifiRemoter = wifiRemoterBoard.getMWifiRemoter();
+                wifiRemoterBoard.setIWifiRemoterListener(tmpIWRL);
+                wifiRemoterBoard.doMqttConnection();
+                step = 1; //开始校验密码
+            }
 		});
 
 		mListViewDev.setAdapter(mAdapterDev);
@@ -594,20 +574,13 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							LocalBroadcastManager.getInstance(MyApplication.context).sendBroadcast(intent);
 							sendBroadcast(intent);*/
 						}else {
-							List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
-									mWifiRemoter.mac));
-							if (wr != null && wr.size() > 0) {
-								wr.get(0).devClientid = mWifiRemoter.devClientid;
-								wr.get(0).clientid = mWifiRemoter.clientid;
-								mWifiRemoter = wr.get(0);
-								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
-								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
-							} else {
-								mWifiRemoter.sceneName = mEditSceneName.getText().toString();
-								mWifiRemoter.loginPsw = mEditPassword.getText().toString();
-							}
-							MyApplication.liteOrm.cascade().save(mWifiRemoter);
-							sleep(300);
+						    step = 4;
+						    try {
+                                mWifiRemoterBoard.changePassword(wifiOldPsw, mEditPassword.getText().toString());
+                                return;
+                            }catch(Exception e){
+						        e.printStackTrace();
+                            }
 
 							/*Intent intent = new Intent("android.intent.action.CART_BROADCAST");
 							intent.putExtra("data", "remoter_list_refresh");
@@ -880,8 +853,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								if(devType == EE_DEV_OW_REMOTER) {
 									inputPwd = editText;
 									try {
-										//mWifiRemoterBoard.sendCommand("807", inputPwd, "", 0);
-										if(!mWifiRemoterBoard.getMWifiRemoter().loginPsw.equals(inputPwd) ){
+									    step = 2;
+									    wifiOldPsw = inputPwd;
+										mWifiRemoterBoard.sendCommand("807", inputPwd, "", 0);
+										/*if(!mWifiRemoterBoard.getMWifiRemoter().loginPsw.equals(inputPwd) ){
 											Dialogs.alertDialogBtn(mcontext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
 												@Override
 												public void onClick(DialogInterface dialog, int which) {
@@ -895,7 +870,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 													mEditSceneName.setText("");
 												}
 											});
-										}
+										}*/
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
@@ -1514,7 +1489,39 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	//---------Wifi Remoter Listener
 	@Override
-	public void onPasswordChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+	public void onPasswordChanged(WifiRemoter wifiRemoter, String newPasswd, WifiRemoterStatus status) {
+        if(status==WifiRemoterStatus.SET_PASSWORD_SET_SUCCESS) {
+            Log.d("DABU", "WifiRemoterBoard密码设置成功");
+            if (step == 4) {
+                List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+                        mWifiRemoter.mac));
+                if (wr != null && wr.size() > 0) {
+                    wr.get(0).devClientid = mWifiRemoter.devClientid;
+                    wr.get(0).clientid = mWifiRemoter.clientid;
+                    mWifiRemoter = wr.get(0);
+                    mWifiRemoter.loginPsw = mEditPassword.getText().toString();
+                    mWifiRemoter.sceneName = mEditSceneName.getText().toString();
+                } else {
+                    mWifiRemoter.sceneName = mEditSceneName.getText().toString();
+                    mWifiRemoter.loginPsw = mEditPassword.getText().toString();
+                }
+                MyApplication.liteOrm.cascade().save(mWifiRemoter);
+                sleep(300);
+
+                step = 0;
+
+                this.finish();
+
+                Intent intent = new Intent();
+                intent.putExtra("action", "recreate");
+                intent.setClass(mcontext, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }else{
+            Log.d("DABU", "WifiRemoterBoard密码设置失败");
+            Dialogs.alertMessage(mcontext,"密码设置", "密码设置失败");
+        }
 
 	}
 
@@ -1540,35 +1547,103 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	@Override
 	public void onConnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
-
+	    if(status==WifiRemoterStatus.SERVER_CONNECGED) {
+	        wrConnected = true;
+            Log.d("DABU", "WifiRemoterBoard连接成功");
+            if(step==1) {
+                List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+                        wifiRemoter.mac));
+                try {
+                    if (wr != null && wr.size() > 0) {
+                        step = 2;
+                        mWifiRemoterBoard.sendCommand("807", wr.get(0).loginPsw, "", wr.get(0).defaultDoorId);
+                    } else {
+                        step = 3;
+                        mWifiRemoterBoard.sendCommand("807", "LKD.CN", "", wifiRemoter.defaultDoorId);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            wrConnected = false;
+            Log.d("DABU", "WifiRemoterBoard连接失败");
+        }
 	}
 
 	@Override
 	public void onDisconnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
-
+        if(status==WifiRemoterStatus.SERVER_DISCONNECTED) {
+            wrConnected = false;
+            Log.d("DABU", "WifiRemoterBoard连接失败");
+        }else{
+            wrConnected = true;
+            Log.d("DABU", "WifiRemoterBoard连接成功");
+        }
 	}
 
 	@Override
 	public void onPasswdVerify(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
 		if(status==WifiRemoterStatus.SET_PASSWORD_CHECK_SUCCESS){
 			Log.d("DABU","WifiRemoterBoards密码正确");
+			if(step==2){
+                mTextTitle.setText("修改设备");
+                mBtnDevAdd.setText("修改");
+                isModifing = true;
+
+                mEditDevSN.setText(wifiRemoter.name);
+                mEditSceneName.setText(wifiRemoter.sceneName);
+            }else{
+                if(step==3){
+                    wifiOldPsw = "LKD.CN";
+                    mTextTitle.setText("添加设备");
+                    mBtnDevAdd.setText("添加");
+                    isModifing = false;
+                    mEditSceneName.setText("");
+                    mEditDevSN.setText(wifiRemoter.name);
+                }
+            }
+
+			step = 0;//复原
+
+            Log.d("DeviceAddByUser", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoter.name
+                    +"\ndevName:"+wifiRemoter.devName
+                    +"\nHost Url:"+wifiRemoter.hostUrl
+                    +"\nPublic Topics:"+wifiRemoter.publictopic
+                    +"\nSubscribe Topics:"+wifiRemoter.subscribetopic
+                    +"\nClient Id:"+wifiRemoter.clientid
+                    +"\nDevice Local IP:"+wifiRemoter.devIpAddr
+                    +"\nDevice Local Port:"+ wifiRemoter.devPort
+                    +"\nMac:"+wifiRemoter.mac);
 		}else{
 			Log.d("DABU","WifiRemoterBoards密码错误");
-			alertDialog("密码错误，请重新输入正确的密码！", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					showInputPasswordDialog(EE_DEV_OW_REMOTER);
-					return;
-				}
-			}, new DialogInterface.OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					mEditDevSN.setText("");
-					mEditPassword.setText("");
-					mEditSceneName.setText("");
-					return;
-				}
-			});
+			if(step==2) {
+                try {
+                    step = 3;
+                    mWifiRemoterBoard.sendCommand("807", "LKD.CN", "", wifiRemoter.defaultDoorId);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }else {
+                alertDialog("密码错误，请重新输入正确的密码！", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showInputPasswordDialog(EE_DEV_OW_REMOTER);
+                        return;
+                    }
+                }, new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        mEditDevSN.setText("");
+                        mEditPassword.setText("");
+                        mEditSceneName.setText("");
+
+                        step=0;
+
+                        return;
+                    }
+                });
+            }
 		}
 
 	}
@@ -1577,6 +1652,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	public void onDoorNoChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
 
 	}
+
+    @Override
+    public void onDefaultDoorNo(WifiRemoter wifiRemoter, String doorNo, WifiRemoterStatus status){
+
+    }
 
 	@Override
 	public void onDeviceOnline(WifiRemoter wifiRemoter, WifiRemoterStatus status) {

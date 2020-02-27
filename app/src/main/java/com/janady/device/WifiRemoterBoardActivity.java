@@ -60,6 +60,7 @@ import com.hb.dialog.myDialog.MyAlertDialog;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.janady.HomeActivity;
 import com.janady.database.model.Door;
+import com.janady.lkd.WifiRemoterStatus;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
@@ -120,7 +121,8 @@ public class WifiRemoterBoardActivity
 							OnFunDeviceOptListener,
 							OnPreparedListener,
 							OnErrorListener,
-							OnInfoListener{
+							OnInfoListener,
+							WifiRemoterBoard.IWifiRemoterListener {
 
 	private final String TAG="----WRBActivity-------";
 	private RelativeLayout mLayoutTop = null;
@@ -644,12 +646,8 @@ public class WifiRemoterBoardActivity
             List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
             if (wifiRemoters.size() > 0) {
                 mWifiRemoter = wifiRemoters.get(0);
-                if (!wifiIsLogined) {
-                    showWifiInputPasswordDialog();
-                    return;
-                }
-
                 wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter, true);
+
                 currIndex = mWifiRemoter.defaultCameraIdx;
                 if (mWifiRemoter.cameras != null) {
                     if (mWifiRemoter.cameras.get(currIndex).isOnline) {
@@ -997,6 +995,66 @@ public class WifiRemoterBoardActivity
 		Message message = new Message();
 		message.what = MESSAGE_PLAY_MEDIA_MULIT;
 		mHandler.sendMessageDelayed(message, 100);
+	}
+
+	@Override
+	public void onPasswordChanged(WifiRemoter wifiRemoter, String newPasswd, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onClosed(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onStoped(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onLock(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onOpened(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onConnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onDisconnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onPasswdVerify(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onDoorNoChanged(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onDefaultDoorNo(WifiRemoter wifiRemoter, String doorNo, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onDeviceOnline(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
+	}
+
+	@Override
+	public void onDeviceOffline(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+
 	}
 
 	private class OnItemViewTouchListener implements View.OnTouchListener {
