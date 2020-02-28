@@ -141,7 +141,7 @@ public class WifiRemoterBoard {
         data_json.put("password", password);
         data_json.put("time", DateUtils.getNowTimeStamp());
 
-        if(funCode!="802 " &&  funCode!="806" && funCode!="807" && funCode!="808") {
+        if(funCode!="802" &&  funCode!="806" && funCode!="807" && funCode!="808") {
             data_json.put("door_no", doorNo);
             data_json.put("button_value", extraValue);
         }else{
