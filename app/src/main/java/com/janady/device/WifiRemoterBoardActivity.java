@@ -250,6 +250,11 @@ public class WifiRemoterBoardActivity
     private int currWifiRemoterDoorIndex = 0;
     private int maxDoorNo = 0;
     private int maxDoorLimit = 5;
+    //wifi流程控制变量
+    private int step = 0; // WIFI：0-没事，1-准备密码校验，2-密码校验，3-原始密码校验
+
+	private WifiRemoterBoard.IWifiRemoterListener tmpIWRL = this;
+	private boolean wrConnected = false;
 
 
     private SelectorView selectorView;
@@ -645,8 +650,16 @@ public class WifiRemoterBoardActivity
 	private void initWifiDevice(String mac, String sceneName, String sn){
             List<WifiRemoter> wifiRemoters = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC, mac));
             if (wifiRemoters.size() > 0) {
+
+            	if(!wifiIsLogined) {
+					step = 1;
+				}else{
+            		step = 0;
+				}
+
                 mWifiRemoter = wifiRemoters.get(0);
                 wifiRemoterBoard = new WifiRemoterBoard(mContext, mWifiRemoter, true);
+				wifiRemoterBoard.setIWifiRemoterListener(tmpIWRL);
 
                 currIndex = mWifiRemoter.defaultCameraIdx;
                 if (mWifiRemoter.cameras != null) {
@@ -1024,17 +1037,95 @@ public class WifiRemoterBoardActivity
 
 	@Override
 	public void onConnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
-
+		if(status==WifiRemoterStatus.SERVER_CONNECGED) {
+			wrConnected = true;
+			Log.d("WRBA", "WifiRemoterBoard连接成功");
+			if(step==1) {
+				List<WifiRemoter> wr = MyApplication.liteOrm.cascade().query(new QueryBuilder<WifiRemoter>(WifiRemoter.class).whereEquals(WifiRemoter.COL_MAC,
+						wifiRemoter.mac));
+				try {
+					if (wr != null && wr.size() > 0) {
+						step = 2;
+						wifiRemoterBoard.sendCommand("807", wr.get(0).loginPsw, "", wr.get(0).defaultDoorId);
+					} else {
+						step = 3;
+						wifiRemoterBoard.sendCommand("807", "LKD.CN", "", wifiRemoter.defaultDoorId);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}else{
+			wrConnected = false;
+			Log.d("WRBA", "WifiRemoterBoard连接失败");
+		}
 	}
 
 	@Override
 	public void onDisconnected(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
-
+		if(status==WifiRemoterStatus.SERVER_DISCONNECTED) {
+			wrConnected = false;
+			Log.d("DABU", "WifiRemoterBoard连接失败");
+		}else{
+			wrConnected = true;
+			Log.d("DABU", "WifiRemoterBoard连接成功");
+		}
 	}
 
 	@Override
 	public void onPasswdVerify(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
+		if(status==WifiRemoterStatus.SET_PASSWORD_CHECK_SUCCESS){
+			Log.d("WRBA","WifiRemoterBoards密码正确");
+			if(step==2 || step ==3){
+				wifiIsLogined = true;
 
+				MyApplication.liteOrm.cascade().save(wifiRemoter);
+				sleep(300);
+
+				String wifiMac = getIntent().getStringExtra("WIFI_DEVICE_MAC");
+				String wifiSceneName = getIntent().getStringExtra("WIFI_DEVICE_SCENE");
+				String wifiSn = getIntent().getStringExtra("WIFI_DEVICE_SN");
+				initWifiDevice(wifiMac, wifiSceneName, wifiSn);
+			}
+
+			step = 0;//复原
+
+			Log.d("WRBA", "OnClickedWifiRemoterBoard: \nName:"+wifiRemoter.name
+					+"\ndevName:"+wifiRemoter.devName
+					+"\nHost Url:"+wifiRemoter.hostUrl
+					+"\nPublic Topics:"+wifiRemoter.publictopic
+					+"\nSubscribe Topics:"+wifiRemoter.subscribetopic
+					+"\nClient Id:"+wifiRemoter.clientid
+					+"\nDevice Local IP:"+wifiRemoter.devIpAddr
+					+"\nDevice Local Port:"+ wifiRemoter.devPort
+					+"\nMac:"+wifiRemoter.mac);
+		}else{
+			Log.d("WRBA","WifiRemoterBoards密码错误");
+			if(step==2) {
+				try {
+					step = 3;
+					wifiRemoterBoard.sendCommand("807", "LKD.CN", "", wifiRemoter.defaultDoorId);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}else {
+				alertDialog("密码错误，请重新输入正确的密码！", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						showWifiInputPasswordDialog();
+						return;
+					}
+				}, new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+
+						step=0;
+						wifiIsLogined = false;
+						return;
+					}
+				});
+			}
+		}
 	}
 
 	@Override
@@ -2440,8 +2531,16 @@ public class WifiRemoterBoardActivity
             @Override
             public boolean confirm(String editText) {
                 // 重新以新的密码登录
-                if (null != mWifiRemoter) {
-                    if(!mWifiRemoter.loginPsw.equals("") && mWifiRemoter.loginPsw.equals(editText)){
+                if (null != wifiRemoterBoard) {
+					try {
+						step = 2;
+						newPsd = editText;
+						wifiRemoterBoard.sendCommand("807", editText.toString(), "", 0);
+						return super.confirm(editText);
+					}catch (Exception e){
+						e.printStackTrace();
+					}
+                    /*if(!mWifiRemoter.loginPsw.equals("") && mWifiRemoter.loginPsw.equals(editText)){
                         wifiIsLogined = true;
                         String wifiMac = getIntent().getStringExtra("WIFI_DEVICE_MAC");
                         String wifiSceneName = getIntent().getStringExtra("WIFI_DEVICE_SCENE");
@@ -2449,7 +2548,7 @@ public class WifiRemoterBoardActivity
 
                         initWifiDevice(wifiMac, wifiSceneName, wifiSn);
                         return super.confirm(editText);
-                    }
+                    }*/
                 }
 
                 Dialogs.alertDialogBtn(mContext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
