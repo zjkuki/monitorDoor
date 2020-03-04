@@ -695,6 +695,7 @@ public class WifiRemoterBoardActivity
                 doorNo.add(i + "号门");
                 mTabDoors.addTab(mTabDoors.newTab().setText(i + "号门"));
             }*/
+
                 if (mTabDoors.getTabCount() < 5) {
                     mTabDoors.setTabMode(TabLayout.MODE_FIXED);
                     mTabDoors.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -704,10 +705,13 @@ public class WifiRemoterBoardActivity
                 }
 
                 for (int i = 0; i < mWifiRemoter.doorList.size(); i++) {
-                    TabLayout.Tab tab = mTabDoors.newTab();
-                    tab.setText(mWifiRemoter.doorList.get(i).name);
-                    mTabDoors.addTab(tab);
+                     if(mTabDoors.getTabAt(mWifiRemoter.doorList.get(i).no-1) == null) {
+                        TabLayout.Tab tab = mTabDoors.newTab();
+                        tab.setText(mWifiRemoter.doorList.get(i).name);
+                        mTabDoors.addTab(tab);
+                    }
                 }
+
                 if (mTabDoors.getTabCount() > 0) {
                     mTabDoors.getTabAt(mWifiRemoter.defaultDoorId).select();
                     currWifiRemoterDoorIndex = mTabDoors.getSelectedTabPosition();
