@@ -1,4 +1,20 @@
-    apply plugin: 'com.android.application'
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+import java.security.MessageDigest
+
+apply plugin: 'com.android.application'
+
+def releaseTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("UTC"))
+}
+
+def isWindows() {
+    return org.gradle.internal.os.OperatingSystem.current().isWindows()
+}
+
+def apath
+def appVersionFile = "appVersion.txt"
+def md5 = MessageDigest.getInstance("MD5")
 
 android {
     compileSdkVersion 28
@@ -50,6 +66,22 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file('..\\lkd.jks')
+            storePassword KEY_PASS
+            keyAlias ALIAS_NAME
+            keyPassword ALIAS_PASS
+        }
+
+        debug {
+            keyAlias 'lkd'
+            keyPassword '123123'
+            storeFile file('..\\lkd.jks')
+            storePassword '123123'
+        }
+    }
+
     buildTypes {
         debug {
             debuggable = true
@@ -57,6 +89,8 @@ android {
             minifyEnabled = false
             zipAlignEnabled = false
             multiDexEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
         release {
             debuggable = false
@@ -65,22 +99,11 @@ android {
             zipAlignEnabled = true
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
-    signingConfigs {
-        config {
-            storeFile file('..\\lkd.jks')
-            storePassword KEY_PASS
-            keyAlias ALIAS_NAME
-            keyPassword ALIAS_PASS
-        }
-        debug {
-            keyAlias ALIAS_NAME
-            keyPassword KEY_PASS
-            storeFile file('..\\lkd.jks')
-            storePassword ALIAS_PASS
-        }
-    }
+
+
     useLibrary 'org.apache.http.legacy'
 //    dexOptions {
 //        jumboMode true
@@ -99,7 +122,72 @@ android {
     buildToolsVersion '28.0.3'
 
     lintOptions {
+        checkReleaseBuilds false
         abortOnError false
+    }
+
+    android.applicationVariants.all { variant ->
+        // variant.outputs.each { output ->
+        // def outputFile = output.outputFile
+
+        variant.outputs.all {
+            outputFileName = "${variant.applicationId}_v${variant.versionName}_${releaseTime()}.apk"
+        }
+        //}
+    }
+
+    task generateAppVersionFile {
+        dependsOn "assembleRelease"
+        doLast {
+            def pathSplitStr
+            if (isWindows()) {
+                pathSplitStr = "\\"
+            } else {
+                pathSplitStr = "/"
+            }
+            println("appVariants size=" + android.applicationVariants.findAll().size().toString())
+            android.applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    //apath = android.applicationVariants.first().outputs.first().outputFile
+                    apath = output.outputFile
+
+                    println("apk file=" + apath)
+                    FileInputStream fs = new FileInputStream(apath)
+                    def fn
+                    def value
+                    try {
+                        MappedByteBuffer byteBuffer = fs.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, apath.length())
+                        md5.update(byteBuffer)
+                        BigInteger bi = new BigInteger(1, md5.digest())
+                        value = bi.toString(16)
+                        fn = apath.absolutePath.substring(apath.absolutePath.lastIndexOf(pathSplitStr) + 1, apath.absolutePath.lastIndexOf(".apk"))
+                        println("file=" + fn + "   MD5=" + value)
+                    } catch (Exception e) {
+                        e.printStackTrace()
+                    } finally {
+                        def writepath = apath.absolutePath.substring(0, apath.absolutePath.lastIndexOf(pathSplitStr)).toString()
+                        println("OutPutFilePath=" + writepath)
+                        FileWriter writer = new FileWriter(writepath + pathSplitStr + appVersionFile)
+                        //--加号必须写在上一行结尾，否则报错！！！
+                        def json = "{\"versionCode\":" + variant.versionCode.toString() + ",\n\"isForceUpdate\":0,\n\"preBaselineCode\":0,\n\"versionName\":" + variant.versionName.toString() +
+                                ",\n\"downUrl\":\"http://121.37.25.137/files/" + fn.toString() + ".apk\",\n\"md5\":\"" + value.toString() + "\",\n\"updateLog\":" +
+                                "\"注意事项：\n     如果您的手机在线更新无法自动安装，请进入【设置】->【安全与隐私】->【未知来源应用下载】的选项打开为允许状态\n更新内容：\n  1）WiFi控制板问题修正；\n\"}\n"
+                        //"\"1）解决开始按钮的卡慢问题；\n2）加入熄屏运行机制\n3）修复文件生成时间的BUG\n4）解决指定文件夹无法搜索的问题\"}\n"
+
+                        println("json str=" + json)
+                        writer.write(json)
+                        /*writer.write("Hello Kuka:\n")
+                        writer.write("  My name is coolszy!\n")
+                        writer.write("  I like you and miss you。")*/
+                        writer.close()
+                    }
+                    if (fs != null) {
+                        fs.close()
+                    }
+
+                }
+            }
+        }
     }
 }
 dependencies {
@@ -136,6 +224,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.2.2'
 
     implementation 'commons-codec:commons-codec:1.11'
+    implementation project(path: ':autoUpdate')
 
 }
-

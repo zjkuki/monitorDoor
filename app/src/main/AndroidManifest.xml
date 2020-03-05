@@ -8,8 +8,6 @@
 
 
     <!-- <uses-permission android:name="com.example.permission.RECEIVE_MY_BROADCAST" /> -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RESTART_PACKAGES" />
@@ -43,7 +41,6 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
 
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- bluetooth lock -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -461,6 +458,17 @@
         <activity android:name="com.example.funsdkdemo.devices.settings.ActivityHumanDetect" />
         <activity android:name="com.example.funsdkdemo.devices.settings.ActivityOneKeyMaskVideo" />
 
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.lkd.smartlocker.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
 
         <service android:name="com.example.funsdkdemo.alarm.ServiceGuidePushAlarmNotification">
             <intent-filter>
@@ -481,6 +489,13 @@
         <!--mqtt service-->
         <!--<service android:name="io.fogcloud.fog_mqtt.service.MqttService" />-->
         <service android:name="org.eclipse.paho.android.service.MqttService" android:permission="android.permission.BIND_JOB_SERVICE"/>
+
     </application>
 
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:resizeable="true"/>
 </manifest>

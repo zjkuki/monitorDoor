@@ -71,6 +71,7 @@ import com.litesuits.orm.db.assit.QueryBuilder;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUIPullRefreshLayout;
+import com.sangbo.autoupdate.CheckVersion;
 
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -207,6 +208,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
         initTopBar();
         initRecyclerView();
+
+        CheckVersion.setDialogTheme(R.style.MyAlertDialogStyle);
+        CheckVersion.update(getContext());
+
         return rootView;
     }
 

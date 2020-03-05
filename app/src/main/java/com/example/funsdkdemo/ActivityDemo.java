@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -21,11 +21,8 @@ import android.widget.Toast;
 
 import com.example.common.DialogWaitting;
 import com.example.common.UIFactory;
-import com.janady.setup.JBaseFragment;
-import com.lib.FunSDK;
+import com.janady.utils.ui.RelayoutTool;
 import com.lkd.smartlocker.R;
-import com.qmuiteam.qmui.arch.QMUIFragment;
-import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.xm.ui.widget.SpinnerSelectItem;
 
 import java.util.Arrays;
@@ -36,6 +33,46 @@ public class ActivityDemo extends FragmentActivity {
 	private Toast mToast = null;
 	
 	private View mNavRightView = null;
+
+	/******** 基准分辨率 **********/
+	private static final float UI_STANDARD_width = 1080;
+	/******** 缩放比例值 **********/
+	protected static float scale = 0;
+
+	@Override
+	public void setContentView(int layoutResID) {
+		View view = View.inflate(this, layoutResID, null);
+		this.setContentView(view);
+	}
+
+	@Override
+	public void setContentView(View view) {
+		if (scale == 0) {
+			initScreenScale();
+		}
+
+		if (scale != 1) {
+			RelayoutTool.relayoutViewHierarchy(view, scale);
+		}
+		super.setContentView(view);
+	}
+
+	@Override
+	public void setContentView(View view, LayoutParams params) {
+		if (scale == 0) {
+			initScreenScale();
+		}
+		RelayoutTool.relayoutViewHierarchy(view, scale);
+		RelayoutTool.scaleLayoutParams(params, scale);
+		super.setContentView(view, params);
+	}
+
+	public void initScreenScale() {
+		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		float width = displayMetrics.widthPixels;
+		scale = width / UI_STANDARD_width;
+	}
+
 
 	public void setText(String text){
 		if ( null != mWaitDialog ) {

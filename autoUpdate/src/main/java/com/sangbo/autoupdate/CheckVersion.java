@@ -176,7 +176,7 @@ public class CheckVersion {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
             PackageManager m= mContext.getPackageManager();
 
-            Uri contentUri = FileProvider.getUriForFile(mContext, "com.omdd.dcapp.fileProvider", file);
+            Uri contentUri = FileProvider.getUriForFile(mContext, "com.lkd.smartlocker.fileProvider", file);
             //Uri contentUri = Uri.parse("file://"+ file);
             //intent.putExtra("application/vnd.android.package-archive", contentUri);
             intent.setDataAndType(contentUri, "application/vnd.android.package-archive");

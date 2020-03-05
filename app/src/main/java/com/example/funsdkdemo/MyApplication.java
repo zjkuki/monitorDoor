@@ -13,6 +13,7 @@ import com.lib.funsdk.support.FunPath;
 import com.lib.funsdk.support.FunSupport;
 import com.litesuits.orm.LiteOrm;
 import com.qmuiteam.qmui.arch.QMUISwipeBackActivityManager;
+import com.sangbo.autoupdate.CheckVersion;
 
 import java.util.Date;
 
@@ -30,6 +31,8 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		CheckVersion.checkUrl = "http://121.37.25.137/files/appVersion.txt";
+
 		QMUISwipeBackActivityManager.init(this);
 
 		context = getApplicationContext();

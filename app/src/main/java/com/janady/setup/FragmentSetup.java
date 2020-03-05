@@ -17,6 +17,7 @@ import com.janady.HomeActivity;
 import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.OnFunLoginListener;
 import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.sangbo.autoupdate.CheckVersion;
 
 import org.w3c.dom.Text;
 

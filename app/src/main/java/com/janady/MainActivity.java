@@ -10,6 +10,7 @@ import com.example.funsdkdemo.dialog.PermissionDialog;
 import com.janady.setup.FragmentSetup;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.qmuiteam.qmui.arch.annotation.DefaultFirstFragment;
+import com.sangbo.autoupdate.CheckVersion;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -31,6 +32,7 @@ public class MainActivity extends QMUIFragmentActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.BLUETOOTH,
                 Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE);
+
 
     }
     private boolean checkPermission(final String permissionTitle, final String... permission) {

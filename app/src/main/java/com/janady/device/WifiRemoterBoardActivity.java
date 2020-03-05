@@ -23,6 +23,7 @@ import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -61,6 +62,8 @@ import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.janady.HomeActivity;
 import com.janady.database.model.Door;
 import com.janady.lkd.WifiRemoterStatus;
+import com.janady.utils.ui.ChangeView;
+import com.janady.utils.ui.RelayoutTool;
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.ActivityDeviceFishEyeInfo;
 import com.example.funsdkdemo.devices.ActivityGuideDevicePictureList;
@@ -94,8 +97,6 @@ import com.lib.funsdk.support.widget.FunVideoView;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
 import com.litesuits.orm.db.assit.QueryBuilder;
 
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +106,6 @@ import java.util.Map;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.lib.funsdk.support.models.FunDevType.EE_DEV_OW_REMOTER;
 
 //import static com.lib.funsdk.support.models.FunDevType.EE_DEV_SPORTCAMERA;
 
@@ -441,8 +441,15 @@ public class WifiRemoterBoardActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        //屏幕适配
+        /*DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);// 取得窗口属性
+        int screenWidth = dm.widthPixels;// 窗口的宽度
+        int screenHeight = dm.heightPixels;// 窗口高度*/
 
 		setContentView(R.layout.wifiremoterboard_lock_activity);
+
+
 		cbSelectedDoor = (CheckBox) findViewById(R.id.cb_selected_door);
 		cbSelectedDoor.setText("默认");
 		cbSelectedDoor.setOnClickListener(new OnClickListener() {
@@ -645,6 +652,13 @@ public class WifiRemoterBoardActivity
 		initWifiDevice(wifiMac, wifiSceneName, wifiSn);
 
 		setStatusBar();
+
+        //ViewGroup viewGroup=(ViewGroup)this.findViewById(R.id.layoutLockerButtons);
+        //ChangeView.changeViewSize(viewGroup, screenWidth, screenHeight);
+
+        //View convertView =LayoutInflater.from(this).inflate(R.layout.wifiremoterboard_lock_activity, null);;
+        //RelayoutTool.relayoutViewHierarchy(convertView, scale);
+
 	}
 
 	private void initWifiDevice(String mac, String sceneName, String sn){
@@ -2166,13 +2180,13 @@ public class WifiRemoterBoardActivity
 
 	}
 	private void loginDevice() {
-		showWaitDialog();
+		//showWaitDialog();
 
 		FunSupport.getInstance().requestDeviceLogin(mFunDevice);
 	}
 
 	private void loginDevice(String loginName, String pwd) {
-		showWaitDialog();
+		//showWaitDialog();
 
 		FunSupport.getInstance().requestDeviceLogin1(mFunDevice,loginName,pwd);
 		//FunSupport.getInstance().requestDeviceLogin(mFunDevice);
@@ -2180,7 +2194,7 @@ public class WifiRemoterBoardActivity
 
 
 	private void requestSystemInfo() {
-		showWaitDialog();
+		//showWaitDialog();
 
 		FunSupport.getInstance().requestDeviceConfig(mFunDevice, SystemInfo.CONFIG_NAME);
 	}
