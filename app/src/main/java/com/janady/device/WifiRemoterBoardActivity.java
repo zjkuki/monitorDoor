@@ -2017,8 +2017,8 @@ public class WifiRemoterBoardActivity
 		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
 		lpVs.height = LayoutParams.MATCH_PARENT;
 
-		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
-		lpGd.height = LayoutParams.MATCH_PARENT;
+		//RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		//lpGd.height = LayoutParams.MATCH_PARENT;
 
 
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
@@ -2044,8 +2044,8 @@ public class WifiRemoterBoardActivity
 		RelativeLayout.LayoutParams lpVs = (RelativeLayout.LayoutParams) mLayoutVideoScreen.getLayoutParams();
 		lpVs.height = UIFactory.dip2px(this, 280);
 
-		RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
-		lpGd.height = UIFactory.dip2px(this, 280);
+		//RelativeLayout.LayoutParams lpGd = (RelativeLayout.LayoutParams) gridview.getLayoutParams();
+		//lpGd.height = UIFactory.dip2px(this, 280);
 
 
 		RelativeLayout.LayoutParams lpWnd = (RelativeLayout.LayoutParams) mLayoutVideoWnd.getLayoutParams();
