@@ -97,5 +97,13 @@ public class MyApplication extends Application {
 
 		FunSupport.getInstance().term();
 	}
-	
+
+	//这是一个重新方法
+	@Override
+	protected void attachBaseContext(Context base) {
+		super.attachBaseContext(base);
+		android.support.multidex.MultiDex.install(this);
+
+	}
+
 }

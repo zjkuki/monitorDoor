@@ -223,6 +223,8 @@ dependencies {
     implementation 'com.zhy:okhttputils:2.6.2'
     implementation 'com.squareup.okhttp3:okhttp:4.2.2'
 
+    implementation 'com.android.support:multidex:1.0.1'
+
     implementation 'commons-codec:commons-codec:1.11'
     implementation project(path: ':autoUpdate')
 
