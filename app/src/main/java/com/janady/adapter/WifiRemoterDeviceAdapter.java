@@ -57,7 +57,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
     public void bindData(RecyclerViewHolder holder, final int position, WifiRemoter item) {
         mCurrWifiRemoter = item;
 
-        holder.getTextView(R.id.item_wr_name).setText("场景："+mCurrWifiRemoter.sceneName);
+        holder.getTextView(R.id.item_wr_name).setText(context.getString(R.string.SCENE)+mCurrWifiRemoter.sceneName);
         holder.getTextView(R.id.item_wr_sn).setText("SN："+mCurrWifiRemoter.name);
         holder.getTextView(R.id.item_wr_mac).setText("MAC："+mCurrWifiRemoter.mac);
 
@@ -68,10 +68,10 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);//内部类
-                builder.setTitle("温馨提示");
-                builder.setMessage("您确定要删除此WIFI设备吗?");
+                builder.setTitle(R.string.DLG_TIPS_TITLE);
+                builder.setMessage(R.string.WIFI_REMOTER_DEL);
                 //确定按钮
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(context.getString(R.string.common_confirm), new DialogInterface.OnClickListener() {
 
                     @SuppressLint("WrongConstant")
                     @Override
@@ -82,11 +82,11 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
                         WifiRemoterDeviceAdapter.super.setData(mDevs);
                         WifiRemoterDeviceAdapter.super.notifyDataSetChanged();
                         //确定删除的代码
-                        Toast.makeText(context, "删除成功", 0).show();
+                        Toast.makeText(context, context.getString(R.string.delete_s), 0).show();
                     }
                 });
                 //点取消按钮
-                builder.setNegativeButton("取消", null);
+                builder.setNegativeButton(context.getString(R.string.common_cancel), null);
                 builder.show();
             }
         });
@@ -108,7 +108,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
                     JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
                     Bitmap mQrCodeBmp=makeQRCode(content);
                     dialogBuild.setImage(mQrCodeBmp);
-                    dialogBuild.setDialog_msg("您正在分享WIFI控制器-"+mCurrWifiRemoter.sceneName);
+                    dialogBuild.setDialog_msg(context.getString(R.string.WIFI_REMOTER_SHARING)+"-"+mCurrWifiRemoter.sceneName);
                     JQrcodePopDialog dialog = dialogBuild.create();
                     dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
                     dialog.show();
@@ -147,7 +147,7 @@ public class WifiRemoterDeviceAdapter extends BaseRecyclerAdapter<WifiRemoter> {
         builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.app_name));
         builder.setMessage(text);
-        builder.setPositiveButton("确定", onClickListener);
+        builder.setPositiveButton(context.getString(R.string.common_confirm), onClickListener);
         builder.setOnCancelListener(onCancelListener);
         builder.show();
     }

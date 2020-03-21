@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,7 +21,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.TestFragment;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
@@ -32,14 +30,12 @@ import com.janady.HomeActivity;
 import com.janady.lkd.WifiRemoterStatus;
 import com.janady.utils.MqttUtil;
 import com.janady.setup.FragmentUserLogin;
-import com.janady.utils.TimeMillisUtil;
 import com.lib.funsdk.support.config.ModifyPassword;
 import com.lkd.smartlocker.R;
 import com.google.zxing.activity.CaptureActivity;
 import com.inuker.bluetooth.library.search.SearchRequest;
 import com.inuker.bluetooth.library.search.SearchResult;
 import com.inuker.bluetooth.library.search.response.SearchResponse;
-import com.inuker.bluetooth.library.utils.BluetoothLog;
 import com.inuker.bluetooth.library.utils.ByteUtils;
 import com.janady.AppConstants;
 import com.janady.Dialogs;
@@ -194,7 +190,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 		mTextTitle = (TextView)findViewById(R.id.textViewInTopLayout);
         mTextTip = (TextView)findViewById(R.id.textTip);
-        mTextTip.setText("搜索设备：");
+        mTextTip.setText(R.string.SEARCH_DEVICE_TITLE);
 
         mTextTip.setOnClickListener(new OnClickListener() {
             @Override
@@ -260,8 +256,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						mEditSceneName.setText(bles.get(0).sceneName);
 						mBluetooth.isFirst = false;*/
 
-						mTextTitle.setText("修改设备");
-						mBtnDevAdd.setText("修改");
+						mTextTitle.setText(R.string.EDIT_DEVICE_TITLE);
+						mBtnDevAdd.setText(R.string.BTN_EDIT_DEVICE);
 						isModifing = true;
 
 						bleOldPsw = bles.get(0).password;
@@ -277,8 +273,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						//showInputPasswordDialog(EE_DEV_BLUETOOTH);
 						//return;
 					} else {
-						mTextTitle.setText("添加设备");
-						mBtnDevAdd.setText("添加");
+						mTextTitle.setText(R.string.ADD_DEVICE_TITLE);
+						mBtnDevAdd.setText(R.string.BTN_ADD_DEVICE);
 						isModifing = false;
 
 						bleOldPsw = "LKD.CN";
@@ -316,16 +312,16 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mEditPassword.setText("");
 					//密码留空，调用FUNSDK进行密码校验
 					//mFunDevice.loginPsw = cams.get(0).loginPsw;
-					mTextTitle.setText("修改设备");
-					mBtnDevAdd.setText("修改");
+					mTextTitle.setText(R.string.EDIT_DEVICE_TITLE);
+					mBtnDevAdd.setText(R.string.BTN_EDIT_DEVICE);
 					isModifing = true;
 
 					if(!cams.get(0).loginPsw.equals("")){
 						showInputPasswordDialog(EE_DEV_NORMAL_MONITOR);
 					}
 				}else{
-					mTextTitle.setText("添加设备");
-					mBtnDevAdd.setText("添加");
+					mTextTitle.setText(R.string.ADD_DEVICE_TITLE);
+					mBtnDevAdd.setText(R.string.BTN_ADD_DEVICE);
 					isModifing = false;
 					mEditSceneName.setText("");
 					mFunDevice.loginPsw ="";
@@ -468,7 +464,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		case R.id.devAddBtn:
 			{
 				if(mEditDevSN.getText().toString().equals("") || mEditSceneName.getText().toString().equals("")){
-					alertDialog("序列号或场景名不能为空！", new DialogInterface.OnClickListener() {
+					alertDialog( getString(R.string.NOT_NULL_SS), new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							return;
@@ -482,7 +478,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				}else {
 					if (mCurrDevType == FunDevType.EE_DEV_BLUETOOTH) {
 						if(mEditPassword.getText().toString().equals("")) {
-							Dialogs.alertMessage(mcontext, "错误", "密码不能为空，请输入正确密码", new DialogInterface.OnCancelListener() {
+							Dialogs.alertMessage(mcontext, getString(R.string.DLG_ERR_TITLE), getString(R.string.ERR_PASSWD_EMPYT), new DialogInterface.OnCancelListener() {
 								@Override
 								public void onCancel(DialogInterface dialog) {
 									return;
@@ -491,7 +487,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						}
 
 						if(mEditPassword.getText().length() > 6 || mEditPassword.getText().length()< 6) {
-							Dialogs.alertMessage(mcontext, "错误", "请输入六位密码", new DialogInterface.OnCancelListener() {
+							Dialogs.alertMessage(mcontext, getString(R.string.DLG_ERR_TITLE), getString(R.string.PASSWORD_ENTER_6), new DialogInterface.OnCancelListener() {
 								@Override
 								public void onCancel(DialogInterface dialog) {
 									return;
@@ -517,7 +513,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 							if (bleLocker.getIsReday()) {
 								bleLocker.changePassword(mBluetooth.password);
 							} else {
-								alertDialog("蓝牙设备未连接成功！", new DialogInterface.OnClickListener() {
+								alertDialog(getString(R.string.BT_DEV_CONN_FAILED), new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
 										return;
@@ -651,11 +647,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								}else {
 									String s = tmp.getString("Name").substring(tmp.getString("Name").lastIndexOf("#") + 1);
 									if (tmp.getString("Name").contains("-19#")) {
-										wr.name = "WIFI主控器（单向）@ " + s;
+										wr.name = getString(R.string.WIFI_BOARD_OW)+"@ " + s;
 										wr.devType = "One_Way_Smart_Lock";
 										wr.devTypeId = EE_DEV_OW_REMOTER.getDevIndex();
 									} else {
-										wr.name = "WIFI主控器（双向）@ " + s;
+										wr.name = getString(R.string.WIFI_BOARD_TW)+"@ " + s;
 										wr.devType = "One_Way_Smart_Lock";
 										wr.devTypeId = EE_DEV_OW_REMOTER.getDevIndex();
 									}
@@ -1163,7 +1159,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	private void refreshLanDeviceList() {
 		hideWaitDialog();
-		mTextTip.setText("扫描设备");
+		mTextTip.setText(getString(R.string.SCAN_DALG_TITLE));
 		//if(mCurrDevType==EE_DEV_BOUTIQUEROTOT) {
 			mAdapterDev.updateDevice(FunSupport.getInstance().getLanDeviceList());
 		//}else {
@@ -1209,7 +1205,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			}
 		}
 
-		mTextTip.setText("停止扫描设备....");
+		mTextTip.setText(getString(R.string.STOP_SCAN_DEVICE));
 		mRefreshLayout.showState(AppConstants.LOADING);
 
     }
@@ -1217,10 +1213,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
     private final SearchResponse mSearchResponse = new SearchResponse() {
         @Override
         public void onSearchStarted() {
-            mTextTip.setText("停止扫描设备....");
+            mTextTip.setText(getString(R.string.STOP_SCAN_DEVICE));
             isBleScanning = true;
             mRefreshLayout.showState(AppConstants.LIST);
-			Log.i("DeviceAddByUser","正在搜索设备");
+			Log.i("DeviceAddByUser",getString(R.string.SEARCHING_DEVICE));
             //toolbar.setTitle(R.string.string_refreshing);
         }
 
@@ -1247,7 +1243,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
         @Override
         public void onSearchStopped() {
             isBleScanning = false;
-            mTextTip.setText("扫描设备");
+            mTextTip.setText(R.string.SCAN_DEVICE);
 			Log.i("DeviceAddByUser","DeviceAddByUser.onSearchStopped");
             mRefreshLayout.showState(AppConstants.LIST);
             //mTextTip.setText("扫描设备");
@@ -1261,7 +1257,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			mRefreshLayout.showState(AppConstants.LIST);
             Log.i("DeviceAddByUser","DeviceAddByUser.onSearchCanceled");
 
-            mTextTip.setText("扫描设备");
+            mTextTip.setText(R.string.SCAN_DEVICE);
             //toolbar.setTitle(R.string.devices);
         }
     };
@@ -1353,7 +1349,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			hideWaitDialog();
 
 			if (step == 1) {
-				alertDialog("密码错误！蓝牙设备连接失败！", new DialogInterface.OnClickListener() {
+				alertDialog(getString(R.string.BT_PASSWD_ERROR), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						mEditDevSN.setText("");
@@ -1391,9 +1387,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			needCheckSTA=false;
 			if(Resetted ==1 ) {
 				Log.i("DeviceAddByUser"," 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
-				Dialogs.alertMessage(mcontext, "提示","设备已重置为出厂状态，输入新密码可重新激活本设备");
-				mTextTitle.setText("添加设备");
-				mBtnDevAdd.setText("添加");
+				Dialogs.alertMessage(mcontext, getString(R.string.DLG_TIPS_TITLE),getString(R.string.BT_DEVICE_RESETED));
+				mTextTitle.setText(R.string.ADD_DEVICE_TITLE);
+				mBtnDevAdd.setText(R.string.BTN_ADD_DEVICE);
 				bleOldPsw = "LKD.CN";
 				mBluetooth.password = "";
 				mBluetooth.isFirst = true;
@@ -1403,8 +1399,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				bleLocker.connect();
 			}else{
 				Log.i("DeviceAddByUser"," 设备正常，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
-				mTextTitle.setText("修改设备");
-				mBtnDevAdd.setText("修改");
+				mTextTitle.setText(R.string.EDIT_DEVICE_TITLE);
+				mBtnDevAdd.setText(R.string.BTN_EDIT_DEVICE);
 				showInputPasswordDialog(EE_DEV_BLUETOOTH);
 			}
 		}
@@ -1451,7 +1447,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 						mRefreshLayout.showState(AppConstants.LIST);
 						Log.i("SearchEasyLinkDevice","CountDownTimer-onFinish");
 
-						mTextTip.setText("扫描设备");
+						mTextTip.setText(R.string.SCAN_DEVICE);
 						//toolbar.setTitle(R.string.devices);
 						Log.i("SearchEasyLinkDevice", "down");
 					}
@@ -1520,7 +1516,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
             }
         }else{
             Log.d("DABU", "WifiRemoterBoard密码设置失败");
-            Dialogs.alertMessage(mcontext,"密码设置", "密码设置失败");
+            Dialogs.alertMessage(mcontext,getString(R.string.DLG_PASSWDSET_TITLE), getString(R.string.DLG_PASSWDSET_ERROR));
         }
 
 	}
@@ -1587,8 +1583,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 		if(status==WifiRemoterStatus.SET_PASSWORD_CHECK_SUCCESS){
 			Log.d("DABU","WifiRemoterBoards密码正确");
 			if(step==2){
-                mTextTitle.setText("修改设备");
-                mBtnDevAdd.setText("修改");
+                mTextTitle.setText(R.string.EDIT_DEVICE_TITLE);
+                mBtnDevAdd.setText(R.string.BTN_EDIT_DEVICE);
                 isModifing = true;
 
                 mEditDevSN.setText(wifiRemoter.name);
@@ -1596,8 +1592,8 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
             }else{
                 if(step==3){
                     wifiOldPsw = "LKD.CN";
-                    mTextTitle.setText("添加设备");
-                    mBtnDevAdd.setText("添加");
+                    mTextTitle.setText(R.string.ADD_DEVICE_TITLE);
+                    mBtnDevAdd.setText(R.string.BTN_ADD_DEVICE);
                     isModifing = false;
                     mEditSceneName.setText("");
                     mEditDevSN.setText(wifiRemoter.name);
@@ -1625,7 +1621,7 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
                     e.printStackTrace();
                 }
             }else {
-                alertDialog("密码错误，请重新输入正确的密码！", new DialogInterface.OnClickListener() {
+                alertDialog(getString(R.string.DLG_PASSWD_ERR_REENTER), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showInputPasswordDialog(EE_DEV_OW_REMOTER);

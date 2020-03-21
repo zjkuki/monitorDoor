@@ -241,9 +241,9 @@ public class DeviceCameraActivity
 
 		//mTextTitle.setText(mFunDevice.devName);
 		if(!camera.isOnline){
-			mTextTitle.setText(camera.sceneName+"-摄像机(离线)");
+			mTextTitle.setText(camera.sceneName+ getString(R.string.CAMERA_OFFLINE));
 		}else{
-			mTextTitle.setText(camera.sceneName+"-摄像机");
+			mTextTitle.setText(camera.sceneName+ getString(R.string.CAMERA_ONLINE));
 		}
 
         mFunDevice = FunSupport.getInstance().findDeviceById(devId);
@@ -412,7 +412,7 @@ public class DeviceCameraActivity
 
 		mSplitView = findViewById(R.id.splitView);
 		mCbDoubleTalk = findViewById(R.id.cb_double_talk_switch);
-		mCbDoubleTalk.setChecked(true);
+		mCbDoubleTalk.setChecked(false); //false单向对讲，true双向对讲
 		mCbDoubleTalk.setVisibility(GONE);
 
 
@@ -931,7 +931,7 @@ public class DeviceCameraActivity
 	private void changePrevCamera(){
 		currIndex --;
 		if(currIndex<0){
-			showToast("已是第一个摄像机！");
+			showToast(R.string.CAMERA_FIRST);
 			currIndex=0;
 			return;
 		}
@@ -952,7 +952,7 @@ public class DeviceCameraActivity
 	private void changeNextCamera(){
 		currIndex ++;
 		if(currIndex > cams.size()-1){
-			showToast("已是最后一个摄像机！");
+			showToast(R.string.CAMERA_LAST);
 			currIndex =cams.size()-1;
 			return;
 		}

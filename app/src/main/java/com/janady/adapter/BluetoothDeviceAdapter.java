@@ -67,7 +67,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             return;
         }
 
-        holder.getTextView(R.id.item_ble_name).setText("场景："+item.sceneName);
+        holder.getTextView(R.id.item_ble_name).setText(context.getString(R.string.SCENE)+item.sceneName);
         holder.getTextView(R.id.item_ble_sn).setText("SN："+item.name);
         holder.getTextView(R.id.item_ble_mac).setText("MAC："+item.mac);
         //tvMac=holder.getTextView(R.id.item_ble_mac);
@@ -81,10 +81,10 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);//内部类
-                builder.setTitle("温馨提示");
-                builder.setMessage("您确定要删除此蓝牙设备吗?");
+                builder.setTitle(R.string.DLG_TIPS_TITLE);
+                builder.setMessage(R.string.DLG_BLUETOOTH_DEL);
                 //确定按钮
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(context.getString(R.string.common_confirm), new DialogInterface.OnClickListener() {
 
                     @SuppressLint("WrongConstant")
                     @Override
@@ -95,11 +95,11 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                         BluetoothDeviceAdapter.super.setData(mDevs);
                         BluetoothDeviceAdapter.super.notifyDataSetChanged();
                         //确定删除的代码
-                        Toast.makeText(context, "删除成功", 0).show();
+                        Toast.makeText(context, context.getString(R.string.delete_s), 0).show();
                     }
                 });
                 //点取消按钮
-                builder.setNegativeButton("取消", null);
+                builder.setNegativeButton(context.getString(R.string.common_cancel), null);
                 builder.show();
             }
         });
@@ -119,7 +119,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                     JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
                     Bitmap mQrCodeBmp=makeQRCode(content);
                     dialogBuild.setImage(mQrCodeBmp);
-                    dialogBuild.setDialog_msg("您正在分享蓝牙控制器-"+mCurrBleDev.sceneName);
+                    dialogBuild.setDialog_msg(context.getString(R.string.BLE_SHARING) + "-"+mCurrBleDev.sceneName);
                     JQrcodePopDialog dialog = dialogBuild.create();
                     dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
                     dialog.show();
@@ -157,7 +157,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             BluetoothLog.i(" 密码修改, onPasswordChanged：code="+ status.getSatusId() +" message=" + status.getmStatusMsg() +"\n");
             if( step==2 ) {
                 step=3;
-                Dialogs.alertDialogBtn(context, "提示", "密码修改成功！", new DialogInterface.OnClickListener() {
+                Dialogs.alertDialogBtn(context, context.getString(R.string.DLG_TIPS_TITLE), context.getString(R.string.DLG_PASSWD_MODIFY_SUCCESS), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         MyApplication.liteOrm.save(mCurrBleDev);
@@ -277,7 +277,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
             needCheckSTA=false;
             if(Resetted ==1 ) {
                 BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
-                Dialogs.alertDialogBtn(context, "提示", "设备已重置为出厂状态，输入新密码可重新激活本设备", new DialogInterface.OnClickListener() {
+                Dialogs.alertDialogBtn(context, context.getString(R.string.DLG_TIPS_TITLE), context.getString(R.string.BT_DEVICE_RESETED), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         oldPsw = "LKD.CN";
@@ -305,7 +305,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
         builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getString(R.string.app_name));
         builder.setMessage(text);
-        builder.setPositiveButton("确定", onClickListener);
+        builder.setPositiveButton(context.getString(R.string.common_confirm), onClickListener);
         builder.setOnCancelListener(onCancelListener);
         builder.show();
     }
@@ -343,7 +343,7 @@ public class BluetoothDeviceAdapter extends BaseRecyclerAdapter<Bluetooth> {
                     mWaitDialog.show();
 
                 }else{
-                    this.mMessages.setText("两次密码输入不正确！");
+                    this.mMessages.setText(context.getString(R.string.user_change_password_error_passwnotequal));
                     this.mMessages.setVisibility(View.VISIBLE);
                     return false;
                 }

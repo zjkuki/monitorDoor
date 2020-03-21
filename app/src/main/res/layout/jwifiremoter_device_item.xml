@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:lines="1"
-                android:text="场景："
+                android:text="@string/SCENE"
                 android:textColor="@color/record_alarm_color"
                 android:textSize="14sp" />
 

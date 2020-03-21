@@ -245,16 +245,16 @@ public class ExpandAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
     private List<com.janady.view.popmenu.MenuItem> getMenuList() {
         List<com.janady.view.popmenu.MenuItem> list = new ArrayList<>();
-        list.add(new com.janady.view.popmenu.MenuItem(1, "修改名称"));
-        list.add(new com.janady.view.popmenu.MenuItem(2, "删除设备"));
+        list.add(new com.janady.view.popmenu.MenuItem(1, context.getString(R.string.DLG_RENAME)));
+        list.add(new com.janady.view.popmenu.MenuItem(2, context.getString(R.string.DLG_DEVICE_DEL)));
         return list;
     }
     //----------------原生弹窗
     private PopupMenu createItemPopMenu(View itemView){
         PopupMenu popupMenu = new PopupMenu(context, itemView);
         Menu menu = popupMenu.getMenu();
-        menu.add(0,1,0,"修改名称");
-        menu.add(0,2,0,"删除设备");
+        menu.add(0,1,0,context.getString(R.string.DLG_RENAME));
+        menu.add(0,2,0,context.getString(R.string.DLG_DEVICE_DEL));
 
         // 监听事件
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

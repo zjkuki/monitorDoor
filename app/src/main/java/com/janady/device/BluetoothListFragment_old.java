@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class BluetoothListFragment_old extends JBaseGroupedListFragment {
     @Override
     protected String title() {
-        return "我的蓝牙设备";
+        return getString(R.string.MY_BT);
     }
 
     @Override

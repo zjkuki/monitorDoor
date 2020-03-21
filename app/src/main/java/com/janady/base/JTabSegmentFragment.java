@@ -80,7 +80,7 @@ public class JTabSegmentFragment extends JBaseFragment {
             }
         });
 
-        mTopBar.setTitle("添加设备");
+        mTopBar.setTitle(R.string.guide_module_title_device_add);
     }
     @Override
     protected View onCreateView() {
@@ -109,8 +109,8 @@ public class JTabSegmentFragment extends JBaseFragment {
     private void initTabAndPager() {
         mContentViewPager.setAdapter(mPagerAdapter);
         mContentViewPager.setCurrentItem(mDestPage.getPosition(), false);
-        mTabSegment.addTab(new QMUITabSegment.Tab("设备类型"));
-        mTabSegment.addTab(new QMUITabSegment.Tab("WIFI配置"));
+        mTabSegment.addTab(new QMUITabSegment.Tab(getString(R.string.DEVICE_TYPE)));
+        mTabSegment.addTab(new QMUITabSegment.Tab(getString(R.string.ap_to_wifi)));
         mTabSegment.setupWithViewPager(mContentViewPager, false);
         mTabSegment.setMode(QMUITabSegment.MODE_FIXED);
         mTabSegment.setHasIndicator(true);
@@ -151,7 +151,7 @@ public class JTabSegmentFragment extends JBaseFragment {
                         //.setTitle("Section 1: 默认提供的样式")
                         //.setDescription("Section 1 的描述")
                         .setLeftIconSize(size, ViewGroup.LayoutParams.WRAP_CONTENT);
-                List<CategoryItemDescription> list = DataManager.getInstance().showCategoryDesciptions();
+                List<CategoryItemDescription> list = DataManager.getInstance(getContext()).showCategoryDesciptions();
                 for (final CategoryItemDescription item : list) {
                     QMUICommonListItemView normalItem = mGroupListView.createItemView(
                             ContextCompat.getDrawable(getContext(), item.getIconRes()),

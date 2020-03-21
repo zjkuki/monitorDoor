@@ -571,7 +571,7 @@ public class WifiRemoterBoardActivity
 
 		mSplitView = findViewById(R.id.splitView);
 		mCbDoubleTalk = findViewById(R.id.cb_double_talk_switch);
-		mCbDoubleTalk.setChecked(true);
+		mCbDoubleTalk.setChecked(false); //false-半双工  true-全双工
 		mCbDoubleTalk.setVisibility(View.GONE);
 
 
@@ -1127,7 +1127,7 @@ public class WifiRemoterBoardActivity
 					e.printStackTrace();
 				}
 			}else {
-				alertDialog("密码错误，请重新输入正确的密码！", new DialogInterface.OnClickListener() {
+				alertDialog(getString(R.string.DLG_PASSWD_ERR_REENTER), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						showWifiInputPasswordDialog();
@@ -1203,7 +1203,7 @@ public class WifiRemoterBoardActivity
 		mFunVideoView.clearVideo();
 		FunDevice fundev= null;
 
-		mTextTitle.setText("实时预览");
+		mTextTitle.setText(R.string.RT_PREVIEW);
 
 		for (int i = 0; i < cam_count; i++) {
 			View v = gridview.findViewWithTag(i);
@@ -1531,7 +1531,7 @@ public class WifiRemoterBoardActivity
 							showCamera(0,"","");
 						}
 					}else{
-						Dialogs.alertDialogBtn(mContext, "打开摄像机失败", "此设备还未绑定摄像机，马上进行摄像机绑定吗？", new DialogInterface.OnClickListener() {
+						Dialogs.alertDialogBtn(mContext, getString(R.string.DLG_CAMERA_OPEN_FAIL_TITLE), getString(R.string.DLG_CAMERA_EMPTY), new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								selectCamera();
@@ -1600,7 +1600,7 @@ public class WifiRemoterBoardActivity
 	private void changePrevCamera(){
 		currIndex --;
 		if(currIndex<0){
-			showToast("已是第一个摄像机！");
+			showToast(R.string.CAMERA_FIRST);
 			currIndex=0;
 			return;
 		}
@@ -1624,7 +1624,7 @@ public class WifiRemoterBoardActivity
 		currIndex ++;
 		//if(currIndex > cams.size()-1){
 		if(currIndex > mWifiRemoter.cameras.size()-1){
-			showToast("已是最后一个摄像机！");
+			showToast(R.string.CAMERA_LAST);
 			//currIndex =cams.size()-1;
 			currIndex = mWifiRemoter.cameras.size()-1;
 			return;
@@ -1650,7 +1650,7 @@ public class WifiRemoterBoardActivity
 		final String[] doorName = {""};
 
 		if(mWifiRemoter.doorList!=null && mWifiRemoter.doorList.size()==5){
-			Dialogs.alertDialogBtn(mContext, "失败", "当前遥控器已经" + maxDoorLimit + "个，达到最大数量，无法继续添加", new DialogInterface.OnClickListener() {
+			Dialogs.alertDialogBtn(mContext, getString(R.string.DLG_FAIL_TITLE), String.format(getString(R.string.DLG_REMOTER_MAXLIMIT), maxDoorLimit), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					return;
@@ -1664,9 +1664,9 @@ public class WifiRemoterBoardActivity
 		}else {
 
 			final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
-					.setTitle("请输入遥控器的名称")
+					.setTitle(getString(R.string.DLG_REMOTER_NEWNAME))
 					.setEditText("");
-			myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+			myAlertInputDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Log.d(TAG, myAlertInputDialog.getResult());
@@ -1702,7 +1702,7 @@ public class WifiRemoterBoardActivity
 					}
 					myAlertInputDialog.dismiss();
 				}
-			}).setNegativeButton("取消", new View.OnClickListener() {
+			}).setNegativeButton(getString(R.string.common_cancel), new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					Log.d(TAG, "取消");
@@ -1715,7 +1715,7 @@ public class WifiRemoterBoardActivity
 
 	private void EditDoor(){
 	    if(mTabDoors.getTabCount()<=0){
-            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+            Dialogs.alertDialog2Btn(mContext, getString(R.string.DLG_TIPS_TITLE), getString(R.string.DLG_REMOTER_EMPTY), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     AddDoor();
@@ -1732,9 +1732,9 @@ public class WifiRemoterBoardActivity
 		final String[] doorName = {mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition()).name};
 
 		final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mContext).builder()
-				.setTitle("请输入新的遥控器的名称")
+				.setTitle(getString(R.string.DLG_REMOTER_NEWNAME))
 				.setEditText(doorName[0]);
-		myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+		myAlertInputDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.d(TAG, myAlertInputDialog.getResult());
@@ -1748,7 +1748,7 @@ public class WifiRemoterBoardActivity
 				}
 				myAlertInputDialog.dismiss();
 			}
-		}).setNegativeButton("取消", new View.OnClickListener() {
+		}).setNegativeButton(getString(R.string.common_cancel), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "取消");
@@ -1760,7 +1760,7 @@ public class WifiRemoterBoardActivity
 
 	private void RemoveDoor(){
         if(mTabDoors.getTabCount()<=0){
-            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+            Dialogs.alertDialog2Btn(mContext, getString(R.string.DLG_TIPS_TITLE), getString(R.string.DLG_REMOTER_EMPTY), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     AddDoor();
@@ -1777,9 +1777,9 @@ public class WifiRemoterBoardActivity
 		final Door door = mWifiRemoter.doorList.get(mTabDoors.getSelectedTabPosition());
 
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
-				.setTitle("删除遥控器")
-				.setMsg("确定删除【"+door.name+"】遥控器吗？");
-		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
+				.setTitle(getString(R.string.DLG_REMOTER_DEL_TITLE))
+				.setMsg(String.format(getString(R.string.DLG_REMOTER_DEL_BY_NO), door.name));
+		myAlertDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mWifiRemoter.doorList.remove(mTabDoors.getSelectedTabPosition());
@@ -1798,10 +1798,10 @@ public class WifiRemoterBoardActivity
 					}
 				}
 			}
-		}).setNegativeButton("取消", new View.OnClickListener() {
+		}).setNegativeButton(getString(R.string.common_cancel), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.d(TAG, "取消");
+				Log.d(TAG, getString(R.string.common_cancel));
 			}
 		});
 		myAlertDialog.show();
@@ -1809,7 +1809,7 @@ public class WifiRemoterBoardActivity
 
 	private void RemoveAllDoor(){
         if(mTabDoors.getTabCount()<=0){
-            Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+            Dialogs.alertDialog2Btn(mContext, getString(R.string.DLG_TIPS_TITLE), getString(R.string.DLG_REMOTER_EMPTY), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     AddDoor();
@@ -1824,9 +1824,9 @@ public class WifiRemoterBoardActivity
         }
 
 		final MyAlertDialog myAlertDialog = new MyAlertDialog(mContext).builder()
-				.setTitle("删除遥控器")
-				.setMsg("确定删除所有遥控器吗？");
-		myAlertDialog.setPositiveButton("确认", new View.OnClickListener() {
+				.setTitle(getString(R.string.DLG_REMOTER_DEL_TITLE))
+				.setMsg(getString(R.string.DLG_REMOTER_DEL));
+		myAlertDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				int i=mWifiRemoter.doorList.size()-1;
@@ -1841,7 +1841,7 @@ public class WifiRemoterBoardActivity
 				MyApplication.liteOrm.cascade().save(mWifiRemoter);
                 sleep(300);
 			}
-		}).setNegativeButton("取消", new View.OnClickListener() {
+		}).setNegativeButton(getString(R.string.common_cancel), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.d(TAG, "取消");
@@ -2114,7 +2114,7 @@ public class WifiRemoterBoardActivity
 							intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 							startActivity(intent);
 						}else{
-							Dialogs.alertDialog2Btn(mContext, "提示", "您还没有添加遥控，马上添加遥控吗？", new DialogInterface.OnClickListener() {
+							Dialogs.alertDialog2Btn(mContext, getString(R.string.DLG_TIPS_TITLE), getString(R.string.DLG_REMOTER_EMPTY), new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
 									AddDoor();
@@ -2569,7 +2569,7 @@ public class WifiRemoterBoardActivity
                     }*/
                 }
 
-                Dialogs.alertDialogBtn(mContext, "密码错误", "请输入正确的密码", new DialogInterface.OnClickListener() {
+                Dialogs.alertDialogBtn(mContext, getString(R.string.DLG_PASSWD_ERR_TITLE), getString(R.string.DLG_PASSWD_ERR_REENTER), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         return;
@@ -3175,8 +3175,8 @@ public class WifiRemoterBoardActivity
 		builder.setIcon(icon);
 		//设置加载的listview
 		builder.setView(getlistview);
-		builder.setPositiveButton("确定", btnOk);
-		builder.setNegativeButton("取消", btnCancle);
+		builder.setPositiveButton(R.string.common_confirm, btnOk);
+		builder.setNegativeButton(R.string.common_cancel, btnCancle);
 		builder.create().show();
 	}
 

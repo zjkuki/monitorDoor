@@ -60,7 +60,7 @@ public class HomeDeviceController extends HomeController<CategoryItemDescription
     @Override
     protected BaseRecyclerAdapter<CategoryItemDescription> getItemAdapter() {
         if (mItemAdapter == null) {
-            List<CategoryItemDescription> list = DataManager.getInstance().getCategoryDesciptions();
+            List<CategoryItemDescription> list = DataManager.getInstance(getContext()).getCategoryDesciptions();
             mFunDeviceslist = list;
             mItemAdapter = new CategoryItemAdapter(getContext(), list);
         }

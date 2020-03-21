@@ -78,7 +78,7 @@ public class CameraListFragment extends JBaseFragment {
         return rootView;
     }
     private void initTopBar() {
-        mTopBar.setTitle("我的摄像机");
+        mTopBar.setTitle(R.string.MY_CAMERA);
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

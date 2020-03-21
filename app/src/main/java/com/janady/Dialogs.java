@@ -62,7 +62,7 @@ public class Dialogs {
         alert = builder.setIcon(R.drawable.xmjp_camera)
                 .setTitle(title)
                 .setMessage(content)
-                .setPositiveButton("确定", btnOk)
+                .setPositiveButton(context.getString(R.string.common_confirm), btnOk)
                 .setOnCancelListener(onCancle)
                 .create();
         alert.show();
@@ -75,8 +75,8 @@ public class Dialogs {
         alert = builder.setIcon(R.drawable.xmjp_camera)
                 .setTitle(title)
                 .setMessage(content)
-                .setNegativeButton("取消", btnCancle)
-                .setPositiveButton("确定", btnOk)
+                .setNegativeButton(context.getString(R.string.common_cancel), btnCancle)
+                .setPositiveButton(context.getString(R.string.common_confirm), btnOk)
                 .create();
         alert.show();
     }
@@ -88,8 +88,8 @@ public class Dialogs {
         alert = builder.setIcon(R.drawable.xmjp_camera)
                 .setTitle(title)
                 .setMessage(content)
-                .setNegativeButton("取消", btnCancle)
-                .setPositiveButton("确定", btnOk)
+                .setNegativeButton(context.getString(R.string.common_cancel), btnCancle)
+                .setPositiveButton(context.getString(R.string.common_confirm), btnOk)
                 .setNeutralButton(btnCustomerText, btnCustomerClick).create();             //创建AlertDialog对象
         alert.show();
     }
@@ -116,7 +116,7 @@ public class Dialogs {
         alert = builder.setIcon(icon)
                 .setTitle(title)
                 .setSingleChoiceItems(list, defaultIndex, selectedClick)
-                .setPositiveButton("确定", positviteClick)
+                .setPositiveButton(context.getString(R.string.common_confirm), positviteClick)
                 .create();
         alert.show();
     }
@@ -125,14 +125,14 @@ public class Dialogs {
         final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(context).builder()
                 .setTitle(title)
                 .setEditText("");
-        myAlertInputDialog.setPositiveButton("确认", onOkClickListener
+        myAlertInputDialog.setPositiveButton(context.getString(R.string.common_confirm), onOkClickListener
                 /*new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMsg(myAlertInputDialog.getResult());
                 myAlertInputDialog.dismiss();
             }
-        }*/).setNegativeButton("取消", onCancleClickListener
+        }*/).setNegativeButton(context.getString(R.string.common_cancel), onCancleClickListener
                 /*new View.OnClickListener() {
             @Override
             public void onClick(View v) {

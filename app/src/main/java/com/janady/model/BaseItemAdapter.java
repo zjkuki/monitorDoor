@@ -66,18 +66,18 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
 
         RoundRect roundRect = new RoundRect(100,100,10);
 
-        String stat = "未就绪";
+        String stat = context.getString(R.string.REDAY);
         int textColor= Color.BLACK;
         Bitmap photo = null;
         //if(item.getDemoClass()== BluetoothOperatorFragment.class) {
         if(item.getDemoClass()== BluetoothLockFragment.class) {
             if(item.getEnable()) {
-                stat = "在线";
+                stat = context.getString(R.string.ONLINE);
                 textColor = 0xFF00bfa5;
                 photo = roundRect.toRoundRect(context, R.drawable.btlocker3);
 
             }else{
-                stat = "离线";
+                stat = context.getString(R.string.OFFLINE);
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.btlocker3_disable);
             }
@@ -89,10 +89,12 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         if(item.getDemoClass()== WifiRemoterBoardFragment.class) {
             if (item.getEnable()) {
                 textColor = 0xFF00bfa5;
-                stat = "在线";
+                stat = context.getString(R.string.ONLINE);
+                //stat = "在线";
                 photo = roundRect.toRoundRect(context, R.drawable.wifiremote);
             } else {
-                stat = "离线";
+                stat = context.getString(R.string.OFFLINE);
+                //stat = "离线";
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.wifiremote_disable);
             }
@@ -101,10 +103,12 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
         if(item.getDemoClass()== DeviceCameraFragment.class){
             if(item.getEnable()) {
                 textColor = 0xFF00bfa5;
-                stat = "在线";
+                stat = context.getString(R.string.ONLINE);
+                //stat = "在线";
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera);
             }else{
-                stat = "离线";
+                stat = context.getString(R.string.OFFLINE);
+                //stat = "离线";
                 textColor = Color.RED;
                 photo = roundRect.toRoundRect(context, R.drawable.xmjp_camera_disable);
             }
@@ -209,7 +213,8 @@ public class BaseItemAdapter extends BaseRecyclerAdapter<ItemDescription> {
 
         final RoundRect roundRect = new RoundRect(100,100,10);
 
-        final String[] stat = {"未就绪"};
+        //final String[] stat = {"未就绪"};
+        final String[] stat = {context.getString(R.string.REDAY)};
         final int[] textColor = {Color.BLACK};
         final Bitmap[] photo = {null};
 

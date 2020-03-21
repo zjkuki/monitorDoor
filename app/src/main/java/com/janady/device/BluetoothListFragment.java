@@ -78,7 +78,7 @@ public class BluetoothListFragment extends JBaseFragment {
         return rootView;
     }
     private void initTopBar() {
-        mTopBar.setTitle("我的蓝牙设备");
+        mTopBar.setTitle(R.string.MY_BT);
         mTopBar.addLeftBackImageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

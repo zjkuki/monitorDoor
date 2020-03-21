@@ -5,7 +5,7 @@
         android:id="@+id/menu_main"
         android:checked="true"
         android:icon="@drawable/ic_device_hub_black_32dp"
-        android:title="快速分享" />
+        android:title="@string/QUICK_SHARE" />
 
     <!--因为需要覆盖view 此处省略android:icon-->
     <item
@@ -15,7 +15,7 @@
     <item
         android:id="@+id/menu_me"
         android:icon="@drawable/ic_room"
-        android:title="注销登录" />
+        android:title="@string/DLG_LOGOUT_TITLE" />
 
 
 </menu>

@@ -130,7 +130,7 @@
                     android:layout_toRightOf="@id/wifiDevicesIcon"
                     android:background="#00000000"
                     android:checked="true"
-                    android:text="摄像机"
+                    android:text="@string/CAMERA"
                     android:textColor="#ff101010"
                     android:textColorHint="#ffe0e0e0"
                     android:textSize="18sp" />
@@ -144,7 +144,7 @@
                     android:layout_toRightOf="@id/wifiDevicesIcon"
                     android:background="#00000000"
                     android:checked="false"
-                    android:text="WIFI控制板"
+                    android:text="@string/WIFI_REMOTER"
                     android:textColor="#ff101010"
                     android:textColorHint="#ffe0e0e0"
                     android:textSize="18sp" />

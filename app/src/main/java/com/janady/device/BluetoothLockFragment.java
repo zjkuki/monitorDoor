@@ -37,7 +37,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
     private static final String BleService = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     private static final String BleNotifitesCharacter = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     private static final String BleWriteCharacter = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-    public String title = "我的蓝牙设备";
+    public String title = getString(R.string.MY_BT);
     public BleLocker bleLocker;
     public boolean isDebugViewOpen = false;
     private com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton searchBtn;
@@ -120,9 +120,9 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         mBtnBack.setOnClickListener(this);
 
         mTextTitle = root.findViewById(R.id.textViewInTopLayout);
-        mTextTitle.setText(title + " - 等待连接");
+        mTextTitle.setText(title + " - "+getString(R.string.WAITING_CONN));
 
-        mTopBar.setTitle(title + " - 等待连接");
+        mTopBar.setTitle(title  + " - "+getString(R.string.WAITING_CONN));
 
         showWaitDialog();
         countDownTimer = new CountDownTimer(10000, 1000) {
@@ -134,7 +134,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             }
 
             public void onFinish() {
-                Dialogs.alertDialog2Btn(getContext(), "蓝牙连接失败", "设备无法连接，是否要重新连接呢？", new DialogInterface.OnClickListener() {
+                Dialogs.alertDialog2Btn(getContext(), getString(R.string.BT_DEV_CONN_FAILED), getString(R.string.DLG_DEVICE_RECONNECT), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         showWaitDialog();
@@ -271,12 +271,12 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             openBtn.setTextColor(Color.GRAY);
             closeBtn.setTextColor(Color.GRAY);
             lockBtn.setTextColor(Color.GRAY);
-            stopBtn.setText("开锁");
+            stopBtn.setText(R.string.BTN_UNLOCK);
         }else{
             openBtn.setTextColor(stopBtn.getTextColors());
             closeBtn.setTextColor(stopBtn.getTextColors());
             lockBtn.setTextColor(stopBtn.getTextColors());
-            stopBtn.setText("停");
+            stopBtn.setText(R.string.BTN_STOP);
         }
 
     }
@@ -296,7 +296,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onSearchStarted() {
 
-            searchBtn.setText("停止扫描");
+            searchBtn.setText(R.string.STOP_SCAN_DEVICE);
             isScanning = true;
 
        }
@@ -316,14 +316,14 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         public void onSearchStopped() {
 
             isScanning = true;
-            searchBtn.setText("扫描设备");
+            searchBtn.setText(R.string.SCAN_DEVICE);
             //toolbar.setTitle(R.string.devices);
         }
 
         @Override
         public void onSearchCanceled() {
 
-            searchBtn.setText("扫描设备");
+            searchBtn.setText(R.string.SCAN_DEVICE);
             //toolbar.setTitle(R.string.devices);
         }
     };
@@ -337,16 +337,16 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onClosed(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onClose：" + status.getmStatusMsg());}
-            mTextTitle.setText(title + " - 关门");
-            mTopBar.setTitle(title + " - 关门");
+            mTextTitle.setText(title + " - "+getString(R.string.CLOSE_OK));
+            mTopBar.setTitle(title + " - "+getString(R.string.CLOSE_OK));
 
         }
 
         @Override
         public void onStoped(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onStop：" + status.getmStatusMsg());}
-            mTextTitle.setText(title + " - 停止");
-            mTopBar.setTitle(title + " - 停止");
+            mTextTitle.setText(title + " - "+getString(R.string.STOP_OK));
+            mTopBar.setTitle(title + " - "+getString(R.string.STOP_OK));
         }
 
         @Override
@@ -354,12 +354,12 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             if(status==BleLockerStatus.LOCKED){
                 isLocked = true;
                 imgLockStat.setImageResource(R.drawable.ic_locked);
-                tvLockStat.setText("有锁");
-                mTextTitle.setText(title + " - 有锁");
-                mTopBar.setTitle(title + " - 有锁");
+                tvLockStat.setText(R.string.LOCKED);
+                mTextTitle.setText(title + " - "+getString(R.string.LOCKED));
+                mTopBar.setTitle(title + " - "+getString(R.string.LOCKED));
             }else{
                 imgLockStat.setImageResource(R.drawable.ic_unlocked);
-                tvLockStat.setText("无锁");
+                tvLockStat.setText(R.string.UNLOCKED);
                 isLocked = false;
             }
 
@@ -370,8 +370,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
         @Override
         public void onOpened(Bluetooth bluetooth, BleLockerStatus status) {
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "..\n   onOpen：" + status.getmStatusMsg());}
-            mTextTitle.setText(title + " - 开门操作");
-            mTopBar.setTitle(title + " - 开门操作");
+            mTextTitle.setText(title + " - "+getString(R.string.OPEN_OK));
+            mTopBar.setTitle(title + " - "+getString(R.string.OPEN_OK));
         }
 
         @Override
@@ -392,8 +392,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
             if(status == BleLockerStatus.REDAY){
                 hideWaitDialog();
-                mTextTitle.setText(title + " - 已连接");
-                mTopBar.setTitle(title + " - 已连接");
+                mTextTitle.setText(title + " - "+getString(R.string.CONNECTED));
+                mTopBar.setTitle(title + " - "+getString(R.string.CONNECTED));
 
                 if(countDownTimer!=null){countDownTimer.cancel();}
             }
@@ -401,8 +401,8 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
 
         @Override
         public void onConnected(Bluetooth bluetooth, BleLockerStatus status) {
-            mTextTitle.setText(title+" - 正在连接");
-            mTopBar.setTitle(title + " - 正在连接");
+            mTextTitle.setText(title+" - "+getString(R.string.CONNECTIONNING));
+            mTopBar.setTitle(title + " - "+getString(R.string.CONNECTIONNING));
             if(isDebugViewOpen){Util.AppendText(tvresult, Util.getPrintTime() + " 设备：" + bluetooth.name + "...\n   onConnected：" + status.getmStatusMsg());}
             if(status==BleLockerStatus.CONNECTED && needCheckSTA) {
                 bleLocker.sta();
@@ -445,7 +445,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle(getString(R.string.app_name));
             builder.setMessage(text);
-            builder.setPositiveButton("确定", onClickListener);
+            builder.setPositiveButton(getString(R.string.common_confirm), onClickListener);
             builder.setOnCancelListener(onCancelListener);
             builder.show();
         }
@@ -456,7 +456,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
             needCheckSTA=false;
             if(Resetted ==1 ) {
                 BluetoothLog.i(" 设备已重置，onResetted：code=" + status.getSatusId() + " message=" + status.getmStatusMsg() + "\n");
-                Dialogs.alertDialogBtn(getContext(), "提示", "设备已重置为出厂状态，输入新密码可重新激活本设备", new DialogInterface.OnClickListener() {
+                Dialogs.alertDialogBtn(getContext(), getString(R.string.DLG_TIPS_TITLE), getString(R.string.BT_DEVICE_RESETED), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         bleOldPsw = "LKD.CN";
@@ -511,7 +511,7 @@ public class BluetoothLockFragment extends JBaseFragment implements View.OnClick
                     showWaitDialog();
 
                 }else{
-                    this.mMessages.setText("两次密码输入不正确！");
+                    this.mMessages.setText(R.string.DLG_PASSWD_ERR_2);
                     this.mMessages.setVisibility(View.VISIBLE);
                     return false;
                 }

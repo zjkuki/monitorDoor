@@ -95,7 +95,7 @@ public class WifiConfigFragment extends JBaseFragment implements OnFunDeviceWiFi
         mEditWifiSSID.setText(currSSID);
         mEditWifiPasswd.setText(FunWifiPassword.getInstance().getPassword(currSSID));
 
-        tvWifiReadMe.setText("*请选择较强信号的WIFI，正确填写WIFI密码，可快速让设备联网；");
+        tvWifiReadMe.setText(R.string.WIFI_CONF_TIPS);
 
         okBtn = root.findViewById(R.id.ok_button);
         okBtn.setOnClickListener(new View.OnClickListener() {

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -16,7 +15,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +31,6 @@ import com.google.zxing.activity.CaptureActivity;
 import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
-import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.database.model.TestFragmentState;
 import com.janady.utils.HttpUtils;
 import com.janady.utils.MqttUtil;
@@ -222,13 +219,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 && resultCode == RESULT_OK) {
             // Demo, 扫描二维码的结果
             if (null != data) {
-                Dialogs.alertMessage(getContext(), "扫描结果", data.toString());
+                Dialogs.alertMessage(getContext(), getString(R.string.SCAN_DALG_TITLE), data.toString());
             }
         }
     }
 
     private void initTopBar() {
-        mTopBar.setTitle("我的所有设备");
+        mTopBar.setTitle(R.string.main_title);
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -258,11 +255,11 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
 
         if(testFragmentState!=null){
-            DataManager.getInstance().testFragmentState = testFragmentState;
+            DataManager.getInstance(getContext()).testFragmentState = testFragmentState;
             MyApplication.liteOrm.delete(testFragmentState);
             testFragmentState = null;
         }
-        mainItems = DataManager.getInstance().getDescriptions();
+        mainItems = DataManager.getInstance(getContext()).getDescriptions();
         mItemAdapter = new ExpandAdapter(getContext(), mainItems);
         mItemAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mItemAdapter);
@@ -298,7 +295,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 switch (item.getItemId()) {
                     case R.id.menu_main:
                         try {
-                            Dialogs.alertDialog2Btn(getContext(), "分享提示", "本操作将分享您全部已添加的设备，您确定要继续吗？", new DialogInterface.OnClickListener() {
+                            Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_SHARE_TIPS_TITLE), getString(R.string.DLG_SHARING_TIPS), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     JSONObject json = new com.alibaba.fastjson.JSONObject();
@@ -344,7 +341,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         }
                         break;
                     case R.id.menu_me:
-                        Dialogs.alertDialog2Btn(getContext(), "注销", "您确定要注销本次登录吗？", new DialogInterface.OnClickListener() {
+                        Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_LOGOUT_TITLE), getString(R.string.DLG_LOGOUT), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (FunSupport.getInstance().logout()) {
@@ -667,9 +664,9 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     case Menu.FIRST + 0:
                         Toast.makeText(getContext(), itemDescription.getName(), Toast.LENGTH_SHORT).show();
                         final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(getContext()).builder()
-                                .setTitle("请输入新的名称")
+                                .setTitle(getString(R.string.DLG_RENAME))
                                 .setEditText(sceneName);
-                        myAlertInputDialog.setPositiveButton("确认", new View.OnClickListener() {
+                        myAlertInputDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Log.d("TF", myAlertInputDialog.getResult());
@@ -700,7 +697,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
                                 myAlertInputDialog.dismiss();
                             }
-                        }).setNegativeButton("取消", new View.OnClickListener() {
+                        }).setNegativeButton(getString(R.string.common_cancel), new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 Log.d("TF", "取消");
@@ -712,10 +709,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         break;
                     case Menu.FIRST + 1:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());//内部类
-                        builder.setTitle("温馨提示");
-                        builder.setMessage("您确定要删除此设备吗?");
+                        builder.setTitle(getString(R.string.DLG_REMINDER_TITLE));
+                        builder.setMessage(getString(R.string.DLG_REMINDER_DELETE));
                         //确定按钮
-                        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton(getString(R.string.common_confirm), new DialogInterface.OnClickListener() {
 
                             @SuppressLint("WrongConstant")
                             @Override
@@ -746,7 +743,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                             }
                         });
                         //点取消按钮
-                        builder.setNegativeButton("取消", null);
+                        builder.setNegativeButton(getString(R.string.common_cancel), null);
                         builder.show();
 
                         break;
@@ -763,8 +760,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private List<com.janady.view.popmenu.MenuItem> getMenuList() {
         List<com.janady.view.popmenu.MenuItem> list = new ArrayList<>();
-        list.add(new com.janady.view.popmenu.MenuItem(1, "修改名称"));
-        list.add(new com.janady.view.popmenu.MenuItem(2, "删除设备"));
+        list.add(new com.janady.view.popmenu.MenuItem(1, getString(R.string.DLG_RENAME_TITLE)));
+        list.add(new com.janady.view.popmenu.MenuItem(2, getString(R.string.device_opt_remove_by_user)));
         return list;
     }
 
@@ -909,12 +906,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             public void run(){
                 if(dropPopMenu!=null){dropPopMenu.dismiss();}
 
-                DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
-                DataManager.getInstance().mBleDevices = mBleDevices;
+                DataManager.getInstance(getContext()).mFunDevices = FunSupport.getInstance().getDeviceList();
+                DataManager.getInstance(getContext()).mBleDevices = mBleDevices;
                 mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
-                DataManager.getInstance().mWifiRemoters = mWifiRemoters;
+                DataManager.getInstance(getContext()).mWifiRemoters = mWifiRemoters;
 
-                mainItems = DataManager.getInstance().getDescriptions();
+                mainItems = DataManager.getInstance(getContext()).getDescriptions();
                 mItemAdapter.setData(mainItems);
                 mItemAdapter.notifyDataSetChanged();
             }
@@ -1191,7 +1188,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 toMsgClientId = json.getString("to");
                 mqttaction = json.getString("action");
                 if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestDatas")){
-                    data = DataManager.getInstance().getAllDevices2FastJson();
+                    data = DataManager.getInstance(getContext()).getAllDevices2FastJson();
                     json.put("action","responsedDevicesDatas");
                     json.put("data", data);
                     mqttUtil.publish(json.toJSONString());

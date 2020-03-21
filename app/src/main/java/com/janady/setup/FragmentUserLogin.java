@@ -84,7 +84,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
         mEditPassWord.setText(FunSupport.getInstance().getSavedPassword());
 
         if(!MyApplication.networkConnected){
-            Toast.makeText(MyApplication.context,"请先连接网络",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyApplication.context,getString(R.string.NO_NETWORK),Toast.LENGTH_SHORT).show();
         }
         // 用户相关的操作,必须切换网络访问方式
         FunSupport.getInstance().setLoginType(FunLoginType.LOGIN_BY_INTENTT);
@@ -271,7 +271,7 @@ public class FragmentUserLogin extends JBaseFragment implements View.OnClickList
     @Override
     public void onLoginFailed(Integer errCode) {
         hideWaitDialog();
-        Dialogs.alertMessage(getContext(), "登录失败", FunError.getErrorStr(errCode));
+        Dialogs.alertMessage(getContext(), getString(R.string.user_register_login_fail), FunError.getErrorStr(errCode));
         showToast(FunError.getErrorStr(errCode));
     }
 

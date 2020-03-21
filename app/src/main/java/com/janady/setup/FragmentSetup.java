@@ -54,7 +54,7 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
     public void onStart() {
         super.onStart();
 
-        setupContent.setText("正在初始化设备，请稍候...");
+        setupContent.setText(R.string.app_init);
         //FunSupport.getInstance().requestDeviceList();
         FunSupport.getInstance().requestLanDeviceList();
 
@@ -76,7 +76,7 @@ public class FragmentSetup extends QMUIFragment implements OnFunLoginListener {
             switch(msg.what) {
                 case MESSAGE_ENTER_MAINMENU:
                 {
-                    setupContent.setText("登录中...");
+                    setupContent.setText(R.string.app_loginning);
                     if ( !FunSupport.getInstance().getAutoLogin()
                             || !FunSupport.getInstance().loginByLastUser() ) {
                         // 之前没有账号成功登录或者没有设置为自动登录,结束登录流程

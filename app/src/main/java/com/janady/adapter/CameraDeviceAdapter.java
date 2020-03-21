@@ -56,15 +56,15 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
         }else{
             return;
         }
-        holder.getTextView(R.id.item_name).setText("场景："+item.sceneName);
+        holder.getTextView(R.id.item_name).setText(context.getString(R.string.SCENE)+item.sceneName);
         holder.getTextView(R.id.item_sn).setText("SN："+item.name);
 
         if(mCurrCamDev.isOnline){
-            holder.getTextView(R.id.item_status).setText("在线");
+            holder.getTextView(R.id.item_status).setText(context.getString(R.string.ONLINE));
             holder.getTextView(R.id.item_status).setTextColor(Color.BLUE);
         }else{
             holder.getTextView(R.id.item_status).setTextColor(Color.RED);
-            holder.getTextView(R.id.item_status).setText("离线");
+            holder.getTextView(R.id.item_status).setText(context.getString(R.string.OFFLINE));
         }
         ImageView iv = holder.getImageView(R.id.cover);
         String path = FunPath.getCoverPath(item.sn);
@@ -98,10 +98,10 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);//内部类
-                builder.setTitle("温馨提示");
-                builder.setMessage("您确定要删除此摄像机吗?");
+                builder.setTitle(R.string.DLG_TIPS_TITLE);
+                builder.setMessage(R.string.DLG_CAMERA_DEL);
                 //确定按钮
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(context.getString(R.string.common_confirm), new DialogInterface.OnClickListener() {
 
                     @SuppressLint("WrongConstant")
                     @Override
@@ -112,11 +112,11 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
                         CameraDeviceAdapter.super.setData(mDevs);
                         CameraDeviceAdapter.super.notifyDataSetChanged();
                         //确定删除的代码
-                        Toast.makeText(context, "删除成功", 0).show();
+                        Toast.makeText(context, context.getString(R.string.delete_s), 0).show();
                     }
                 });
                 //点取消按钮
-                builder.setNegativeButton("取消", null);
+                builder.setNegativeButton(context.getString(R.string.common_cancel), null);
                 builder.show();
             }
         });
@@ -138,7 +138,7 @@ public class CameraDeviceAdapter extends BaseRecyclerAdapter<Camera> {
                     JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(context);
                     Bitmap mQrCodeBmp=makeQRCode(content);
                     dialogBuild.setImage(mQrCodeBmp);
-                    dialogBuild.setDialog_msg("您正在分享摄像机-"+mDevs.get(position).sceneName);
+                    dialogBuild.setDialog_msg(context.getString(R.string.CAMERA_SHARE)+"-"+mDevs.get(position).sceneName);
                     JQrcodePopDialog dialog = dialogBuild.create();
                     dialog.setCanceledOnTouchOutside(true);// 点击外部区域关闭
                     dialog.show();

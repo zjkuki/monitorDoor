@@ -24,7 +24,7 @@ public class JQrcodePopDialog extends Dialog {
     public static class Builder {
         private Context context;
         private Bitmap image;
-        private String dialog_msg = "请使用本APP扫描设备分享二维码" ;
+        private String dialog_msg = context.getString(R.string.DLG_QR_SHARE) ;
 
         public Builder(Context context) {
             this.context = context;

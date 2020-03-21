@@ -33,7 +33,7 @@ public class WifiRemoterBoardFragment extends JBaseFragment implements View.OnCl
     private static final String BleService = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     private static final String BleNotifitesCharacter = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
     private static final String BleWriteCharacter = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-    public String title = "我的远程控制器";
+    public String title = getString(R.string.MY_REMOTER);
     public BleLocker bleLocker;
     public boolean isDebugViewOpen = false;
     private com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButton searchBtn;

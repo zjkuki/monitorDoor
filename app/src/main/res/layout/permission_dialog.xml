@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:text="在设置-应用-超级看看-权限"
+            android:text="在设置-应用-MonitorDoor-权限"
             android:textColor="@android:color/white" />
 
         <LinearLayout

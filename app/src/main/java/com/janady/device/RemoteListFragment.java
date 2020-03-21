@@ -72,7 +72,7 @@ public class RemoteListFragment extends JBaseFragment {
         return rootView;
     }
     private void initTopBar() {
-        mTopBar.setTitle("我的远程控制设备");
+        mTopBar.setTitle(R.string.MY_REMOTER);
         mTopBar.addRightImageButton(R.drawable.ic_topbar_add, R.id.topbar_add_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
