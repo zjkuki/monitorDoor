@@ -459,7 +459,7 @@
         <activity android:name="com.example.funsdkdemo.devices.settings.ActivityOneKeyMaskVideo" />
 
         <service
-            android:name=".services.LocationService"
+            android:name="com.janady.services.LocationService"
             android:exported="false">
             <intent-filter android:priority="1000">
 
@@ -480,25 +480,11 @@
         <!-- meta-data需要写在application中 -->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="dEAIGjqcFlEpGl8TVbYCunzaiDVbVInQ" /> <!-- http://lbsyun.baidu.com/apiconsole/key -->
-        <service
-            android:name=".services.FlashAirScannerService"
-            android:exported="false">
-            <intent-filter android:priority="1000">
+            android:value="DwvtuGTE0O567AwF2EIlvDjXGNskCYla" /> <!-- http://lbsyun.baidu.com/apiconsole/key -->
 
-                <!-- 系统启动完成后会调用 -->
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.DATE_CHANGED" />
-                <action android:name="android.intent.action.MEDIA_MOUNTED" />
-                <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="android.intent.action.ACTION_TIME_TICK" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-            </intent-filter>
-        </service>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.lkd.smartlocker.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">

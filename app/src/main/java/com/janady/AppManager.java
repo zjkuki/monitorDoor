@@ -1,5 +1,6 @@
 package com.janady;
 
+import java.util.List;
 import java.util.Stack;
 
 import android.app.Activity;
@@ -97,6 +98,14 @@ public class AppManager {
             android.os.Process.killProcess(android.os.Process.myPid());
 
         } catch (Exception e) {
+        }
+    }
+
+    public Stack<Activity> getActivitys(){
+        if(activityStack!=null){
+            return activityStack;
+        }else{
+            return null;
         }
     }
 

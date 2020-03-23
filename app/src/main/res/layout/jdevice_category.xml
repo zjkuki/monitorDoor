@@ -18,7 +18,7 @@
         app:qmui_outerNormalColor="?attr/qmui_config_color_background"
         app:qmui_showBorderOnlyBeforeL="true">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="2dp">
@@ -87,7 +87,7 @@
                 app:layout_constraintBottom_toTopOf="@id/countTv"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:textSize="8sp" />
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.qmuiteam.qmui.layout.QMUILinearLayout>
 </LinearLayout>

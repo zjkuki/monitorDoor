@@ -1,12 +1,10 @@
 package com.janady.device;
 
 import android.content.DialogInterface;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.support.v4.content.ContextCompat;
+
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -16,7 +14,6 @@ import com.example.funsdkdemo.MyApplication;
 import com.lkd.smartlocker.R;
 import com.janady.base.JBaseEditFragment;
 import com.janady.database.model.Bluetooth;
-import com.janady.database.model.Camera;
 import com.janady.database.model.Door;
 import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;

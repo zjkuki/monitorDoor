@@ -21,3 +21,6 @@
 #-renamesourcefileattribute SourceFile
 -keep public class * extends android.support.v4.**
 -keep class ccom.janady.database.model.** { *; }
+-keep class **_FragmentFinder { *; }
+-keep class com.qmuiteam.qmui.arch.record.** { *; }
+-keep class androidx.fragment.app.* { *; }

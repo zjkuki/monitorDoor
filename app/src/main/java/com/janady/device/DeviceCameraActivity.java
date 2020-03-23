@@ -10,17 +10,15 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.graphics.ColorUtils;
+import androidx.core.graphics.ColorUtils;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -57,11 +55,9 @@ import com.example.funsdkdemo.devices.monitor.ActivityGuideDevicePreview;
 import com.example.funsdkdemo.devices.playback.ActivityGuideDeviceRecordList;
 import com.example.funsdkdemo.devices.settings.ActivityGuideDeviceSetup;
 import com.example.funsdkdemo.devices.tour.view.TourActivity;
-import com.janady.Dialogs;
 import com.janady.HomeActivity;
 import com.janady.database.model.Camera;
 import com.janady.view.CustomCircle;
-import com.janady.view.RoundMenuView;
 import com.lib.EPTZCMD;
 import com.lib.FunSDK;
 import com.lib.funsdk.support.FunDevicePassword;
@@ -80,7 +76,6 @@ import com.lib.funsdk.support.utils.FileUtils;
 import com.lib.funsdk.support.utils.TalkManager;
 import com.lib.funsdk.support.widget.FunVideoView;
 import com.lib.sdk.struct.H264_DVR_FILE_DATA;
-import com.litesuits.orm.db.assit.QueryBuilder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -299,7 +294,7 @@ public class DeviceCameraActivity
 		showVideoControlBar();
 		//hideVideoControlBar();
 
-		mFunVideoView.setMediaSound(false);			//关闭本地音频
+		mFunVideoView.setMediaSound(true);			//关闭本地音频
 
 		mTalkManager = new TalkManager(mFunDevice.getDevSn(), new TalkManager.OnTalkButtonListener() {
 			@Override
@@ -517,6 +512,7 @@ public class DeviceCameraActivity
 	}
 
 
+	@SuppressLint("SourceLockedOrientationActivity")
 	@Override
 	public void onBackPressed() {
 		// 如果当前是横屏，返回时先回到竖屏
@@ -1182,6 +1178,7 @@ public class DeviceCameraActivity
 	/**
 	 * 切换视频全屏/小视频窗口(以切横竖屏切换替代)
 	 */
+	@SuppressLint("SourceLockedOrientationActivity")
 	private void switchOrientation() {
 		// 横竖屏切换
 		if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -1475,6 +1472,9 @@ public class DeviceCameraActivity
 	 */
 	private void startTalkByHalfDuplex() {
 		if (mTalkManager != null && mHandler != null && mFunVideoView != null) {
+			mBtnDevSound.setImageResource(R.drawable.icon_btn_mute_selector);
+			mFunVideoView.setMediaSound(false);
+			isMute = true;
 			mTalkManager.startTalkByHalfDuplex();
 		}
 	}
@@ -1485,6 +1485,9 @@ public class DeviceCameraActivity
 	private void stopTalkByHalfDuplex() {
 		if (mTalkManager != null && mHandler != null && mFunVideoView != null) {
 			mTalkManager.stopTalkByHalfDuplex();
+			mBtnDevSound.setImageResource(R.drawable.icon_btn_sound_selector);
+			mFunVideoView.setMediaSound(false);
+			isMute = false;
 		}
 	}
 

@@ -2,17 +2,24 @@ package com;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.Poi;
+import com.baidu.location.PoiRegion;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +39,8 @@ import com.hb.dialog.myDialog.MyAlertInputDialog;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.janady.Dialogs;
 import com.janady.database.model.TestFragmentState;
+import com.janady.services.BaiduMapUtils;
+import com.janady.services.LocationService;
 import com.janady.utils.HttpUtils;
 import com.janady.utils.MqttUtil;
 import com.janady.common.JQrcodePopDialog;
@@ -111,9 +120,13 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
     private Thread thSearchDevice;
 
+    private LocationService locationService;
+
     private MqttUtil mqttUtil = null;
     private boolean mqttAutoConnect = true;
 
+
+    private static Context mcontext = MyApplication.getContext();
 
     private String fromMsgClientId = "";
     private String toMsgClientId = "";
@@ -207,7 +220,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         initRecyclerView();
 
         CheckVersion.setDialogTheme(R.style.MyAlertDialogStyle);
-        CheckVersion.update(getContext());
+        //CheckVersion.update(getContext());
+        CheckVersion.update(mcontext);
 
         return rootView;
     }
@@ -219,7 +233,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 && resultCode == RESULT_OK) {
             // Demo, 扫描二维码的结果
             if (null != data) {
-                Dialogs.alertMessage(getContext(), getString(R.string.SCAN_DALG_TITLE), data.toString());
+                //Dialogs.alertMessage(getContext(), getString(R.string.SCAN_DALG_TITLE), data.toString());
+                Dialogs.alertMessage(mcontext, getString(R.string.SCAN_DALG_TITLE), data.toString());
             }
         }
     }
@@ -255,16 +270,18 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         }
 
         if(testFragmentState!=null){
-            DataManager.getInstance(getContext()).testFragmentState = testFragmentState;
+            DataManager.getInstance().testFragmentState = testFragmentState;
             MyApplication.liteOrm.delete(testFragmentState);
             testFragmentState = null;
         }
-        mainItems = DataManager.getInstance(getContext()).getDescriptions();
-        mItemAdapter = new ExpandAdapter(getContext(), mainItems);
+        mainItems = DataManager.getInstance().getDescriptions();
+        //mItemAdapter = new ExpandAdapter(getContext(), mainItems);
+        mItemAdapter = new ExpandAdapter(mcontext, mainItems);
         mItemAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mItemAdapter);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
-        mRecyclerView.addItemDecoration(new GridDividerItemDecoration(getContext(), 1));
+        //mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mcontext, 1));
+        mRecyclerView.addItemDecoration(new GridDividerItemDecoration(mcontext, 1));
        /* mRecyclerView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -295,7 +312,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 switch (item.getItemId()) {
                     case R.id.menu_main:
                         try {
-                            Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_SHARE_TIPS_TITLE), getString(R.string.DLG_SHARING_TIPS), new DialogInterface.OnClickListener() {
+                            Dialogs.alertDialog2Btn(mcontext, getString(R.string.DLG_SHARE_TIPS_TITLE), getString(R.string.DLG_SHARING_TIPS), new DialogInterface.OnClickListener() {
+                            //Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_SHARE_TIPS_TITLE), getString(R.string.DLG_SHARING_TIPS), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     JSONObject json = new com.alibaba.fastjson.JSONObject();
@@ -322,7 +340,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                                     //json.put("SDRT", shareDevicePublishTopic);
                                     String content = Base64.encodeToString(json.toJSONString().getBytes(), Base64.DEFAULT);
                                     //Bitmap bitmap = xxxxx;// 这里是获取图片Bitmap，也可以传入其他参数到Dialog中
-                                    JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
+                                    //JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(getContext());
+                                    JQrcodePopDialog.Builder dialogBuild = new JQrcodePopDialog.Builder(mcontext);
                                     mQrCodeBmp = makeQRCode(content);
                                     dialogBuild.setImage(mQrCodeBmp);
                                     JQrcodePopDialog jqdialog = dialogBuild.create();
@@ -341,7 +360,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         }
                         break;
                     case R.id.menu_me:
-                        Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_LOGOUT_TITLE), getString(R.string.DLG_LOGOUT), new DialogInterface.OnClickListener() {
+                        Dialogs.alertDialog2Btn(mcontext, getString(R.string.DLG_LOGOUT_TITLE), getString(R.string.DLG_LOGOUT), new DialogInterface.OnClickListener() {
+                        //Dialogs.alertDialog2Btn(getContext(), getString(R.string.DLG_LOGOUT_TITLE), getString(R.string.DLG_LOGOUT), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (FunSupport.getInstance().logout()) {
@@ -377,7 +397,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 mHandler.removeCallbacksAndMessages(null);
 
                 Intent intent = new Intent();
-                intent.setClass(getContext(), CaptureActivity.class);
+                //intent.setClass(getContext(), CaptureActivity.class);
+                intent.setClass(mcontext, CaptureActivity.class);
                 startActivityForResult(intent, 1);
             }
         });
@@ -485,7 +506,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         //}
 
         if (mqttUtil == null) {
-            mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+            //mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+            mqttUtil = new MqttUtil(mcontext, mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
         } else {
             if (mqttUtil.isConnectionLost) {
                 mqttUtil.doClientConnection();
@@ -572,7 +594,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 ((DeviceCameraFragment) fragment).setFunDevice(mFunDevice);
 
                 Intent intent = new Intent();
-                intent.setClass(getContext(), DeviceCameraActivity.class);
+                //intent.setClass(getContext(), DeviceCameraActivity.class);
+                intent.setClass(mcontext, DeviceCameraActivity.class);
                 intent.putExtra("FUN_DEVICE_ID", mFunDevice.getId());
                 intent.putExtra("FUN_DEVICE_SCENE", citem.sceneName);
                 intent.putExtra("FUN_DEVICE_SN", citem.sn);
@@ -584,7 +607,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             //if (fragment instanceof BluetoothOperatorFragment && itemDescription.getItem() instanceof Bluetooth) {
             if (fragment instanceof BluetoothLockFragment && itemDescription.getItem() instanceof Bluetooth) {
                 Bluetooth citem = (Bluetooth) itemDescription.getItem();
-                BleLocker bleLocker = new BleLocker(citem, false, 800, new BleLockerCallBack(this.getContext(), false));
+                //BleLocker bleLocker = new BleLocker(citem, false, 800, new BleLockerCallBack(this.getContext(), false));
+                BleLocker bleLocker = new BleLocker(citem, false, 800, new BleLockerCallBack(mcontext, false));
                 bleLocker.setmNoRssi(true);
 
 
@@ -600,7 +624,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 WifiRemoter citem = (WifiRemoter) itemDescription.getItem();
 
                 Intent intent = new Intent();
-                intent.setClass(getContext(), WifiRemoterBoardActivity.class);
+                //intent.setClass(getContext(), WifiRemoterBoardActivity.class);
+                intent.setClass(mcontext, WifiRemoterBoardActivity.class);
                 intent.putExtra("WIFI_DEVICE_MAC", citem.mac);
                 intent.putExtra("WIFI_DEVICE_SCENE", citem.sceneName);
                 intent.putExtra("WIFI_DEVICE_SN", citem.devName);
@@ -620,7 +645,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         //dropPopMenu.show(itemView);
         //showToast("test onItemLongClick,current item:"+itemDescription.getName());
         if(dropPopMenu!=null){dropPopMenu.dismiss();}
-        dropPopMenu = new DropPopMenu(getContext());
+        //dropPopMenu = new DropPopMenu(getContext());
+        dropPopMenu = new DropPopMenu(mcontext);
         dropPopMenu.setTriangleIndicatorViewColor(Color.WHITE);
         dropPopMenu.setBackgroundResource(R.drawable.bg_drop_pop_menu_white_shap);
         dropPopMenu.setItemTextColor(Color.BLACK);
@@ -662,8 +688,10 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
 
                 switch (menuItem.getItemId()) {
                     case Menu.FIRST + 0:
-                        Toast.makeText(getContext(), itemDescription.getName(), Toast.LENGTH_SHORT).show();
-                        final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(getContext()).builder()
+                        //Toast.makeText(getContext(), itemDescription.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mcontext, itemDescription.getName(), Toast.LENGTH_SHORT).show();
+                        //final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(getContext()).builder()
+                        final MyAlertInputDialog myAlertInputDialog = new MyAlertInputDialog(mcontext).builder()
                                 .setTitle(getString(R.string.DLG_RENAME))
                                 .setEditText(sceneName);
                         myAlertInputDialog.setPositiveButton(getString(R.string.common_confirm), new View.OnClickListener() {
@@ -708,7 +736,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                         myAlertInputDialog.show();
                         break;
                     case Menu.FIRST + 1:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());//内部类
+                        //AlertDialog.Builder builder = new AlertDialog.Builder(getContext());//内部类
+                        AlertDialog.Builder builder = new AlertDialog.Builder(mcontext);//内部类
                         builder.setTitle(getString(R.string.DLG_REMINDER_TITLE));
                         builder.setMessage(getString(R.string.DLG_REMINDER_DELETE));
                         //确定按钮
@@ -779,7 +808,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
         thSearchDevice.interrupt();
         mHandler.removeCallbacksAndMessages(null);
         JBaseFragment fragment = null;
-        Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
+        //Toast.makeText(getContext(), mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
+        Toast.makeText(mcontext, mainItemDescription.getName() + "-clicked", Toast.LENGTH_LONG).show();try {
             fragment = mainItemDescription.getDemoClass().newInstance();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -856,7 +886,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     //shareDevicePublishTopic = json.getString("SDPT");
                     //shareDeviceResponseTopic = json.getString("SDRT");
 
-                    mqttUtil =  new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic,iMqttActionListener,mqttCallback);
+                    //mqttUtil =  new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic,iMqttActionListener,mqttCallback);
+                    mqttUtil =  new MqttUtil(mcontext, mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic,iMqttActionListener,mqttCallback);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -906,12 +937,12 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
             public void run(){
                 if(dropPopMenu!=null){dropPopMenu.dismiss();}
 
-                DataManager.getInstance(getContext()).mFunDevices = FunSupport.getInstance().getDeviceList();
-                DataManager.getInstance(getContext()).mBleDevices = mBleDevices;
+                DataManager.getInstance().mFunDevices = FunSupport.getInstance().getDeviceList();
+                DataManager.getInstance().mBleDevices = mBleDevices;
                 mWifiRemoters = MyApplication.liteOrm.cascade().query(WifiRemoter.class);
-                DataManager.getInstance(getContext()).mWifiRemoters = mWifiRemoters;
+                DataManager.getInstance().mWifiRemoters = mWifiRemoters;
 
-                mainItems = DataManager.getInstance(getContext()).getDescriptions();
+                mainItems = DataManager.getInstance().getDescriptions();
                 mItemAdapter.setData(mainItems);
                 mItemAdapter.notifyDataSetChanged();
             }
@@ -1188,7 +1219,7 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                 toMsgClientId = json.getString("to");
                 mqttaction = json.getString("action");
                 if(fromMsgClientId.equals(mqttclientid) && mqttaction.equals("requestDatas")){
-                    data = DataManager.getInstance(getContext()).getAllDevices2FastJson();
+                    data = DataManager.getInstance().getAllDevices2FastJson();
                     json.put("action","responsedDevicesDatas");
                     json.put("data", data);
                     mqttUtil.publish(json.toJSONString());
@@ -1308,7 +1339,8 @@ public class TestFragment extends JBaseFragment implements ExpandAdapter.OnClick
                     if (mqttclientid == null && shareDevicePublishTopic == null && shareDeviceResponseTopic == null) {
                         return;
                     }
-                    mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+                    //mqttUtil = new MqttUtil(getContext(), mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
+                    mqttUtil = new MqttUtil(mcontext, mqttclientid, 0, shareDevicePublishTopic, shareDeviceResponseTopic, iMqttActionListener, mqttCallback);
                 }
             }catch (Exception e){
                 e.printStackTrace();

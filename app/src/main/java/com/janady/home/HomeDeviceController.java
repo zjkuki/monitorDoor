@@ -1,8 +1,8 @@
 package com.janady.home;
 
 import android.content.Context;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
@@ -10,10 +10,7 @@ import com.example.common.DialogInputPasswd;
 import com.lkd.smartlocker.R;
 import com.janady.adapter.CategoryItemAdapter;
 import com.janady.base.JTabSegmentFragment;
-import com.janady.device.AddDeviceFragment;
 import com.janady.base.BaseRecyclerAdapter;
-import com.janady.base.RecyclerViewHolder;
-import com.janady.device.DeviceCameraFragment;
 import com.janady.manager.DataManager;
 import com.janady.model.CategoryItemDescription;
 import com.janady.setup.JBaseFragment;
@@ -60,7 +57,7 @@ public class HomeDeviceController extends HomeController<CategoryItemDescription
     @Override
     protected BaseRecyclerAdapter<CategoryItemDescription> getItemAdapter() {
         if (mItemAdapter == null) {
-            List<CategoryItemDescription> list = DataManager.getInstance(getContext()).getCategoryDesciptions();
+            List<CategoryItemDescription> list = DataManager.getInstance().getCategoryDesciptions();
             mFunDeviceslist = list;
             mItemAdapter = new CategoryItemAdapter(getContext(), list);
         }

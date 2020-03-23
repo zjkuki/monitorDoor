@@ -41,7 +41,7 @@ public class DataManager {
 
     public TestFragmentState testFragmentState;
 
-    private static Context mcontext;
+    private static Context mcontext = MyApplication.getContext();;
 
     private static DataManager _sInstance;
     public static DataManager getInstance() {

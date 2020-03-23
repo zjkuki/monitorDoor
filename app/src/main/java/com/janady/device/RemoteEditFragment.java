@@ -1,7 +1,7 @@
 package com.janady.device;
 
 import android.content.DialogInterface;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;

@@ -342,7 +342,7 @@
                         android:visibility="gone"
                         />
 
-                    <android.support.design.widget.TabLayout
+                    <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tabDoors"
                         android:layout_width="270dp"
                         android:layout_height="30dp"
@@ -360,7 +360,7 @@
                         app:tabGravity="center"
                         android:layout_weight="1"
                         android:layout_gravity="center">
-                    </android.support.design.widget.TabLayout>
+                    </com.google.android.material.tabs.TabLayout>
                     <com.janady.view.CycleSelector.SelectorView
                         android:id="@+id/selector"
                         android:layout_width="0dp"

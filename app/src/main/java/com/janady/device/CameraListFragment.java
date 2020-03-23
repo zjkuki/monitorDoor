@@ -1,16 +1,12 @@
 package com.janady.device;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -18,13 +14,10 @@ import com.example.funsdkdemo.MyApplication;
 import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
 import com.janady.adapter.CameraDeviceAdapter;
-import com.janady.adapter.FunDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
-import com.janady.base.JTabSegmentFragment;
 import com.janady.database.model.Camera;
 import com.janady.setup.JBaseFragment;
-import com.lib.funsdk.support.FunSupport;
 import com.lib.funsdk.support.models.FunDevStatus;
 import com.lib.funsdk.support.models.FunDevType;
 import com.lib.funsdk.support.models.FunDevice;

@@ -4,21 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.example.funsdkdemo.MyApplication;
-import com.janady.database.model.Camera;
-import com.litesuits.orm.db.assit.QueryBuilder;
 import com.lkd.smartlocker.R;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
 import com.janady.base.RecyclerViewHolder;
-import com.janady.home.HomeDeviceController;
 import com.janady.setup.JBaseFragment;
 import com.lib.MsgContent;
 import com.lib.funsdk.support.FunPath;

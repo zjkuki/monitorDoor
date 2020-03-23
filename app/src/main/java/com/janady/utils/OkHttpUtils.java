@@ -3,7 +3,7 @@ package com.janady.utils;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.util.ArrayMap;
+import androidx.collection.ArrayMap;
 import android.widget.Toast;
 
 import com.example.funsdkdemo.MyApplication;

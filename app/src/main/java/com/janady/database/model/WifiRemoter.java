@@ -63,6 +63,10 @@ public class WifiRemoter {// 指定一对多关系
 
     public int defaultCameraIdx = 0;
 
+    public double gps_latitude = -1;  //纬度
+    public double gps_longitude = -1; // 经度
+    public String gps_locationDescribe = ""; //位置描述
+
     @Mapping(Relation.ManyToMany)
     public ArrayList<Camera> cameras;
 

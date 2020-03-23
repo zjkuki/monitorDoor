@@ -1,14 +1,20 @@
 package com.example.funsdkdemo;
 
-import android.app.Application;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Vibrator;
 
+import androidx.multidex.MultiDexApplication;
+
+import com.baidu.mapapi.CoordType;
+import com.baidu.mapapi.SDKInitializer;
 import com.example.download.XDownloadFileManager;
+import com.janady.services.LocationService;
 import com.lib.funsdk.support.FunPath;
 import com.lib.funsdk.support.FunSupport;
 import com.litesuits.orm.LiteOrm;
@@ -18,7 +24,8 @@ import com.sangbo.autoupdate.CheckVersion;
 import java.util.Date;
 
 
-public class MyApplication extends Application {
+//public class MyApplication extends Application {
+public class MyApplication extends MultiDexApplication {
 
 	public static boolean noToatsShow = false;
 	public static LiteOrm liteOrm;
@@ -27,6 +34,8 @@ public class MyApplication extends Application {
 	public static Context context;
 	public static boolean networkConnected;
 	public static String mqttClientId;
+	public static LocationService locationService;
+	public static Vibrator mVibrator;
 
 	@Override
 	public void onCreate() {
@@ -63,6 +72,13 @@ public class MyApplication extends Application {
 
 		mqttClientId = FunSupport.getInstance().getUserName()+"@"+new Date().getTime();
 
+		/***
+		 * 初始化定位sdk，建议在Application中创建
+		 */
+		locationService = new LocationService(getApplicationContext());
+		mVibrator =(Vibrator)getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
+		SDKInitializer.initialize(getApplicationContext());
+		SDKInitializer.setCoordType(CoordType.BD09LL);
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -70,6 +86,10 @@ public class MyApplication extends Application {
 
 	}
 
+	//创建一个静态的方法，以便获取context对象
+	public static Context getContext(){
+		return context;
+	}
 
 	@Override
 	public void onTerminate(){
@@ -102,7 +122,7 @@ public class MyApplication extends Application {
 	@Override
 	protected void attachBaseContext(Context base) {
 		super.attachBaseContext(base);
-		android.support.multidex.MultiDex.install(this);
+		androidx.multidex.MultiDex.install(this);
 
 	}
 

@@ -35,6 +35,9 @@ public class Bluetooth {
     public String name;
     public String sceneName;
     public boolean isOnline = true;
+    public double gps_latitude = -1;  //纬度
+    public double gps_longitude = -1; // 经度
+    public String gps_locationDescribe = ""; //位置描述
 
     @Mapping(Relation.OneToOne)
     public Door door;

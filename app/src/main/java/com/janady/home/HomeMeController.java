@@ -1,12 +1,11 @@
 package com.janady.home;
 
 import android.content.Context;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.janady.adapter.BaseItemAdapter;
 import com.janady.base.BaseRecyclerAdapter;
-import com.lib.funsdk.support.models.FunDevice;
 
 import java.util.ArrayList;
 import java.util.List;

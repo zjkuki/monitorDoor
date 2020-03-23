@@ -2,7 +2,7 @@ package com.example.funsdkdemo.devices.tour.presenter;
 
 import android.content.Context;
 import android.os.Message;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.lkd.smartlocker.R;
 import com.example.funsdkdemo.devices.tour.listener.TourContract;

@@ -1,23 +1,18 @@
 package com.janady.base;
 
 import android.content.Intent;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.util.TypedValue;
-import android.view.Gravity;
+
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
-import com.janady.device.AddDeviceFragment;
 import com.janady.device.BluetoothEditFragment;
 import com.janady.device.DeviceAddByUser;
 import com.janady.device.DeviceCameraFragment;
@@ -151,7 +146,7 @@ public class JTabSegmentFragment extends JBaseFragment {
                         //.setTitle("Section 1: 默认提供的样式")
                         //.setDescription("Section 1 的描述")
                         .setLeftIconSize(size, ViewGroup.LayoutParams.WRAP_CONTENT);
-                List<CategoryItemDescription> list = DataManager.getInstance(getContext()).showCategoryDesciptions();
+                List<CategoryItemDescription> list = DataManager.getInstance().showCategoryDesciptions();
                 for (final CategoryItemDescription item : list) {
                     QMUICommonListItemView normalItem = mGroupListView.createItemView(
                             ContextCompat.getDrawable(getContext(), item.getIconRes()),

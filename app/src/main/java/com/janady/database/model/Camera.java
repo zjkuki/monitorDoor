@@ -51,7 +51,9 @@ public class Camera {
     public String name;
     @Mapping(Relation.ManyToMany)
     public ArrayList<Door> doorList;
-
+    public double gps_latitude = -1;  //纬度
+    public double gps_longitude = -1; // 经度
+    public String gps_locationDescribe = ""; //位置描述
 
     public String toJson() {
         String json = JSON.toJSONString(this);

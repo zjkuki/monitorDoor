@@ -1,14 +1,10 @@
 package com.janady.device;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -17,11 +13,8 @@ import com.janady.HomeActivity;
 import com.janady.adapter.WifiRemoterDeviceAdapter;
 import com.janady.database.model.WifiRemoter;
 import com.lkd.smartlocker.R;
-import com.janady.adapter.BluetoothDeviceAdapter;
 import com.janady.base.BaseRecyclerAdapter;
 import com.janady.base.GridDividerItemDecoration;
-import com.janady.database.model.Bluetooth;
-import com.janady.lkd.BleLocker;
 import com.janady.setup.JBaseFragment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.pullRefreshLayout.QMUICenterGravityRefreshOffsetCalculator;

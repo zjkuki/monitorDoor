@@ -1,16 +1,18 @@
 package com.janady;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
-import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.TestFragment;
+import com.janady.base.JBaseEditFragment;
 import com.janady.setup.JBaseFragment;
 import com.lkd.smartlocker.R;
-import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
-import com.qmuiteam.qmui.arch.annotation.DefaultFirstFragment;
+
+import java.util.List;
 
 //@DefaultFirstFragment(value = TestFragment.class)
 //@DefaultFirstFragment(value = HomeFragment.class)
@@ -26,8 +28,34 @@ public class HomeActivity extends QMUIFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppManager.getAppManager().addActivity(this);
-        getSupportFragmentManager().beginTransaction().add(R.id.home_page,new TestFragment(),"testFragment").commit();
+        if (AppManager.getAppManager() != null) {
+            if (AppManager.getAppManager().getActivitys() == null) {
+                AppManager.getAppManager().addActivity(this);
+            } else {
+                AppManager.getAppManager().getActivity(HomeActivity.class);
+            }
+        }
+
+        List<Fragment> fms = getSupportFragmentManager().getFragments();
+        if (fms != null) {
+            if (fms.size() == 0) {
+                //getSupportFragmentManager().beginTransaction().add(R.id.home_page, new TestFragment(), "testFragment").commit();
+                getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).add(R.id.home_page, new TestFragment(), "testFragment").commit();
+            } else {
+                /*for (Fragment fragment : fms) {
+                    if ((JBaseFragment) fragment instanceof TestFragment) {
+                        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+                        trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                        trans.show(fragment);
+                        trans.addToBackStack(null);
+                        trans.commit();
+                    }
+                }*/
+                getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).show(getSupportFragmentManager().findFragmentByTag("testFragment")).commit();
+            }
+        } else {
+            getSupportFragmentManager().beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).add(R.id.home_page, new TestFragment(), "testFragment").commit();
+        }
         //Log.i("HOME", getCurrentFragment().toString());
     }
 

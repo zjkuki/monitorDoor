@@ -1,38 +1,21 @@
 package com.janady.setup;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.LayoutInflater;
+import androidx.annotation.NonNull;
+
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.common.DialogWaitting;
-import com.example.common.UIFactory;
-import com.lkd.smartlocker.R;
-import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.arch.QMUIFragment;
-import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.xm.ui.widget.SpinnerSelectItem;
 
 import java.util.Arrays;
 import java.util.List;
-
-import me.yokeyword.fragmentation.ISupportFragment;
 
 public abstract class JBaseFragment extends QMUIFragment {
     private Toast mToast;

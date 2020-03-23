@@ -1,26 +1,18 @@
 package com.janady.base;
 
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.janady.HomeActivity;
 import com.lkd.smartlocker.R;
-import com.janady.device.BluetoothEditFragment;
-import com.janady.device.DeviceAddByUser;
-import com.janady.manager.DataManager;
-import com.janady.model.CategoryItemDescription;
 import com.janady.setup.JBaseFragment;
-import com.qmuiteam.qmui.util.QMUIDisplayHelper;
 import com.qmuiteam.qmui.widget.QMUITabSegment;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
-import com.qmuiteam.qmui.widget.grouplist.QMUICommonListItemView;
-import com.qmuiteam.qmui.widget.grouplist.QMUIGroupListView;
 
 import java.util.HashMap;
 import java.util.List;

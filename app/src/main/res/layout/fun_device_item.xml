@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:background="?attr/qmui_s_list_item_bg_with_border_none"
+
     android:orientation="horizontal">
 
     <!--<com.lib.funsdk.support.widget.FunVideoView-->

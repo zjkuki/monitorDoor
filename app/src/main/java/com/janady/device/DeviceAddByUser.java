@@ -21,6 +21,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
 import com.example.common.DialogInputPasswd;
 import com.example.funsdkdemo.ActivityDemo;
 import com.example.funsdkdemo.ListAdapterSimpleFunDevice;
@@ -28,6 +30,8 @@ import com.example.funsdkdemo.MyApplication;
 import com.janady.AppManager;
 import com.janady.HomeActivity;
 import com.janady.lkd.WifiRemoterStatus;
+import com.janady.services.BaiduMapUtils;
+import com.janady.services.LocationService;
 import com.janady.utils.MqttUtil;
 import com.janady.setup.FragmentUserLogin;
 import com.lib.funsdk.support.config.ModifyPassword;
@@ -111,6 +115,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
     private WifiRemoter mWifiRemoter;
     private WifiRemoterBoard.IWifiRemoterListener tmpIWRL = this;
     private boolean wrConnected = false;
+
+	private LocationService locationService;
+	private  double gps_latitude = -1;  //纬度
+	private double gps_longitude = -1; // 经度
+	private String gps_locationDescribe = ""; //位置描述
 
     private String camOldPsw;
     private String bleOldPsw;
@@ -291,6 +300,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mBluetooth.serviceUuid = AppConstants.bleService;
 					mBluetooth.sceneName = mEditSceneName.getText().toString();
 					mBluetooth.password = bleOldPsw;
+					mBluetooth.gps_latitude = gps_latitude;
+					mBluetooth.gps_longitude = gps_longitude;
+					mBluetooth.gps_locationDescribe = gps_locationDescribe;
 
 					bleLocker = new BleLocker(mBluetooth, false, 800, iBleLockerCallBack);
 					bleLocker.setmNoRssi(true);
@@ -308,6 +320,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 				List<Camera> cams = MyApplication.liteOrm.query(new QueryBuilder<Camera>(Camera.class).whereEquals(Camera.COL_SN, mEditDevSN.getText().toString()));
 				if (cams != null && cams.size() > 0) {
 					mCamera = cams.get(0);
+
+					mCamera.gps_latitude = gps_latitude;
+					mCamera.gps_longitude = gps_longitude;
+					mCamera.gps_locationDescribe = gps_locationDescribe;
+
 				  	mEditSceneName.setText(cams.get(0).sceneName);
 					mEditPassword.setText("");
 					//密码留空，调用FUNSDK进行密码校验
@@ -335,6 +352,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 					mCamera.type = mCurrDevType.getDevIndex();
 					mCamera.loginName = "admin";
 					mCamera.loginPsw = mFunDevice.loginPsw;
+
+					mCamera.gps_latitude = gps_latitude;
+					mCamera.gps_longitude = gps_longitude;
+					mCamera.gps_locationDescribe = gps_locationDescribe;
 				}
 
 				Log.d("DeviceAddByUser", "OnClickedFun: \ndevLoginName:"+funDevice.loginName
@@ -352,6 +373,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 			public void OnClickedWifiRmoter(WifiRemoterBoard wifiRemoterBoard) {
                 //mWifiRemoterBoard = wifiRemoterBoard;
                 mWifiRemoter = wifiRemoterBoard.getMWifiRemoter();
+				mWifiRemoter.gps_latitude = gps_latitude;
+				mWifiRemoter.gps_longitude = gps_longitude;
+				mWifiRemoter.gps_locationDescribe = gps_locationDescribe;
                 wifiRemoterBoard.setIWifiRemoterListener(tmpIWRL);
                 wifiRemoterBoard.doMqttConnection();
                 step = 1; //开始校验密码
@@ -408,6 +432,27 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 
 	}
 
+	@Override
+	protected  void onStart(){
+		super.onStart();
+		// -----------location config ------------
+		locationService = MyApplication.locationService;
+		//获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
+		locationService.registerListener(mBDListener);
+		//注册监听
+		locationService.setLocationOption(locationService.getDefaultLocationClientOption());
+		sleep(300);
+		locationService.start();
+	}
+
+	@Override
+	protected void onStop(){
+		super.onStop();
+		// TODO Auto-generated method stub
+		locationService.unregisterListener(mBDListener); //注销掉监听
+		locationService.stop(); //停止定位服务
+		super.onStop();
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -526,6 +571,10 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								});
 							}
 
+							mBluetooth.gps_latitude = gps_latitude;
+							mBluetooth.gps_longitude = gps_longitude;
+							mBluetooth.gps_locationDescribe = gps_locationDescribe;
+
 							MyApplication.liteOrm.save(mBluetooth);
 							sleep(300);
 
@@ -554,6 +603,9 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 								mCamera.loginPsw = mEditPassword.getText().toString();
 							}
 
+							mCamera.gps_latitude = gps_latitude;
+							mCamera.gps_longitude = gps_longitude;
+							mCamera.gps_locationDescribe = gps_locationDescribe;
 							MyApplication.liteOrm.save(mCamera);
 							sleep(300);
 
@@ -1137,17 +1189,19 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	
 	@Override
 	protected void onActivityResult(int requestCode, int responseCode, Intent data) {
-		if ( requestCode == 1 
-				&& responseCode == RESULT_OK ) {
+		if (requestCode == 1
+				&& responseCode == RESULT_OK) {
 			// Demo, 扫描二维码的结果
-			if ( null != data ) {
+			if (null != data) {
 				String deviceSn = data.getStringExtra("result");
-				if ( null != deviceSn && null != mEditDevSN ) {
+				if (null != deviceSn && null != mEditDevSN) {
 					mEditDevSN.setText(deviceSn);
 				}
 			}
 		}
-		
+
+		super.onActivityResult(requestCode, responseCode, data);
+
 	}
 
 
@@ -1501,6 +1555,11 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
                     mWifiRemoter.sceneName = mEditSceneName.getText().toString();
                     mWifiRemoter.loginPsw = mEditPassword.getText().toString();
                 }
+
+				mWifiRemoter.gps_latitude = gps_latitude;
+				mWifiRemoter.gps_longitude = gps_longitude;
+				mWifiRemoter.gps_locationDescribe = gps_locationDescribe;
+
                 MyApplication.liteOrm.cascade().save(mWifiRemoter);
                 sleep(300);
 
@@ -1663,4 +1722,49 @@ public class DeviceAddByUser extends ActivityDemo implements OnClickListener, On
 	public void onDeviceOffline(WifiRemoter wifiRemoter, WifiRemoterStatus status) {
 
 	}
+	/*****
+	 *
+	 * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
+	 *
+	 */
+	private BDAbstractLocationListener mBDListener = new BDAbstractLocationListener() {
+
+		/**
+		 * 定位请求回调函数
+		 * @param location 定位结果
+		 */
+		@Override
+		public void onReceiveLocation(BDLocation location) {
+			Log.i("DABU-ORL:\n", BaiduMapUtils.geneLocInfo(location).toString());
+
+			// TODO Auto-generated method stub
+			if (null != location && location.getLocType() != BDLocation.TypeServerError) {
+				gps_latitude = location.getLatitude();
+				gps_longitude = location.getLongitude();
+				gps_locationDescribe = location.getLocationDescribe();
+			}else{
+				gps_latitude = -1;
+				gps_longitude = -1;
+				gps_locationDescribe = "null";
+			}
+		}
+
+		@Override
+		public void onConnectHotSpotMessage(String s, int i) {
+			super.onConnectHotSpotMessage(s, i);
+		}
+
+		/**
+		 * 回调定位诊断信息，开发者可以根据相关信息解决定位遇到的一些问题
+		 * @param locType 当前定位类型
+		 * @param diagnosticType 诊断类型（1~9）
+		 * @param diagnosticMessage 具体的诊断信息释义
+		 */
+		@Override
+		public void onLocDiagnosticMessage(int locType, int diagnosticType, String diagnosticMessage) {
+			super.onLocDiagnosticMessage(locType, diagnosticType, diagnosticMessage);
+			int tag = 2;
+			Log.i("DABU-OLDM:\n",BaiduMapUtils.geneLocDiagnosticInfo(locType,diagnosticType,diagnosticMessage).toString());
+		}
+	};
 }
